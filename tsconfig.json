@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "tsconfig.json/*": ["./src/*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/assets/icons/AddInCircleIcon.js", "src/app/assets/icons/BellIcon.js", "src/app/assets/icons/BiIcon.js", "src/app/assets/icons/CloseIcon.js", "src/app/assets/icons/HelpIcon.js", "src/app/assets/icons/SearchIcon.js1", "src/app/assets/icons/SettingIcon.js", "src/app/assets/icons/SyncIcon.js"],
+  "exclude": ["node_modules"]
+}

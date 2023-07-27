@@ -1,0 +1,23 @@
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+.slideInAnimation {
+  animation: slideInRight 0.5s ease-out;
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+.slideOutAnimation {
+  animation: slideOutRight 0.5s ease-out;
+}
