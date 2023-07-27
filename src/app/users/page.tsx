@@ -1,14 +1,20 @@
 "use client";
 
-import { Button, Table, Typography } from "next-ts-lib";
+import { Button, Table, Typography, Switch } from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import KebabMenuIcon from ".././assets/icons/kebabIcon";
 import styles from "../assets/scss/styles.module.scss";
 import Sidebar from "../components/common/Sidebar";
 import DrawerOverlay from "./DrawerOverlay";
 import Drawer from "./Drawer";
 import NavBar from "../layouts/NavBar";
+
+import Chip from '@mui/material/Chip';
+import MUIDataTable, { TableFilterList } from "mui-datatables";
+import { MultiSelectComponent } from '@syncfusion/ej2-react-dropdowns';
+import *as data from "./dataSource.json";
+
 interface FormData {
   id: number;
   name: string;
@@ -24,6 +30,95 @@ interface FormData {
 }
 
 const page: React.FC = () => {
+
+  const CustomChip = ({ label, onDelete }: any) => {
+    return (
+      <Chip
+        variant="outlined"
+        color="secondary"
+        label={label}
+        onDelete={onDelete}
+      />
+    );
+  };
+
+  const CustomFilterList = (props: any) => {
+    return <TableFilterList {...props} ItemComponent={CustomChip} />;
+  };
+
+  const columns = [
+    {
+      name: "name",
+      label: "Name",
+      options: {
+        filter: true,
+        sort: true,
+      }
+    },
+    {
+      name: "company",
+      label: "Company",
+      options: {
+        filter: true,
+        sort: false,
+      }
+    },
+    {
+      name: "city",
+      label: "City",
+      options: {
+        filter: true,
+        sort: false,
+      }
+    },
+    {
+      name: "state",
+      label: "State",
+      options: {
+        filter: true,
+        sort: false,
+      }
+    },
+  ];
+
+  const data = [
+    { name: <Switch />, company: "Test Corp", city: "Yonkers", state: "NY" },
+    { name: "John Walsh", company: "Test Corp", city: "Hartford", state: "CT" },
+    { name: "Bob Herm", company: "Test Corp", city: "Tampa", state: "FL" },
+    { name: "James Houston", company: "Test Corp", city: "Dallas", state: "TX" },
+  ];
+
+  // const options = {
+  //   filterType: 'checkbox',
+  // };
+
+  const temp = 'empList';
+    // define the JSON of data
+    const employeesData = data[temp];
+  // maps the appropriate column to fields property
+  const fields = { text: 'Name', value: 'Eimg' };
+  //set the value to header template
+  const headerTemplate = useCallback(() => {
+    return (<div className="header">
+      <span>Photo</span>
+      <span className="columnHeader">Employee Info</span>
+    </div>);
+  }, []);
+  //set the value to item template
+  const itemTemplate = useCallback((data:any) => {
+    return (<div>
+      <img className="empImage" src={"https://ej2.syncfusion.com/react/demos/src/combo-box/Employees/" + data.Eimg + ".png"} alt="employee" />
+      <div className="ms-ename">{data.Name}</div>
+      <div className="ms-job">{data.Job}</div>
+    </div>);
+  }, []);
+  //set the value to value template
+  const valueTemplate = useCallback((data:any) => {
+    return (<div>
+            <img className="valueTemp" src={"https://ej2.syncfusion.com/react/demos/src/combo-box/Employees/" + data.Eimg + ".png"} alt="employee"/>
+            <div className="nameTemp">{data.Name}</div>
+        </div>);
+}, []);
   // Data
 
   const headers = [
@@ -151,7 +246,7 @@ const page: React.FC = () => {
 
           {/* Data Table */}
           <div>
-            {userData.length > 0 && (
+            {/* {userData.length > 0 && (
               <Table
                 data={userData}
                 headers={headers}
@@ -162,7 +257,15 @@ const page: React.FC = () => {
                 action
                 className={`!h-full`}
               />
-            )}
+            )} */}
+            <MUIDataTable
+              title={"Employee List"}
+              columns={columns}
+              data={data}
+              components={{
+                TableFilterList: CustomFilterList,
+              }}
+            />
           </div>
           <div className={`${kebabMenuOpen ? "visible absolute z-30 top-5 right-11" : "hidden"
             } w-fit h-auto py-2 border border-lightSilver rounded-md bg-white shadow-lg`}>
@@ -178,6 +281,8 @@ const page: React.FC = () => {
               </ul>
             </div>
           </div>
+          
+          <MultiSelectComponent id="multiTemplate" dataSource={employeesData} fields={fields} mode="Box" placeholder="Select employee" itemTemplate={itemTemplate} valueTemplate={valueTemplate} headerTemplate={headerTemplate} />
           {/*  Drawer */}
           <Drawer
             onOpen={isToggleOpen}
