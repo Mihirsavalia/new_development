@@ -1,19 +1,14 @@
 "use client";
 
-import { Button, Table, Typography, Switch } from "next-ts-lib";
+import { Button, Table, Switch, Modal, ModalTitle, Close, ModalContent, ModalAction } from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
-import React, { useState, useCallback } from "react";
-import KebabMenuIcon from ".././assets/icons/kebabIcon";
-import styles from "../assets/scss/styles.module.scss";
-import Sidebar from "../components/common/Sidebar";
-import DrawerOverlay from "./DrawerOverlay";
+import React, { useState } from "react";
+import KebabMenuIcon from "../assets/icons/KebabMenuIcon";
+import NavBar from "../layouts/Navbar";
 import Drawer from "./Drawer";
-import NavBar from "../layouts/NavBar";
-
-import Chip from '@mui/material/Chip';
-import MUIDataTable, { TableFilterList } from "mui-datatables";
-import { MultiSelectComponent } from '@syncfusion/ej2-react-dropdowns';
-import *as data from "./dataSource.json";
+import DrawerOverlay from "./DrawerOverlay";
+import MultiselectCompany from "./MultiselectCompany";
+import RoleDrawer from "./RoleDrawer";
 
 interface FormData {
   id: number;
@@ -24,101 +19,12 @@ interface FormData {
   state: string;
   timezone: string;
   role: string;
-  status: string;
-  company: string[];
+  status: any;
+  company: any;
   // imageName: string;
 }
 
 const page: React.FC = () => {
-
-  const CustomChip = ({ label, onDelete }: any) => {
-    return (
-      <Chip
-        variant="outlined"
-        color="secondary"
-        label={label}
-        onDelete={onDelete}
-      />
-    );
-  };
-
-  const CustomFilterList = (props: any) => {
-    return <TableFilterList {...props} ItemComponent={CustomChip} />;
-  };
-
-  const columns = [
-    {
-      name: "name",
-      label: "Name",
-      options: {
-        filter: true,
-        sort: true,
-      }
-    },
-    {
-      name: "company",
-      label: "Company",
-      options: {
-        filter: true,
-        sort: false,
-      }
-    },
-    {
-      name: "city",
-      label: "City",
-      options: {
-        filter: true,
-        sort: false,
-      }
-    },
-    {
-      name: "state",
-      label: "State",
-      options: {
-        filter: true,
-        sort: false,
-      }
-    },
-  ];
-
-  const data = [
-    { name: <Switch />, company: "Test Corp", city: "Yonkers", state: "NY" },
-    { name: "John Walsh", company: "Test Corp", city: "Hartford", state: "CT" },
-    { name: "Bob Herm", company: "Test Corp", city: "Tampa", state: "FL" },
-    { name: "James Houston", company: "Test Corp", city: "Dallas", state: "TX" },
-  ];
-
-  // const options = {
-  //   filterType: 'checkbox',
-  // };
-
-  const temp = 'empList';
-    // define the JSON of data
-    const employeesData = data[temp];
-  // maps the appropriate column to fields property
-  const fields = { text: 'Name', value: 'Eimg' };
-  //set the value to header template
-  const headerTemplate = useCallback(() => {
-    return (<div className="header">
-      <span>Photo</span>
-      <span className="columnHeader">Employee Info</span>
-    </div>);
-  }, []);
-  //set the value to item template
-  const itemTemplate = useCallback((data:any) => {
-    return (<div>
-      <img className="empImage" src={"https://ej2.syncfusion.com/react/demos/src/combo-box/Employees/" + data.Eimg + ".png"} alt="employee" />
-      <div className="ms-ename">{data.Name}</div>
-      <div className="ms-job">{data.Job}</div>
-    </div>);
-  }, []);
-  //set the value to value template
-  const valueTemplate = useCallback((data:any) => {
-    return (<div>
-            <img className="valueTemp" src={"https://ej2.syncfusion.com/react/demos/src/combo-box/Employees/" + data.Eimg + ".png"} alt="employee"/>
-            <div className="nameTemp">{data.Name}</div>
-        </div>);
-}, []);
   // Data
 
   const headers = [
@@ -150,7 +56,7 @@ const page: React.FC = () => {
     {
       heading: "Status",
       field: "status",
-      sort: true,
+      sort: false,
     },
   ];
   const [userData, setUserData] = useState<FormData[]>([
@@ -163,8 +69,8 @@ const page: React.FC = () => {
       state: "California",
       timezone: "Pacific Time",
       role: "Admin",
-      status: "Active",
-      company: ["Acme Inc.", "Tech Corp."],
+      status: <Switch checked />,
+      company: <MultiselectCompany width={56} />
     },
     {
       id: 2,
@@ -175,8 +81,9 @@ const page: React.FC = () => {
       state: "Ontario",
       timezone: "Eastern Time",
       role: "User",
-      status: "Inactive",
-      company: ["Acme Inc.", "Tech Corp."],
+      status: <Switch />,
+
+      company: <MultiselectCompany width={96} />
     },
     {
       id: 3,
@@ -187,27 +94,41 @@ const page: React.FC = () => {
       state: "England",
       timezone: "GMT",
       role: "Manager",
-      status: "Active",
-      company: ["Acme Inc.", "Tech Corp.", "DevCo."],
+      status: <Switch checked />,
+
+      company: <MultiselectCompany width={96} />
     },
+
   ]);
 
-  const [kebabMenuOpen, setKebabMenuOpen] = useState<boolean>(false);
-  const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
+  const [kebabMenuOpen, setKebabMenuOpen] = useState<string>("");
+  const [isManageOpen, setIsManageOpen] = useState<boolean>(false);
+  const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
+  const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
 
-  const handleRowClick = (id: number) => {
-    setSelectedRowId(id);
-    setKebabMenuOpen(!kebabMenuOpen);
-  }
+
+  const handleKebabChange = (productId: string) => {
+    if (productId === "Manage Rights") {
+      setIsManageOpen(!isManageOpen)
+    }
+    if (productId === "Edit") {
+      setIsEditOpen(!isEditOpen)
+    }
+    if (productId === "Remove") {
+      setIsRemoveOpen(!isRemoveOpen)
+    }
+  };
+  const handleRemoveModal = () => {
+    setIsRemoveOpen(!isRemoveOpen)
+  };
 
   const actionButtons = (
-    <span className="flex items-center relative justify-evenly">
-      <div onClick={(id: any) => handleRowClick(id)} className="cursor-pointer rounded-full">
-        <KebabMenuIcon />
-      </div>
-    </span>
+    <div className="flex items-center relative justify-evenly cursor-pointer rounded-full">
+      <KebabMenuIcon />
+    </div>
   );
   const actions = [actionButtons];
+  const actionArray = ["Manage Rights", "Edit", "Remove"];
 
   // States
   const [isToggleOpen, setIsToggleOpen] = useState<boolean>(false);
@@ -223,8 +144,6 @@ const page: React.FC = () => {
   return (
     <>
       <NavBar>
-
-
         <div className={`flex flex-col w-full`}>
           {/* NavBar */}
           <div className="p-4 flex justify-between w-auto  bg-whiteSmoke">
@@ -246,43 +165,81 @@ const page: React.FC = () => {
 
           {/* Data Table */}
           <div>
-            {/* {userData.length > 0 && (
+            {userData.length > 0 && (
               <Table
                 data={userData}
                 headers={headers}
                 actions={actions}
-                getRowId={handleRowClick}
-                sortable
+                getRowId={(userData: any) => {
+                  userData.id;
+                }}
+                actionDesc={actionArray}
+                getAction={(value: any) => {
+                  handleKebabChange(value);
+                }}
+                className={`!h-[439px]`}
                 sticky
+                sortable
                 action
-                className={`!h-full`}
               />
-            )} */}
-            <MUIDataTable
-              title={"Employee List"}
-              columns={columns}
-              data={data}
-              components={{
-                TableFilterList: CustomFilterList,
-              }}
+            )}
+          </div>
+          {isRemoveOpen && (
+            <Modal
+              isOpen={handleRemoveModal}
+              onClose={handleRemoveModal}
+              width="352px"
+            >
+              <ModalTitle>
+                <div className="py-3 px-4 font-bold">Remove</div>
+
+                <div className="" >
+                  <Close variant="medium" />
+                </div>
+              </ModalTitle>
+
+              <ModalContent>
+                <div className="p-2 mb-3">
+                  Are you sure you want to remove the Company.
+                </div>
+              </ModalContent>
+
+              <ModalAction>
+                <div>
+                  <Button
+                    className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
+                    variant="btn-outline-error"
+                  >
+                    No
+                  </Button>
+                </div>
+
+                <div>
+                  <Button
+                    className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
+                    variant="btn-error"
+                  >
+                    Yes
+                  </Button>
+                </div>
+              </ModalAction>
+            </Modal>
+          )}
+
+          {isEditOpen && (<>
+            {/*  Drawer */}
+            <Drawer
+              onOpen={isToggleOpen}
+              onClose={() => setIsToggleOpen(false)}
+              onData={onDrawerData}
             />
-          </div>
-          <div className={`${kebabMenuOpen ? "visible absolute z-30 top-5 right-11" : "hidden"
-            } w-fit h-auto py-2 border border-lightSilver rounded-md bg-white shadow-lg`}>
-            <div className="w-40 h-auto">
-              <ul className="w-40">
-                <li className="flex w-full h-9 px-3 hover:bg-lightGray cursor-pointer">
-                  <div className="flex justify-center items-center ml-2 cursor-pointer">
-                    <Typography type="label" className="inline-block text-xs ">
-                      Manage Rights{selectedRowId}
-                    </Typography>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </div>
-          
-          <MultiSelectComponent id="multiTemplate" dataSource={employeesData} fields={fields} mode="Box" placeholder="Select employee" itemTemplate={itemTemplate} valueTemplate={valueTemplate} headerTemplate={headerTemplate} />
+            {/* Drawer Overlay */}
+            <DrawerOverlay
+              isOpen={isToggleOpen}
+              onClose={() => setIsToggleOpen(false)}
+            />
+          </>)}
+
           {/*  Drawer */}
           <Drawer
             onOpen={isToggleOpen}
@@ -296,7 +253,6 @@ const page: React.FC = () => {
           />
         </div>
       </NavBar>
-
     </>
   );
 };

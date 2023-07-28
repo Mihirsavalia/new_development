@@ -215,7 +215,7 @@ const SettingButton = () => {
           <Setting />
         </div>
         {open && (
-          <div className="p-8 w-[700px] bg-white shadow-lg absolute top-7 right-0 z-50 flex justify-center gap-10">
+          <div className="p-8 w-[700px] bg-white shadow-lg absolute top-7 right-0 flex justify-center gap-10">
             {settings_data.map((data, index) => (
               <div className="flex flex-col gap-4">
                 <span className="pb-3 font-semibold border-b border-b-[#d8d8d8]">

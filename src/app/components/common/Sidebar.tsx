@@ -11,7 +11,8 @@ import PurchaseIcon from "../../assets/icons/PurchaseIcon";
 import ReportsIcon from "../../assets/icons/ReportsIcon";
 import VendorIcon from "../../assets/icons/VendorIcon";
 import styles from "../../assets/scss/sidebar.module.scss";
- import PQlogoIcon from "../../assets/icons/PQLogo";
+import PQlogoIcon from "../../assets/icons/PQLogo";
+import { Tooltip } from "next-ts-lib";
 
 interface SidebarItem {
   name: string;
@@ -45,7 +46,7 @@ const sidebarItems: SidebarItem[] = [
     href: "/approvals",
     icon: <ApprovalIcon />,
   },
-  
+
   {
     name: "Reports",
     href: "/settings",
@@ -65,14 +66,17 @@ const DashboardItems = ({ pathname, isCollapsed }: any) => {
         <Link
           key={index}
           href={item.href}
-          className={`mb-3 flex items-center pl-[27px] border-l-[4px] hover:bg-whiteSmoke hover:border-primary ${
-            pathname === `${item.href}`
-              ? "border-primary bg-whiteSmoke"
-              : "border-pureWhite"
-          }`}
+          className={`mb-3 flex items-center ${isCollapsed ? "pl-4" : "pl-[27px]"} border-l-[4px] hover:bg-whiteSmoke hover:border-primary ${pathname === `${item.href}`
+            ? "border-primary bg-whiteSmoke"
+            : "border-pureWhite"
+            }`}
         >
           {isCollapsed ? (
-            <span className="py-[17.65px]">{item.icon}</span>
+            <div className=" pl-0 py-[9.65px] z-10">
+              <Tooltip content={`${item.name}`} position="right">
+                <span className="">{item.icon}</span>
+              </Tooltip>
+            </div>
           ) : (
             <>
               <span className="py-[17.65px]">{item.icon}</span>
@@ -108,18 +112,17 @@ const Sidebar = ({ setOpen }: any) => {
 
   return (
     <div
-      className={`${
-        isCollapsed ? "lg:w-20" : "lg:w-64"
-      } flex flex-col justify-between border-r border-lightSilver lg:h-screen text-darkCharcoal overflow-y-auto overflow-x-hidden xyz`}>
+      className={`${isCollapsed ? "lg:w-20" : "lg:w-64"
+        } flex flex-col justify-between border-r border-lightSilver lg:h-screen text-darkCharcoal overflow-y-auto overflow-x-hidden xyz`}>
       <div className="flex flex-col">
         <div className="flex items-center justify-between">
           <span
             className={`py-4 pl-7 h-16 w-full flex items-center
           text-primary font-medium text-[24px] lg:border-b border-lightSilver`}>
-            <PQlogoIcon isCollapsed={isCollapsed}/>
+            <PQlogoIcon isCollapsed={isCollapsed} />
             {/* AP */}
           </span>
-          
+
           <span className="lg:hidden">
             <button
               className="flex flex-col h-12 w-12 rounded justify-center items-center group pr-5"
@@ -129,32 +132,28 @@ const Sidebar = ({ setOpen }: any) => {
               }}
             >
               <div
-                className={`h-1 w-6 my-1 rounded-full bg-darkCharcoal transition ease transform duration-300 ${
-                  isOpen
-                    ? "rotate-45 translate-y-3 opacity-50 group-hover:opacity-100"
-                    : "opacity-50 group-hover:opacity-100"
-                }`}
+                className={`h-1 w-6 my-1 rounded-full bg-darkCharcoal transition ease transform duration-300 ${isOpen
+                  ? "rotate-45 translate-y-3 opacity-50 group-hover:opacity-100"
+                  : "opacity-50 group-hover:opacity-100"
+                  }`}
               />
               <div
-                className={`h-1 w-6 my-1 rounded-full bg-darkCharcoal transition ease transform duration-300 ${
-                  isOpen ? "opacity-0" : "opacity-50 group-hover:opacity-100"
-                }`}
+                className={`h-1 w-6 my-1 rounded-full bg-darkCharcoal transition ease transform duration-300 ${isOpen ? "opacity-0" : "opacity-50 group-hover:opacity-100"
+                  }`}
               />
               <div
-                className={`h-1 w-6 my-1 rounded-full bg-darkCharcoal transition ease transform duration-300 ${
-                  isOpen
-                    ? "-rotate-45 -translate-y-3 opacity-50 group-hover:opacity-100"
-                    : "opacity-50 group-hover:opacity-100"
-                }`}
+                className={`h-1 w-6 my-1 rounded-full bg-darkCharcoal transition ease transform duration-300 ${isOpen
+                  ? "-rotate-45 -translate-y-3 opacity-50 group-hover:opacity-100"
+                  : "opacity-50 group-hover:opacity-100"
+                  }`}
               />
             </button>
           </span>
         </div>
         {windowSize <= 1023 ? (
           <div
-            className={`flex flex-col absolute h-screen z-50 top-[66px] bg-pureWhite w-64 ${
-              isOpen ? styles.leftToRight : styles.rightToLeft
-            }`}
+            className={`flex flex-col absolute h-screen top-[66px] bg-pureWhite w-auto ${isOpen ? styles.leftToRight : styles.rightToLeft
+              }`}
           >
             <DashboardItems pathname={pathname} isCollapsed={isCollapsed} />
           </div>
@@ -166,9 +165,8 @@ const Sidebar = ({ setOpen }: any) => {
       </div>
       {windowSize >= 1023 && (
         <span
-          className={`py-8 pl-7 ${
-            isCollapsed ? "pr-[50px]" : "pr-44"
-          } border-t border-lightSilver cursor-pointer`}
+          className={`py-7 pl-7 ${isCollapsed ? "pr-[50px]" : "pr-44"
+            } border-t border-lightSilver cursor-pointer`}
           onClick={() => {
             setCollapse(!isCollapsed);
           }}
