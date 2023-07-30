@@ -14,14 +14,16 @@ interface AssignUserProps {
 }
 
 const clientNames: State[] = [
-  { id: "Google", name: "Googleeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" },
+  { id: "Google", name: "Googleeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" },
   { id: "Microsoft", name: "Microsoft" },
   { id: "Apple", name: "Apple" },
   { id: "Amazon", name: "Amazon" },
   { id: "IBM", name: "IBM" },
 ];
 
-export default function MultiselectCompany({ className, width = 48 }: AssignUserProps): JSX.Element {
+export default function MultiselectCompany({ className, width=48 }: AssignUserProps): JSX.Element {
+  let updatedWidth=0;
+  updatedWidth = width > 48 ? updatedWidth = 48 : width
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [searchText, setSearchText] = useState<string>("");
   const [selectedStates, setSelectedStates] = useState<string[]>([]);
@@ -85,7 +87,7 @@ export default function MultiselectCompany({ className, width = 48 }: AssignUser
     <>
       <div ref={dropdownRef}>
         <div
-          className="flex w-full items-center justify-between cursor-pointer"
+          className={`flex w-${updatedWidth} h-[32px] items-center justify-between cursor-pointer`}
           onClick={toggleDropdown}
 
         >
@@ -141,9 +143,9 @@ export default function MultiselectCompany({ className, width = 48 }: AssignUser
           </span>
         </div>
 
-        <div className={`w-${width} relative !p-0`}>
+        <div className={`w-${width} relative !p-0 `}>
           {isOpen && (
-            <div className={`absolute w-${width} bg-white overflow-auto rounded-lg shadow-2xl pt-2`}>
+            <div className={`absolute w-${updatedWidth * 2} z-10 bg-white overflow-auto rounded-lg shadow-2xl pt-2`}>
               <form>
                 <div className="relative mx-4 mt-2 ">
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -195,7 +197,7 @@ export default function MultiselectCompany({ className, width = 48 }: AssignUser
                         className="w-5 h-5 rounded-full mr-1"
                       />
 
-                      <div className={`w-${width} truncate `}>
+                      <div className={`w-${updatedWidth} truncate `}>
                         {state.name}
                       </div>
                     </label>

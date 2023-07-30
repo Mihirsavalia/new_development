@@ -1,16 +1,19 @@
-"use client";
-
+import {
+    Button,
+    CheckBox,
+    Table
+} from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
-
-import { Button, CheckBox } from "next-ts-lib";
 import React from "react";
 import ChevronLeftIcon from "../assets/icons/ChevronLeftIcon";
 
+
 interface DrawerProps {
+    onOpen: boolean;
     onClose: () => void;
 }
 
-const RoleDrawer: React.FC<DrawerProps> = ({ onClose }) => {
+const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose }) => {
     const headers = [
         {
             heading: "Module",
@@ -58,17 +61,15 @@ const RoleDrawer: React.FC<DrawerProps> = ({ onClose }) => {
         { module: "Rights Management" },
         { module: "Payments" },
         { module: "Reports" },
-    ]
-    // const checkbox =  {
-    //   view: (item: any) =>  <CheckBox id={""} /> 
-    // }
+    ];
+
 
     return (
         <>
-            <div className={`flex flex-col h-48`}>
+            {onOpen && (<div className={`flex flex-col h-48`}>
                 <div className="py-5 flex justify-between w-auto bg-whiteSmoke">
                     <div className="flex justify-star ml-3">
-                        <label className="mx-2 cursor-pointer" onClick={onClose} >
+                        <label className="mx-2 cursor-pointer" >
                             <ChevronLeftIcon />
                         </label>
                         <label className="!font-bold text-base flex justify-center items-center text-center">
@@ -79,11 +80,11 @@ const RoleDrawer: React.FC<DrawerProps> = ({ onClose }) => {
                 {/* Data Table */}
                 <div>
                     {/* <Table
-                            data={data}
-                            headers={headers}
-                            className={`!h-[439px] !z-0`}
-                            sticky
-                        /> */}
+                        data={data}
+                        headers={headers}
+                        className={`!h-[439px] !z-0`}
+                        sticky
+                    /> */}
                     Mihir
                 </div>
                 {/* Footer*/}
@@ -104,8 +105,9 @@ const RoleDrawer: React.FC<DrawerProps> = ({ onClose }) => {
                         </Button>
                     </div>
                 </div>
-            </div>
+            </div>)}
         </>
     );
-};
-export default RoleDrawer;
+}
+
+export default Drawer

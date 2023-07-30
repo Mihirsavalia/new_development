@@ -10,7 +10,7 @@ import PaymentsIcon from "../../assets/icons/PaymentsIcon";
 import PurchaseIcon from "../../assets/icons/PurchaseIcon";
 import ReportsIcon from "../../assets/icons/ReportsIcon";
 import VendorIcon from "../../assets/icons/VendorIcon";
-import styles from "../../assets/scss/sidebar.module.scss";
+import styles from "../../assets/scss/styles.module.scss";
 import PQlogoIcon from "../../assets/icons/PQLogo";
 import { Tooltip } from "next-ts-lib";
 
@@ -60,6 +60,7 @@ const sidebarItems: SidebarItem[] = [
 ];
 
 const DashboardItems = ({ pathname, isCollapsed }: any) => {
+
   return (
     <>
       {sidebarItems.map((item, index) => (
@@ -94,6 +95,7 @@ const Sidebar = ({ setOpen }: any) => {
   const [isCollapsed, setCollapse] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [windowSize, setWindowSize] = useState(0);
+  const [animate, setAnimate] = useState<string>("");
 
   const handleResize = () => {
     setWindowSize(window.innerWidth);
@@ -109,20 +111,25 @@ const Sidebar = ({ setOpen }: any) => {
       };
     }
   }, []);
+  setTimeout(() => {
+    setAnimate("");
+  }, 300)
 
   return (
     <div
-      className={`${isCollapsed ? "lg:w-20" : "lg:w-64"
+      className={` ${isCollapsed ? "lg:w-20" : "lg:w-64"
         } flex flex-col justify-between border-r border-lightSilver lg:h-screen text-darkCharcoal overflow-y-auto overflow-x-hidden xyz`}>
       <div className="flex flex-col">
         <div className="flex items-center justify-between">
           <span
-            className={`py-4 pl-7 h-16 w-full flex items-center
+            className={`py-4  pl-7 h-16 w-full flex items-center
           text-primary font-medium text-[24px] lg:border-b border-lightSilver`}>
-            <PQlogoIcon isCollapsed={isCollapsed} />
-            {/* AP */}
+            <div className={`${animate}`}>
+              <PQlogoIcon isCollapsed={isCollapsed} />
+            </div>
           </span>
 
+          {/* Close Button */}
           <span className="lg:hidden">
             <button
               className="flex flex-col h-12 w-12 rounded justify-center items-center group pr-5"
@@ -149,16 +156,16 @@ const Sidebar = ({ setOpen }: any) => {
               />
             </button>
           </span>
+
         </div>
         {windowSize <= 1023 ? (
           <div
-            className={`flex flex-col absolute h-screen top-[66px] bg-pureWhite w-auto ${isOpen ? styles.leftToRight : styles.rightToLeft
-              }`}
+            className={`flex flex-col absolute h-screen top-[66px] bg-pureWhite w-auto`}
           >
             <DashboardItems pathname={pathname} isCollapsed={isCollapsed} />
           </div>
         ) : (
-          <div className={`mt-[15px] h-auto block`}>
+          <div className={`mt-[15px] ${animate} h-auto block`}>
             <DashboardItems pathname={pathname} isCollapsed={isCollapsed} />
           </div>
         )}
@@ -169,6 +176,7 @@ const Sidebar = ({ setOpen }: any) => {
             } border-t border-lightSilver cursor-pointer`}
           onClick={() => {
             setCollapse(!isCollapsed);
+            setAnimate(!isCollapsed ? styles.rightToLeft : styles.leftToRight);
           }}
         >
           <MenuIcon />

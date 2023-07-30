@@ -8,6 +8,7 @@ import {
 } from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
 import styles from "../assets/scss/styles.module.scss";
+
 import { useState } from "react";
 import EditIcon from "../assets/icons/EditIcon";
 
@@ -28,9 +29,11 @@ interface DrawerProps {
     onOpen: boolean;
     onClose: () => void;
     onData: (formData: FormData) => void;
+    drawerFor: any;
 }
 
-const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData }) => {
+const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData, drawerFor }) => {
+    let isEdit = drawerFor === "Edit"
     const initialFormData: FormData = {
         name: "",
         email: "",
@@ -43,6 +46,18 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData }) => {
         company: []
     };
     const [formData, setFormData] = useState<FormData>(initialFormData);
+
+    const updatedFormData: FormData = {
+        name: "Mihir",
+        email: "mihir@gmail.com",
+        phone: 1234568790,
+        country: "India",
+        state: "Gujarat",
+        timezone: "UTC - 13",
+        role: "Admin",
+        status: "Active",
+        company: ['Fb']
+    };
 
     const [imagePreview, setImagePreview] = useState<string>("");
     // const [selectedFile, setSelectedFile] = useState(null);
@@ -107,11 +122,11 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData }) => {
         <>
             {onOpen && (
                 <div
-                    className={`fixed top-0 right-0 h-screen w-2/6 z-30 bg-white shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.slideOutAnimation}`}
+                    className={`fixed top-0 right-0 h-screen w-2/6 z-30 bg-white shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.slideInAnimation}`}
                 >
                     <div className="p-4 flex justify-between items-center border-b border-lightSilver">
-                        <div className="font-bold text-base">ADD USER</div>
-                        <div className="mx-2 cursor-pointer" onClick={onClose}>
+                        <div className="font-bold text-base">{isEdit ? "EDIT" : "ADD"} USER</div>
+                        <div className="mx-2 cursor-pointer" onClick={() => { onClose() }}>
                             <Close variant="medium" />
                         </div>
                     </div>
@@ -141,8 +156,9 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData }) => {
                                 label="Full Name"
                                 id="name"
                                 name="name"
+                                value={isEdit ? updatedFormData.name : ""}
                                 validate
-                                getValue={(value: any) => handleInputChange("name", value)}
+                                getValue={(value: any) => handleInputChange("name", (value))}
                             ></TextField>
                         </div>
                         <div className="flex-1 mt-3">
@@ -151,6 +167,7 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData }) => {
                                 id="email"
                                 name="email"
                                 type="email"
+                                value={isEdit ? updatedFormData.email : ""}
                                 validate
                                 getValue={(value: any) => handleInputChange("email", value)}
                             ></TextField>
@@ -160,6 +177,7 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData }) => {
                                 label="Telephone"
                                 validate
                                 required
+                                value={isEdit ? updatedFormData.phone : ""}
                                 getValue={(value: any) =>
                                     handleInputChange("phone", value)
                                 }
@@ -172,6 +190,7 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData }) => {
                                 options={options}
                                 id="country"
                                 required
+                                defaultValue={isEdit ? updatedFormData.country : ""}
                                 onSelect={(value: any) =>
                                     handleInputChange("country", value)
                                 }
@@ -183,6 +202,7 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData }) => {
                                 options={options}
                                 id="state"
                                 required
+                                defaultValue={isEdit ? updatedFormData.state : ""}
                                 onSelect={(value: any) =>
                                     handleInputChange("state", value)
                                 }
@@ -194,6 +214,7 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData }) => {
                                 options={options}
                                 id="timezone"
                                 required
+                                defaultValue={isEdit ? updatedFormData.timezone : ""}
                                 onSelect={(value: any) =>
                                     handleInputChange("timezone", value)
                                 }
@@ -205,6 +226,7 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData }) => {
                                 options={options}
                                 id="company"
                                 required
+                                defaultValue={isEdit ? updatedFormData.company : ""}
                                 onSelect={(value: any) =>
                                     handleInputChange("company", value)
                                 }
@@ -216,6 +238,7 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData }) => {
                                 options={options}
                                 id="assign_role"
                                 required
+                                defaultValue={isEdit ? updatedFormData.role : ""}
                                 onSelect={(value: any) =>
                                     handleInputChange("role", value)
                                 }
@@ -234,7 +257,7 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData }) => {
                             <Button
                                 type="submit"
                                 onClick={handleSaveData}
-                                className={`rounded-full font-medium !w-28 ${isFormDataEmpty ? 'opacity-100' : "opacity-30 pointer-events-none"} `}
+                                className={`rounded-full font-medium !w-28 ${isFormDataEmpty || isEdit ? 'opacity-100' : "opacity-30 pointer-events-none"} `}
                                 variant="btn-primary"
                             >
                                 SAVE

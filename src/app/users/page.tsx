@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Table, Switch, Modal, ModalTitle, Close, ModalContent, ModalAction } from "next-ts-lib";
+import { Button, Close, Modal, ModalAction, ModalContent, ModalTitle, Switch, Table } from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
 import React, { useState } from "react";
 import KebabMenuIcon from "../assets/icons/KebabMenuIcon";
@@ -70,7 +70,7 @@ const page: React.FC = () => {
       timezone: "Pacific Time",
       role: "Admin",
       status: <Switch checked />,
-      company: <MultiselectCompany width={56} />
+      company: <MultiselectCompany width={48} />
     },
     {
       id: 2,
@@ -83,7 +83,7 @@ const page: React.FC = () => {
       role: "User",
       status: <Switch />,
 
-      company: <MultiselectCompany width={96} />
+      company: <MultiselectCompany width={48} />
     },
     {
       id: 3,
@@ -96,7 +96,7 @@ const page: React.FC = () => {
       role: "Manager",
       status: <Switch checked />,
 
-      company: <MultiselectCompany width={96} />
+      company: <MultiselectCompany width={48} />
     },
 
   ]);
@@ -145,45 +145,50 @@ const page: React.FC = () => {
     <>
       <NavBar>
         <div className={`flex flex-col w-full`}>
-          {/* NavBar */}
-          <div className="p-4 flex justify-between w-auto  bg-whiteSmoke">
-            <div className="flex justify-star mx-3">
-              <label className="!font-bold text-base flex justify-center items-center text-center">
-                Manage Users
-              </label>
-            </div>
-            <div className="flex justify-end mx-3">
-              <Button
-                className="rounded-full flex font-medium !px-7"
-                variant="btn-primary"
-                onClick={handleToggleChange}
-              >
-                <label className="text-xl">+</label> CREATE USER
-              </Button>
-            </div>
-          </div>
 
-          {/* Data Table */}
-          <div>
-            {userData.length > 0 && (
-              <Table
-                data={userData}
-                headers={headers}
-                actions={actions}
-                getRowId={(userData: any) => {
-                  userData.id;
-                }}
-                actionDesc={actionArray}
-                getAction={(value: any) => {
-                  handleKebabChange(value);
-                }}
-                className={`!h-[439px]`}
-                sticky
-                sortable
-                action
-              />
-            )}
-          </div>
+          {isManageOpen ? <RoleDrawer onClose={() => setIsManageOpen(false)} />
+            : <div>
+              {/* NavBar */}
+              <div className="p-4 flex justify-between w-auto  bg-whiteSmoke">
+                <div className="flex justify-star mx-3">
+                  <label className="!font-bold text-base flex justify-center items-center text-center">
+                    Manage Users
+                  </label>
+                </div>
+                <div className="flex justify-end mx-3">
+                  <Button
+                    className="rounded-full flex font-medium !px-7"
+                    variant="btn-primary"
+                    onClick={handleToggleChange}
+                  >
+                    <label className="text-xl">+</label> CREATE USER
+                  </Button>
+                </div>
+              </div>
+
+              {/* Data Table */}
+              <div>
+                {userData.length > 0 && (
+                  <Table
+                    data={userData}
+                    headers={headers}
+                    actions={actions}
+                    getRowId={(userData: any) => {
+                      userData.id;
+                    }}
+                    actionDesc={actionArray}
+                    getAction={(value: any) => {
+                      handleKebabChange(value);
+                    }}
+                    className={`!h-[439px]`}
+                    sticky
+                    sortable
+                    action
+                  />
+                )}
+              </div>
+            </div>}
+
           {isRemoveOpen && (
             <Modal
               isOpen={handleRemoveModal}
@@ -225,31 +230,17 @@ const page: React.FC = () => {
               </ModalAction>
             </Modal>
           )}
-
-          {isEditOpen && (<>
-            {/*  Drawer */}
-            <Drawer
-              onOpen={isToggleOpen}
-              onClose={() => setIsToggleOpen(false)}
-              onData={onDrawerData}
-            />
-            {/* Drawer Overlay */}
-            <DrawerOverlay
-              isOpen={isToggleOpen}
-              onClose={() => setIsToggleOpen(false)}
-            />
-          </>)}
-
           {/*  Drawer */}
           <Drawer
-            onOpen={isToggleOpen}
-            onClose={() => setIsToggleOpen(false)}
+            onOpen={isToggleOpen || isEditOpen}
+            onClose={() => { setIsToggleOpen(false), setIsEditOpen(false) }}
             onData={onDrawerData}
+            drawerFor={isToggleOpen && "Add" || isEditOpen && "Edit" || ""}
           />
           {/* Drawer Overlay */}
           <DrawerOverlay
-            isOpen={isToggleOpen}
-            onClose={() => setIsToggleOpen(false)}
+            isOpen={isToggleOpen || isEditOpen}
+            onClose={() => { setIsToggleOpen(false), setIsEditOpen(false) }}
           />
         </div>
       </NavBar>
