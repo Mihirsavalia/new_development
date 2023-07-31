@@ -90,7 +90,7 @@ const DashboardItems = ({ pathname, isCollapsed }: any) => {
   );
 };
 
-const Sidebar = ({ setOpen }: any) => {
+const Sidebar = ({ setOpen,collapse }: any) => {
   const pathname = usePathname();
   const [isCollapsed, setCollapse] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -102,6 +102,8 @@ const Sidebar = ({ setOpen }: any) => {
   };
 
   useEffect(() => {
+    collapse(isCollapsed);
+
     setWindowSize(window.innerWidth);
     if (typeof window !== "undefined") {
       window.addEventListener("resize", handleResize);
@@ -110,14 +112,14 @@ const Sidebar = ({ setOpen }: any) => {
         window.removeEventListener("resize", handleResize);
       };
     }
-  }, []);
+  }, [isCollapsed]);
   setTimeout(() => {
     setAnimate("");
   }, 300)
 
   return (
     <div
-      className={` ${isCollapsed ? "lg:w-20" : "lg:w-64"
+      className={` ${isCollapsed ? "lg:w-20" : "lg:w-56"
         } flex flex-col justify-between border-r border-lightSilver lg:h-screen text-darkCharcoal overflow-y-auto overflow-x-hidden xyz`}>
       <div className="flex flex-col">
         <div className="flex items-center justify-between">

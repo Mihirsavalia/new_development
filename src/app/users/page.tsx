@@ -1,10 +1,11 @@
 "use client";
 
-import { Button, Close, Modal, ModalAction, ModalContent, ModalTitle, Switch, Table } from "next-ts-lib";
+import { Button, Switch, Table } from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
 import React, { useState } from "react";
 import KebabMenuIcon from "../assets/icons/KebabMenuIcon";
-import NavBar from "../layouts/Navbar";
+import Navbar from "../components/common/NavbarX";
+import Sidebar from "../components/common/Sidebar";
 import Drawer from "./Drawer";
 import DrawerOverlay from "./DrawerOverlay";
 import MultiselectCompany from "./MultiselectCompany";
@@ -22,6 +23,7 @@ interface FormData {
   status: any;
   company: any;
   // imageName: string;
+  children?: any
 }
 
 const page: React.FC = () => {
@@ -70,7 +72,23 @@ const page: React.FC = () => {
       timezone: "Pacific Time",
       role: "Admin",
       status: <Switch checked />,
-      company: <MultiselectCompany width={48} />
+      company: <MultiselectCompany width={48} />,
+      children: [
+        {
+          id: 11,
+          childName: "Child 1",
+          childAge: 5,
+          // Level 2 children
+          children: [
+            {
+              id: 111,
+              childName: "Grandchild 1",
+              childAge: 2,
+              // Add more nested levels if needed...
+            },
+          ],
+        },
+      ],
     },
     {
       id: 2,
@@ -82,8 +100,23 @@ const page: React.FC = () => {
       timezone: "Eastern Time",
       role: "User",
       status: <Switch />,
-
-      company: <MultiselectCompany width={48} />
+      company: <MultiselectCompany width={48} />,
+      children: [
+        {
+          id: 12,
+          childName: "Child 2",
+          childAge: 8,
+          // Level 2 children
+          children: [
+            {
+              id: 121,
+              childName: "Grandchild 2",
+              childAge: 4,
+              // Add more nested levels if needed...
+            },
+          ],
+        },
+      ],
     },
     {
       id: 3,
@@ -96,7 +129,23 @@ const page: React.FC = () => {
       role: "Manager",
       status: <Switch checked />,
 
-      company: <MultiselectCompany width={48} />
+      company: <MultiselectCompany width={48} />,
+      children: [
+        {
+          id: 12,
+          childName: "Child 2",
+          childAge: 8,
+          // Level 2 children
+          children: [
+            {
+              id: 121,
+              childName: "Grandchild 2",
+              childAge: 4,
+              // Add more nested levels if needed...
+            },
+          ],
+        },
+      ],
     },
 
   ]);
@@ -105,19 +154,21 @@ const page: React.FC = () => {
   const [isManageOpen, setIsManageOpen] = useState<boolean>(false);
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
   const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
+  const [isCollapsed, setCollapse] = useState<boolean>(false);
 
 
-  const handleKebabChange = (productId: string) => {
-    if (productId === "Manage Rights") {
+  const handleKebabChange = (actionId: string) => {
+    if (actionId === "Manage Rights") {
       setIsManageOpen(!isManageOpen)
     }
-    if (productId === "Edit") {
+    if (actionId === "Edit") {
       setIsEditOpen(!isEditOpen)
     }
-    if (productId === "Remove") {
+    if (actionId === "Remove") {
       setIsRemoveOpen(!isRemoveOpen)
     }
   };
+
   const handleRemoveModal = () => {
     setIsRemoveOpen(!isRemoveOpen)
   };
@@ -141,11 +192,20 @@ const page: React.FC = () => {
     userData.push(data);
   };
 
+  const collapse = (data: any) => {
+    setCollapse(data);
+  };
+
   return (
     <>
-      <NavBar>
-        <div className={`flex flex-col w-full`}>
 
+      <div className="flex flex-row w-full ">
+        <div className={`flex flex-col ${isCollapsed ? "w-20" : "w-56"}`}>
+          <Sidebar collapse={collapse} />
+        </div>
+
+        <div className={`flex flex-col ${isCollapsed ? "w-[93.5%]" : "w-[82.5%]"}`}>
+          <Navbar />
           {isManageOpen ? <RoleDrawer onClose={() => setIsManageOpen(false)} />
             : <div>
               {/* NavBar */}
@@ -175,6 +235,7 @@ const page: React.FC = () => {
                     actions={actions}
                     getRowId={(userData: any) => {
                       userData.id;
+                      // setKebabMenuOpen(userData.id);
                     }}
                     actionDesc={actionArray}
                     getAction={(value: any) => {
@@ -184,12 +245,14 @@ const page: React.FC = () => {
                     sticky
                     sortable
                     action
+                    actionSticky
                   />
                 )}
               </div>
             </div>}
 
-          {isRemoveOpen && (
+
+          {/* {isRemoveOpen && (
             <Modal
               isOpen={handleRemoveModal}
               onClose={handleRemoveModal}
@@ -204,8 +267,8 @@ const page: React.FC = () => {
               </ModalTitle>
 
               <ModalContent>
-                <div className="p-2 mb-3">
-                  Are you sure you want to remove the Company.
+                <div className="p-2 my-5">
+                  Are you sure you want to remove the user ?
                 </div>
               </ModalContent>
 
@@ -229,7 +292,8 @@ const page: React.FC = () => {
                 </div>
               </ModalAction>
             </Modal>
-          )}
+          )} */}
+
           {/*  Drawer */}
           <Drawer
             onOpen={isToggleOpen || isEditOpen}
@@ -243,7 +307,7 @@ const page: React.FC = () => {
             onClose={() => { setIsToggleOpen(false), setIsEditOpen(false) }}
           />
         </div>
-      </NavBar>
+      </div>
     </>
   );
 };

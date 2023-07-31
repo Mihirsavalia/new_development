@@ -156,7 +156,7 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData, drawerFor }) =
                                 label="Full Name"
                                 id="name"
                                 name="name"
-                                value={isEdit ? updatedFormData.name : ""}
+                                // value={isEdit ? updatedFormData.name : ""}
                                 validate
                                 getValue={(value: any) => handleInputChange("name", (value))}
                             ></TextField>
@@ -167,7 +167,7 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData, drawerFor }) =
                                 id="email"
                                 name="email"
                                 type="email"
-                                value={isEdit ? updatedFormData.email : ""}
+                                // value={isEdit ? updatedFormData.email : ""}
                                 validate
                                 getValue={(value: any) => handleInputChange("email", value)}
                             ></TextField>
@@ -177,7 +177,7 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData, drawerFor }) =
                                 label="Telephone"
                                 validate
                                 required
-                                value={isEdit ? updatedFormData.phone : ""}
+                                // value={isEdit ? updatedFormData.phone : ""}
                                 getValue={(value: any) =>
                                     handleInputChange("phone", value)
                                 }
@@ -190,7 +190,7 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData, drawerFor }) =
                                 options={options}
                                 id="country"
                                 required
-                                defaultValue={isEdit ? updatedFormData.country : ""}
+                                // defaultValue={isEdit ? updatedFormData.country : ""}
                                 onSelect={(value: any) =>
                                     handleInputChange("country", value)
                                 }
@@ -226,7 +226,7 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData, drawerFor }) =
                                 options={options}
                                 id="company"
                                 required
-                                defaultValue={isEdit ? updatedFormData.company : ""}
+                                // defaultValue={isEdit ? updatedFormData.company : ""}
                                 onSelect={(value: any) =>
                                     handleInputChange("company", value)
                                 }

@@ -7,7 +7,7 @@ const Navbar = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="lg:flex">
       <Sidebar />
-      <div className="w-full flex flex-col">
+      <div className="flex flex-col w-full">
         <NavbarX />
         <main>{children}</main>
       </div>
