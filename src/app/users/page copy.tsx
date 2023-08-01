@@ -2,7 +2,7 @@
 
 import { Button, Switch, Table } from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import KebabMenuIcon from "../assets/icons/KebabMenuIcon";
 import Navbar from "../components/common/NavbarX";
 import Sidebar from "../components/common/Sidebar";
@@ -196,36 +196,12 @@ const page: React.FC = () => {
     setCollapse(data);
   };
 
-  const [mobileOpen, setMobileOpen] = useState<boolean>(false);
-  const [Collapsed, setCollapsed] = useState<boolean>(false);
-  const [drawer, setDrawer] = useState<boolean>(false);
-  const [windowSize, setWindowSize] = useState(0);
-
-  const isOpen = (arg: any) => {
-    setMobileOpen(arg);
-    setDrawer(arg)
-  };
-  const handleResize = () => {
-    setWindowSize(window.innerWidth);
-  };
-
-  useEffect(() => {
-    setWindowSize(window.innerWidth);
-    if (typeof window !== "undefined") {
-      window.addEventListener("resize", handleResize);
-
-      return () => {
-        window.removeEventListener("resize", handleResize);
-      };
-    }
-  }, []);
-
   return (
     <>
 
       <div className="flex flex-row w-full ">
         <div className={`flex flex-col ${isCollapsed ? "w-20" : "w-56"}`}>
-          <Sidebar collapse={collapse} toggleDrawer={drawer} />
+          <Sidebar collapse={collapse} />
         </div>
 
         <div className={`flex flex-col ${isCollapsed ? "w-[93.5%]" : "w-[82.5%]"}`}>
@@ -258,7 +234,7 @@ const page: React.FC = () => {
                     headers={headers}
                     actions={actions}
                     getRowId={(userData: any) => {
-                      console.log(userData);
+                      userData.id;
                       // setKebabMenuOpen(userData.id);
                     }}
                     actionDesc={actionArray}

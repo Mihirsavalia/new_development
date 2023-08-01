@@ -229,7 +229,7 @@ const page: React.FC = () => {
         </div>
 
         <div className={`flex flex-col ${isCollapsed ? "w-[93.5%]" : "w-[82.5%]"}`}>
-          <Navbar />
+          {/* <Navbar /> */}
           {isManageOpen ? <RoleDrawer onClose={() => setIsManageOpen(false)} />
             : <div>
               {/* NavBar */}

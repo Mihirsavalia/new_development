@@ -1,6 +1,7 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import ApprovalIcon from "../../assets/icons/ApprovalsIcon";
 import BillsIcon from "../../assets/icons/BillsIcon";
 import DashboardIcon from "../../assets/icons/DashboardIcon";
@@ -9,9 +10,8 @@ import PaymentsIcon from "../../assets/icons/PaymentsIcon";
 import PurchaseIcon from "../../assets/icons/PurchaseIcon";
 import ReportsIcon from "../../assets/icons/ReportsIcon";
 import VendorIcon from "../../assets/icons/VendorIcon";
-import PQlogoIcon from "../../assets/icons/PQLogo";
 import styles from "../../assets/scss/styles.module.scss";
-import Link from "next/link";
+import PQlogoIcon from "../../assets/icons/PQLogo";
 import { Tooltip } from "next-ts-lib";
 
 interface SidebarItem {
@@ -90,8 +90,7 @@ const DashboardItems = ({ pathname, isCollapsed }: any) => {
   );
 };
 
-
-const Sidebar = ({ setOpen, setSetting, collapse, toggleDrawer }: any) => {
+const Sidebar = ({ setOpen, collapse, toggleDrawer }: any) => {
   const pathname = usePathname();
   const [isCollapsed, setCollapse] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -102,12 +101,14 @@ const Sidebar = ({ setOpen, setSetting, collapse, toggleDrawer }: any) => {
     setWindowSize(window.innerWidth);
   };
 
+
   useEffect(() => {
     setIsOpen(toggleDrawer);
   }, [toggleDrawer]);
 
   useEffect(() => {
     collapse(isCollapsed);
+
     setWindowSize(window.innerWidth);
     if (typeof window !== "undefined") {
       window.addEventListener("resize", handleResize);
@@ -120,77 +121,76 @@ const Sidebar = ({ setOpen, setSetting, collapse, toggleDrawer }: any) => {
 
   setTimeout(() => {
     setAnimate("");
-  }, 250);
+  }, 300)
 
   return (
-    <>
-      <div
-        className={` ${isCollapsed ? "lg:w-20" : "lg:w-56"
-          } flex flex-col justify-between border-r border-lightSilver lg:h-screen text-darkCharcoal overflow-y-auto overflow-x-hidden`}>
-        <div className="flex flex-col">
-          <div className="flex items-center justify-between">
-            <span
-              className={`py-4  pl-7 h-16 w-full flex items-center
-          text-primary font-medium text-[24px] lg:border-b border-lightSilver`}>
-              <div className={`${animate}`}>
-                <PQlogoIcon isCollapsed={isCollapsed} />
-              </div>
-            </span>
-            <span className="lg:hidden">
-              <button
-                className="flex flex-col h-12 w-12 rounded justify-center items-center group px-3"
-                onClick={() => {
-                  setIsOpen(!isOpen);
-                  // setOpen(!isOpen);
-                }}
-              >
-                <div
-                  className={`h-1 w-6 my-1 rounded-full bg-darkCharcoal transition ease transform duration-300 ${isOpen
-                    ? "rotate-45 translate-y-3 opacity-50 group-hover:opacity-100"
-                    : "opacity-50 group-hover:opacity-100"
-                    }`}
-                />
-                <div
-                  className={`h-1 w-6 my-1 rounded-full bg-darkCharcoal transition ease transform duration-300 ${isOpen ? "opacity-0" : "opacity-50 group-hover:opacity-100"
-                    }`}
-                />
-                <div
-                  className={`h-1 w-6 my-1 rounded-full bg-darkCharcoal transition ease transform duration-300 ${isOpen
-                    ? "-rotate-45 -translate-y-3 opacity-50 group-hover:opacity-100"
-                    : "opacity-50 group-hover:opacity-100"
-                    }`}
-                />
-              </button>
-            </span>
-          </div>
-          {windowSize <= 1023 ? (
-            <div
-              className={`flex flex-col absolute h-screen top-[66px] bg-pureWhite w-auto ${isOpen ? styles.abc : styles.aaa
-                }`}
-            >
-              <DashboardItems pathname={pathname} isCollapsed={isCollapsed} />
-            </div>
-          ) : (
-            <div className={`mt-[15px] ${animate} h-auto block`}>
-              <DashboardItems pathname={pathname} isCollapsed={isCollapsed} />
-            </div>
-          )}
-        </div>
-        {windowSize >= 1024 && (
+    <div
+      className={` ${isCollapsed ? "lg:w-20" : "lg:w-56"
+        } flex flex-col justify-between border-r border-lightSilver lg:h-screen text-darkCharcoal overflow-y-auto overflow-x-hidden`}>
+      <div className="flex flex-col">
+        <div className="flex items-center justify-between">
           <span
-            className={`py-[32px] pl-[29px] ${isCollapsed ? "pr-[50px]" : "pr-[174px]"
-              } border-t border-[#E6E6E6] cursor-pointer`}
-            onClick={() => {
-              setCollapse(!isCollapsed);
-              setAnimate(!isCollapsed ? styles.rightToLeft : styles.leftToRight);
-              // setSetting(!isCollapsed);
-            }}
-          >
-            <MenuIcon />
+            className={`py-4  pl-7 h-16 w-full flex items-center
+          text-primary font-medium text-[24px] lg:border-b border-lightSilver`}>
+            <div className={`${animate}`}>
+              <PQlogoIcon isCollapsed={isCollapsed} />
+            </div>
           </span>
+
+          {/* Close Button */}
+          <span className="lg:hidden ">
+            <button
+              className="flex flex-col h-12 w-12 rounded justify-center items-center group pr-5"
+              onClick={() => {
+                setIsOpen(!isOpen);
+                // setOpen(!isOpen);
+              }}
+            >
+              <div
+                className={`h-1 w-6 my-1 rounded-full bg-darkCharcoal transition ease transform duration-300 ${isOpen
+                  ? "rotate-45 translate-y-3 opacity-50 group-hover:opacity-100"
+                  : "opacity-50 group-hover:opacity-100"
+                  }`}
+              />
+              <div
+                className={`h-1 w-6 my-1 rounded-full bg-darkCharcoal transition ease transform duration-300 ${isOpen ? "opacity-0" : "opacity-50 group-hover:opacity-100"
+                  }`}
+              />
+              <div
+                className={`h-1 w-6 my-1 rounded-full bg-darkCharcoal transition ease transform duration-300 ${isOpen
+                  ? "-rotate-45 -translate-y-3 opacity-50 group-hover:opacity-100"
+                  : "opacity-50 group-hover:opacity-100"
+                  }`}
+              />
+            </button>
+          </span>
+
+        </div>
+        {windowSize <= 1023 ? (
+          <div
+            className={`flex flex-col absolute h-screen top-[66px] bg-pureWhite w-auto`}
+          >
+            <DashboardItems pathname={pathname} isCollapsed={isCollapsed} />
+          </div>
+        ) : (
+          <div className={`mt-[15px] ${animate} h-auto block`}>
+            <DashboardItems pathname={pathname} isCollapsed={isCollapsed} />
+          </div>
         )}
       </div>
-    </>
+      {windowSize >= 1024 && (
+        <span
+          className={`py-7 pl-7 ${isCollapsed ? "pr-[50px]" : "pr-44"
+            } border-t border-lightSilver cursor-pointer`}
+          onClick={() => {
+            setCollapse(!isCollapsed);
+            setAnimate(!isCollapsed ? styles.rightToLeft : styles.leftToRight);
+          }}
+        >
+          <MenuIcon />
+        </span>
+      )}
+    </div>
   );
 };
 

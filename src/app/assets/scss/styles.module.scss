@@ -22,17 +22,34 @@
   animation: slideOutRight 0.5s ease-out;
 }
 
+@media screen and (max-width: 1023px) {
+  .abc {
+    z-index: 999;
+    left: 0%;
+    width: 200px;
+    margin-top: 4px;
+    animation: leftToRightAnimation 0.3s ease-in-out both;
+  }
+  .aaa {
+    z-index: 999;
+    left: -100%;
+    width: 200px;
+    margin-top: 4px;
+    animation: rightToLeftAnimation 0.3s ease-in-out both;
+  }
+}
+
 .leftToRight {
   animation: leftToRightAnimation 0.3s ease-in-out both;
 }
 
 @keyframes leftToRightAnimation {
   0% {
-      transform: translateX(-100%);
+    transform: translateX(-100%);
   }
 
   100% {
-      transform: translateX(0%);
+    transform: translateX(0%);
   }
 }
 
@@ -42,10 +59,10 @@
 
 @keyframes rightToLeftAnimation {
   0% {
-      transform: translateX(100%);
+    transform: translateX(100%);
   }
 
   100% {
-      transform: translateX(0%);
+    transform: translateX(0%);
   }
 }
