@@ -81,7 +81,9 @@ const DashboardItems = ({ pathname, isCollapsed }: any) => {
           ) : (
             <>
               <span className="py-[17.65px]">{item.icon}</span>
-              <span className="pl-[10px] py-[14.5px]">{item.name}</span>
+              <span className="pl-[10px] py-[14.5px]">
+                <label className="sm:text-sm font-medium  2xl:!text-base">{item.name}</label>
+              </span>
             </>
           )}
         </Link>
@@ -97,17 +99,17 @@ const Sidebar = ({ setOpen, setSetting, collapse, toggleDrawer }: any) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [windowSize, setWindowSize] = useState(0);
   const [animate, setAnimate] = useState<string>("");
-
+  
   const handleResize = () => {
     setWindowSize(window.innerWidth);
   };
-
+  
   useEffect(() => {
     setIsOpen(toggleDrawer);
   }, [toggleDrawer]);
-
+  
   useEffect(() => {
-    collapse(isCollapsed);
+    // collapse(isCollapsed);
     setWindowSize(window.innerWidth);
     if (typeof window !== "undefined") {
       window.addEventListener("resize", handleResize);
@@ -125,13 +127,14 @@ const Sidebar = ({ setOpen, setSetting, collapse, toggleDrawer }: any) => {
   return (
     <>
       <div
-        className={` ${isCollapsed ? "lg:w-20" : "lg:w-56"
+        className={`${isCollapsed ? "lg:w-20" : "lg:w-56"
           } flex flex-col justify-between border-r border-lightSilver lg:h-screen text-darkCharcoal overflow-y-auto overflow-x-hidden`}>
         <div className="flex flex-col">
           <div className="flex items-center justify-between">
             <span
               className={`py-4  pl-7 h-16 w-full flex items-center
           text-primary font-medium text-[24px] lg:border-b border-lightSilver`}>
+
               <div className={`${animate}`}>
                 <PQlogoIcon isCollapsed={isCollapsed} />
               </div>
@@ -141,7 +144,8 @@ const Sidebar = ({ setOpen, setSetting, collapse, toggleDrawer }: any) => {
                 className="flex flex-col h-12 w-12 rounded justify-center items-center group px-3"
                 onClick={() => {
                   setIsOpen(!isOpen);
-                  // setOpen(!isOpen);
+                  setOpen(!isOpen);
+                  
                 }}
               >
                 <div
@@ -165,7 +169,7 @@ const Sidebar = ({ setOpen, setSetting, collapse, toggleDrawer }: any) => {
           </div>
           {windowSize <= 1023 ? (
             <div
-              className={`flex flex-col absolute h-screen top-[66px] bg-pureWhite w-auto ${isOpen ? styles.abc : styles.aaa
+              className={`flex flex-col absolute h-screen top-[60px]  bg-white w-auto ${isOpen ? styles.expandDiv : styles.collapsedDiv
                 }`}
             >
               <DashboardItems pathname={pathname} isCollapsed={isCollapsed} />

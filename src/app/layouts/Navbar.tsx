@@ -1,6 +1,6 @@
 // custom components
 import React from 'react'
-import NavbarX from "../components/common/NavbarX";
+import NavbarX from "../components/common/Navbar";
 import Sidebar from "../components/common/Sidebar";
 
 const Navbar = ({ children }: { children: React.ReactNode }) => {

@@ -2,6 +2,7 @@
 
 import React, { ReactNode, useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
+import DrawerOverlay from "../../users/DrawerOverlay";
 
 interface WrapperProps {
   children: ReactNode;
@@ -13,14 +14,11 @@ const Wrapper = ({ children }: WrapperProps): JSX.Element => {
   const [drawer, setDrawer] = useState<boolean>(false);
   const [windowSize, setWindowSize] = useState(0);
 
-  const isOpen = (arg: any) => {
-    setMobileOpen(arg);
-    setDrawer(arg)
+  const isOpen = (data: any) => {
+    setMobileOpen(data);
+    setDrawer(data)
   };
-  
-  const isCollapsed = (arg: any) => {
-    setCollapsed(arg);
-  };
+
 
   const handleResize = () => {
     setWindowSize(window.innerWidth);
@@ -39,13 +37,14 @@ const Wrapper = ({ children }: WrapperProps): JSX.Element => {
 
   return (
     <div className="lg:flex">
-      <Sidebar setOpen={isOpen} setSetting={isCollapsed} toggleDrawer={drawer} />
-      <main className={`${windowSize <= 1023 ? "w-[100vw]" : Collapsed ? "w-[94vw]" : "w-[85vw]"}`}>
+      <Sidebar setOpen={isOpen}  toggleDrawer={drawer} />
+      <main className={` w-full`}>
         <DrawerOverlay
-          className="!top-[70px]"
+          className="!top-[100px]"
           isOpen={drawer}
           onClose={() => { setDrawer(!drawer) }}
         />
+      
         {children}
       </main>
     </div>

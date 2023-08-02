@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 // components
-import { Avatar, Badge, Select, TextField, Close, Tooltip } from "next-ts-lib";
+import { Avatar, Badge, Close, Select, TextField, Tooltip } from "next-ts-lib";
 
 // icons
 import Bell from "../../assets/icons/BellIcon";
@@ -140,7 +140,7 @@ const NotificationButton = () => {
           <Badge
             badgetype="error"
             variant="dot"
-            // text={notifications.length.toString()}
+          // text={notifications.length.toString()}
           />
         </div>
         {/* {open && (
@@ -215,16 +215,16 @@ const SettingButton = () => {
           <Setting />
         </div>
         {open && (
-          <div className="p-8 w-[700px] bg-white shadow-lg absolute top-7 right-0 flex justify-center gap-10">
+          <div className=" !z-[3] p-8 w-[700px] bg-white shadow-lg absolute top-7 right-0 flex justify-center gap-10">
             {settings_data.map((data, index) => (
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-4" key={index}>
                 <span className="pb-3 font-semibold border-b border-b-[#d8d8d8]">
                   {data.heading}
                 </span>
                 {data.items.map((element, index) => (
                   <Link
                     key={index}
-                    href="#"
+                    href="/users"
                     className="font-light text-sm hover:text-[#02b89d]"
                   >
                     {element}

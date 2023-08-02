@@ -1,11 +1,12 @@
 "use client";
 
-import { Button, Switch, Table } from "next-ts-lib";
+import { Button, Close, Modal, ModalAction, ModalContent, ModalTitle, Switch, Table } from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
 import React, { useEffect, useState } from "react";
 import KebabMenuIcon from "../assets/icons/KebabMenuIcon";
-import Navbar from "../components/common/NavbarX";
-import Sidebar from "../components/common/Sidebar";
+import Navbar from "../components/common/Navbar";
+// import Sidebar from "../components/common/Sidebar";
+import Wrapper from "../components/common/Wrapper";
 import Drawer from "./Drawer";
 import DrawerOverlay from "./DrawerOverlay";
 import MultiselectCompany from "./MultiselectCompany";
@@ -169,8 +170,8 @@ const page: React.FC = () => {
     }
   };
 
-  const handleRemoveModal = () => {
-    setIsRemoveOpen(!isRemoveOpen)
+  const modalClose = () => {
+    setIsRemoveOpen(false);
   };
 
   const actionButtons = (
@@ -192,9 +193,9 @@ const page: React.FC = () => {
     userData.push(data);
   };
 
-  const collapse = (data: any) => {
-    setCollapse(data);
-  };
+  // const collapse = (data: any) => {
+  //   setCollapse(data);
+  // };
 
   const [mobileOpen, setMobileOpen] = useState<boolean>(false);
   const [Collapsed, setCollapsed] = useState<boolean>(false);
@@ -223,19 +224,15 @@ const page: React.FC = () => {
   return (
     <>
 
-      <div className="flex flex-row w-full ">
-        <div className={`flex flex-col ${isCollapsed ? "w-20" : "w-56"}`}>
-          <Sidebar collapse={collapse} toggleDrawer={drawer} />
-        </div>
-
-        <div className={`flex flex-col ${isCollapsed ? "w-[93.5%]" : "w-[82.5%]"}`}>
-          <Navbar />
+      <Wrapper>
+        <Navbar />
+        <div className={``}>
           {isManageOpen ? <RoleDrawer onClose={() => setIsManageOpen(false)} />
             : <div>
               {/* NavBar */}
               <div className="p-4 flex justify-between w-auto  bg-whiteSmoke">
                 <div className="flex justify-star mx-3">
-                  <label className="!font-bold text-base flex justify-center items-center text-center">
+                  <label className="!font-bold sm:text-base 2xl:!text-lg flex justify-center items-center text-center">
                     Manage Users
                   </label>
                 </div>
@@ -245,7 +242,7 @@ const page: React.FC = () => {
                     variant="btn-primary"
                     onClick={handleToggleChange}
                   >
-                    <label className="text-xl">+</label> CREATE USER
+                    <label className="text-xl">+</label><label className="sm:text-sm font-bold 2xl:!text-base"> CREATE USER</label>
                   </Button>
                 </div>
               </div>
@@ -258,7 +255,6 @@ const page: React.FC = () => {
                     headers={headers}
                     actions={actions}
                     getRowId={(userData: any) => {
-                      console.log(userData);
                       // setKebabMenuOpen(userData.id);
                     }}
                     actionDesc={actionArray}
@@ -276,10 +272,10 @@ const page: React.FC = () => {
             </div>}
 
 
-          {/* {isRemoveOpen && (
+          {isRemoveOpen && (
             <Modal
-              isOpen={handleRemoveModal}
-              onClose={handleRemoveModal}
+              isOpen={isRemoveOpen}
+              onClose={modalClose}
               width="352px"
             >
               <ModalTitle>
@@ -316,7 +312,7 @@ const page: React.FC = () => {
                 </div>
               </ModalAction>
             </Modal>
-          )} */}
+          )}
 
           {/*  Drawer */}
           <Drawer
@@ -331,7 +327,7 @@ const page: React.FC = () => {
             onClose={() => { setIsToggleOpen(false), setIsEditOpen(false) }}
           />
         </div>
-      </div>
+      </Wrapper>
     </>
   );
 };

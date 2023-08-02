@@ -23,14 +23,14 @@
 }
 
 @media screen and (max-width: 1023px) {
-  .abc {
+  .expandDiv{
     z-index: 999;
     left: 0%;
     width: 200px;
     margin-top: 4px;
     animation: leftToRightAnimation 0.3s ease-in-out both;
   }
-  .aaa {
+  .collapsedDiv {
     z-index: 999;
     left: -100%;
     width: 200px;

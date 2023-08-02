@@ -15,9 +15,12 @@ module.exports = {
       colors: {
         primary: "#02B89D",
         whiteSmoke: "#F6F6F6",
-        lightSilver:"#D8D8D8",
-        lightGray:"#F4F4F4"
+        lightSilver: "#D8D8D8",
+        lightGray: "#F4F4F4"
       },
+      screens: {
+        xs: "440px"
+      }
     },
   },
   plugins: [],
