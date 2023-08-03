@@ -142,21 +142,19 @@ const Sidebar = ({ setOpen, toggleDrawer }: any) => {
   return (
     <>
       <div
-        className={`!w-[215px] flex flex-col justify-between border-r border-lightSilver lg:h-screen text-darkCharcoal overflow-y-auto overflow-x-hidden`}>
+        className={`!w-[215px] flex flex-col justify-between border-r border-lightSilver lg:h-screen text-darkCharcoal overflow-y-auto overflow-x-hidden `}>
         <div className={`flex flex-col`}>
-          <div className={`flex items-center justify-between`}>
-            <span className={`py-4 px-6 h-16 w-full flex items-center border-b border-lightSilver`}>
-              <div className={`${animate}`}>
-                <PQlogoIcon isCollapsed={isCollapsed} />
-              </div>
+          <div className={`flex sticky top-0 items-center justify-between`}>
+            <span className={`py-4 px-6 h-16 w-full flex items-center border-b bg-white border-lightSilver `}>
+              <PQlogoIcon isCollapsed={isCollapsed} />
             </span>
           </div>
-          <div className="flex my-2.5 ml-[20px] justify-start">
-        <span className=" cursor-pointer mr-2" >
-          <ChevronLeftIcon bgColor="whiteSmoke" />
-        </span>
-        <Typography type="h5" className="!font-bold flex justify-center items-center text-center">Configuration</Typography>
-      </div>
+          <div className="flex py-2.5 sticky bg-white top-[64px] pl-[20px] justify-start">
+            <span className=" cursor-pointer mr-2" >
+              <ChevronLeftIcon bgColor="whiteSmoke" />
+            </span>
+            <Typography type="h5" className="!font-bold flex justify-center items-center text-center">Configuration</Typography>
+          </div>
           <div className={``}>
             <SettingItems pathname={pathname} isCollapsed={isCollapsed} />
           </div>
