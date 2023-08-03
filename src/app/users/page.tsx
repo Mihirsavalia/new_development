@@ -1,9 +1,10 @@
 "use client";
 
-import { Button, Close, Modal, ModalAction, ModalContent, ModalTitle, Switch, Table } from "next-ts-lib";
+import { Button, Close, Modal, ModalAction, ModalContent, ModalTitle, Switch, Table, Typography } from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
 import React, { useEffect, useState } from "react";
 import KebabMenuIcon from "../assets/icons/KebabMenuIcon";
+import PlusIcon from "../assets/icons/PlusIcon";
 import Navbar from "../components/common/Navbar";
 // import Sidebar from "../components/common/Sidebar";
 import Wrapper from "../components/common/Wrapper";
@@ -226,23 +227,20 @@ const page: React.FC = () => {
 
       <Wrapper>
         <Navbar />
-        <div className={``}>
+        <div>
           {isManageOpen ? <RoleDrawer onClose={() => setIsManageOpen(false)} />
             : <div>
               {/* NavBar */}
-              <div className="p-4 flex justify-between w-auto  bg-whiteSmoke">
+              <div className="p-5 flex justify-between w-auto  bg-whiteSmoke">
                 <div className="flex justify-star mx-3">
-                  <label className="!font-bold sm:text-base 2xl:!text-lg flex justify-center items-center text-center">
-                    Manage Users
-                  </label>
+                  <Typography type="h5" className="!font-bold flex justify-center items-center text-center">Manage Users</Typography>
                 </div>
                 <div className="flex justify-end mx-3">
                   <Button
-                    className="rounded-full flex font-medium !px-7"
+                    className="rounded-full !px-6 "
                     variant="btn-primary"
-                    onClick={handleToggleChange}
-                  >
-                    <label className="text-xl">+</label><label className="sm:text-sm font-bold 2xl:!text-base"> CREATE USER</label>
+                    onClick={handleToggleChange}>
+                    <Typography type="h6" className="!font-bold flex justify-center items-center text-center"><span className="mr-1"> <PlusIcon /></span> CREATE USER</Typography>
                   </Button>
                 </div>
               </div>
@@ -255,7 +253,7 @@ const page: React.FC = () => {
                     headers={headers}
                     actions={actions}
                     getRowId={(userData: any) => {
-                      // setKebabMenuOpen(userData.id);
+                      setKebabMenuOpen(userData);
                     }}
                     actionDesc={actionArray}
                     getAction={(value: any) => {

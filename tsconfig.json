@@ -23,6 +23,6 @@
       "tsconfig.json/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/assets/icons/AddInCircleIcon.js", "src/app/assets/icons/BellIcon.js", "src/app/assets/icons/BiIcon.js", "src/app/assets/icons/CloseIcon.js", "src/app/assets/icons/HelpIcon.js", "src/app/assets/icons/SearchIcon.js1", "src/app/assets/icons/SettingIcon.js", "src/app/assets/icons/SyncIcon.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/assets/icons/AddIcon.js", "src/app/assets/icons/BellIcon.js", "src/app/assets/icons/BiIcon.js", "src/app/assets/icons/CloseIcon.js", "src/app/assets/icons/HelpIcon.js", "src/app/assets/icons/SearchIcon.js1", "src/app/assets/icons/SettingIcon.js", "src/app/assets/icons/SyncIcon.js"],
   "exclude": ["node_modules"]
 }

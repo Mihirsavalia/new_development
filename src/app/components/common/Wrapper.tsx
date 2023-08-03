@@ -36,9 +36,9 @@ const Wrapper = ({ children }: WrapperProps): JSX.Element => {
   }, []);
 
   return (
-    <div className="lg:flex">
+    <div className="lg:flex " >
       <Sidebar setOpen={isOpen}  toggleDrawer={drawer} />
-      <main className={` w-full`}>
+      <main style={{width: "-webkit-fill-available"}}>
         <DrawerOverlay
           className="!top-[100px]"
           isOpen={drawer}

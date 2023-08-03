@@ -4,7 +4,8 @@ import {
     Close,
     Select,
     Tel,
-    TextField
+    TextField,
+    Typography
 } from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
 import styles from "../assets/scss/styles.module.scss";
@@ -122,10 +123,10 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData, drawerFor }) =
         <>
             {onOpen && (
                 <div
-                    className={`fixed top-0  right-0 h-screen w-2/6 z-30 bg-white shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.slideInAnimation}`}
+                    className={`fixed top-0 bg-white right-0 h-full xs:!w-5/6 sm:!w-2/4 lg:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.slideInAnimation}`}
                 >
                     <div className="p-4 flex justify-between items-center border-b border-lightSilver">
-                        <div className="font-bold text-base">{isEdit ? "EDIT" : "ADD"} USER</div>
+                        <Typography type="label" className="!font-bold !text-lg"> {isEdit ? "EDIT" : "ADD"} USER</Typography>
                         <div className="mx-2 cursor-pointer" onClick={() => { onClose() }}>
                             <Close variant="medium" />
                         </div>
@@ -245,22 +246,22 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData, drawerFor }) =
                             />
                         </div>
                     </div>
-                    <div className="flex flex-row xs:!justify-start md:!justify-end items-center border-t border-lightSilver">
-                        <div className="my-3 mx-5">
+                    <div className="flex flex-row justify-end items-center border-t border-lightSilver">
+                        <div className="my-3 mx-5 ">
                             <Button
                                 onClick={onClose}
-                                className="rounded-full font-medium sm:!w-20 lg:!w-28 mx-3 xs:!px-1"
+                                className="rounded-full font-medium w-28 mx-3 xs:!px-1"
                                 variant="btn-outline-primary"
                             >
-                                <label className="sm:text-sm font-medium  2xl:!text-base"> CANCLE</label>
+                                <Typography type="h6" className="!font-bold"> CANCLE</Typography>
                             </Button>
                             <Button
                                 type="submit"
                                 onClick={handleSaveData}
-                                className={`rounded-full font-medium sm:!w-20 lg:!w-28 xs:!px-1  ${isFormDataEmpty || isEdit ? 'opacity-100' : "opacity-30 pointer-events-none"} `}
+                                className={`rounded-full font-medium w-28 xs:!px-1  ${isFormDataEmpty || isEdit ? 'opacity-100' : "opacity-30 pointer-events-none"} `}
                                 variant="btn-primary"
                             >
-                                <label className="sm:text-sm font-medium  2xl:!text-base"> SAVE</label>
+                                <Typography type="h6" className="!font-bold"> SAVE</Typography>
                             </Button>
                         </div>
                     </div>

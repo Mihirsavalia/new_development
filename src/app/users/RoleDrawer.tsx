@@ -2,7 +2,7 @@
 
 import "next-ts-lib/dist/index.css";
 
-import { Button, CheckBox, Table } from "next-ts-lib";
+import { Button, CheckBox, Table, Typography } from "next-ts-lib";
 import React from "react";
 import ChevronLeftIcon from "../assets/icons/ChevronLeftIcon";
 
@@ -283,12 +283,11 @@ const RoleDrawer: React.FC<DrawerProps> = ({ onClose }) => {
             <div className={`flex flex-col h-48`}>
                 <div className="py-5 flex justify-between w-auto bg-whiteSmoke">
                     <div className="flex justify-star ml-3">
-                        <label className="mx-2 cursor-pointer" onClick={onClose} >
-                            <ChevronLeftIcon />
-                        </label>
-                        <label className="!font-bold text-base flex justify-center items-center text-center">
-                            Admin Manage Rights
-                        </label>
+                        <span className="mx-2 cursor-pointer" onClick={onClose} >
+                            <ChevronLeftIcon bgColor="white"/>
+                        </span>
+                        <Typography type="h5" className="!font-bold flex justify-center items-center text-center">Admin Manage Rights</Typography>
+
                     </div>
                 </div>
                 {/* Data Table */}

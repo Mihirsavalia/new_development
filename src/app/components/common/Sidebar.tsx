@@ -12,7 +12,7 @@ import VendorIcon from "../../assets/icons/VendorIcon";
 import PQlogoIcon from "../../assets/icons/PQLogo";
 import styles from "../../assets/scss/styles.module.scss";
 import Link from "next/link";
-import { Tooltip } from "next-ts-lib";
+import { Tooltip, Typography } from "next-ts-lib";
 
 interface SidebarItem {
   name: string;
@@ -73,7 +73,7 @@ const DashboardItems = ({ pathname, isCollapsed }: any) => {
             }`}
         >
           {isCollapsed ? (
-            <div className=" pl-0 py-[9.65px] z-10">
+            <div className=" pl-0 py-[9.65px]">
               <Tooltip content={`${item.name}`} position="right">
                 <span className="">{item.icon}</span>
               </Tooltip>
@@ -82,7 +82,7 @@ const DashboardItems = ({ pathname, isCollapsed }: any) => {
             <>
               <span className="py-[17.65px]">{item.icon}</span>
               <span className="pl-[10px] py-[14.5px]">
-                <label className="sm:text-sm font-medium  2xl:!text-base">{item.name}</label>
+                <Typography type="h6" className="">{item.name}</Typography>
               </span>
             </>
           )}
@@ -99,15 +99,15 @@ const Sidebar = ({ setOpen, setSetting, collapse, toggleDrawer }: any) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [windowSize, setWindowSize] = useState(0);
   const [animate, setAnimate] = useState<string>("");
-  
+
   const handleResize = () => {
     setWindowSize(window.innerWidth);
   };
-  
+
   useEffect(() => {
     setIsOpen(toggleDrawer);
   }, [toggleDrawer]);
-  
+
   useEffect(() => {
     // collapse(isCollapsed);
     setWindowSize(window.innerWidth);
@@ -127,12 +127,12 @@ const Sidebar = ({ setOpen, setSetting, collapse, toggleDrawer }: any) => {
   return (
     <>
       <div
-        className={`${isCollapsed ? "lg:w-20" : "lg:w-56"
+        className={`${isCollapsed ? "lg:w-[79px]" : "lg:w-[214px]"
           } flex flex-col justify-between border-r border-lightSilver lg:h-screen text-darkCharcoal overflow-y-auto overflow-x-hidden`}>
-        <div className="flex flex-col">
-          <div className="flex items-center justify-between">
+        <div className={`flex flex-col`}>
+          <div className={`flex items-center justify-between ${isOpen && "z-[5] bg-white"} `}>
             <span
-              className={`py-4  pl-7 h-16 w-full flex items-center
+              className={`py-4 px-6 h-16 w-full flex items-center
           text-primary font-medium text-[24px] lg:border-b border-lightSilver`}>
 
               <div className={`${animate}`}>
@@ -145,7 +145,7 @@ const Sidebar = ({ setOpen, setSetting, collapse, toggleDrawer }: any) => {
                 onClick={() => {
                   setIsOpen(!isOpen);
                   setOpen(!isOpen);
-                  
+
                 }}
               >
                 <div
@@ -169,9 +169,9 @@ const Sidebar = ({ setOpen, setSetting, collapse, toggleDrawer }: any) => {
           </div>
           {windowSize <= 1023 ? (
             <div
-              className={`flex flex-col absolute h-screen top-[60px]  bg-white w-auto ${isOpen ? styles.expandDiv : styles.collapsedDiv
-                }`}
-            >
+            className={`flex flex-col absolute top-[79px] z-[5]  bg-white  ${isOpen ? styles.expandDiv : styles.collapsedDiv
+              }`}
+          >
               <DashboardItems pathname={pathname} isCollapsed={isCollapsed} />
             </div>
           ) : (

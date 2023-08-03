@@ -27,11 +27,11 @@ const companies = [
   { value: "10", label: "Company 10" },
   { value: "11", label: "Company 11" },
 ];
+const global_settings = [{
+  heading: "Global Setting",
+  items: ["Manage Company", "Manage Users", "Manage Roles"],
+},]
 const settings_data = [
-  {
-    heading: "General Setting",
-    items: ["Manage Company", "Manage Users", "Manage Roles"],
-  },
   {
     heading: "Masters",
     items: [
@@ -59,7 +59,7 @@ const settings_data = [
   },
 ];
 
-const NavbarX = () => {
+const Navbar = () => {
   const navbarX_elements = [
     <NotificationButton />,
     <HelpButton />,
@@ -124,7 +124,7 @@ const NavbarX = () => {
   );
 };
 
-export default NavbarX;
+export default Navbar;
 
 // custom JSX Elements
 
@@ -215,7 +215,26 @@ const SettingButton = () => {
           <Setting />
         </div>
         {open && (
-          <div className=" !z-[3] p-8 w-[700px] bg-white shadow-lg absolute top-7 right-0 flex justify-center gap-10">
+
+          <div className=" flex flex-row !z-[3] p-8 w-[700px] bg-white shadow-lg absolute top-7 right-0  justify-center gap-10">
+            <div className="flex flex-col bg-lightGray border-r-2 border-lightSilver " >
+              {global_settings.map((data, index) => (
+                <div className="  flex flex-col gap-4" key={index}>
+                  <span className="pb-3 font-semibold border-b border-b-[#d8d8d8]">
+                    {data.heading}
+                  </span>
+                  {data.items.map((element, index) => (
+                    <Link
+                      key={index}
+                      href="/users"
+                      className="font-light text-sm hover:text-[#02b89d]"
+                    >
+                      {element}
+                    </Link>
+                  ))}
+                </div>
+              ))}
+            </div>
             {settings_data.map((data, index) => (
               <div className="flex flex-col gap-4" key={index}>
                 <span className="pb-3 font-semibold border-b border-b-[#d8d8d8]">
