@@ -13,6 +13,11 @@ import BI from "../../assets/icons/BiIcon";
 // import Close from "../../assets/icons/Close";
 import SearchIcon from "../../assets/icons/SearchIcon";
 
+
+interface NavbarProps {
+  setSetting: (data: any) => void;
+}
+
 // dummy data
 const companies = [
   { value: "1", label: "Company 1" },
@@ -27,10 +32,12 @@ const companies = [
   { value: "10", label: "Company 10" },
   { value: "11", label: "Company 11" },
 ];
+
 const global_settings = [{
   heading: "Global Setting",
   items: ["Manage Company", "Manage Users", "Manage Roles"],
 },]
+
 const settings_data = [
   {
     heading: "Masters",
@@ -59,11 +66,13 @@ const settings_data = [
   },
 ];
 
-const Navbar = () => {
+
+
+const Navbar = ({ setSetting }: NavbarProps): JSX.Element => {
   const navbarX_elements = [
     <NotificationButton />,
     <HelpButton />,
-    <SettingButton />,
+    <SettingButton setSetting={setSetting} />,
     <SyncButton />,
     <SwitchToBIButton />,
     <ProfileButton />,
@@ -187,9 +196,13 @@ const HelpButton = () => {
   );
 };
 
-const SettingButton = () => {
+const SettingButton = ({ setSetting }: any) => {
   const [open, setOpen] = useState(false);
   const settingRef = useRef<HTMLDivElement>(null);
+
+  const handleSettingChange = () => {
+    setSetting(true);
+  }
 
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
@@ -244,6 +257,7 @@ const SettingButton = () => {
                   <Link
                     key={index}
                     href="/users"
+                    onClick={handleSettingChange}
                     className="font-light text-sm hover:text-[#02b89d]"
                   >
                     {element}

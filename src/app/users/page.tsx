@@ -28,7 +28,7 @@ interface FormData {
   children?: any
 }
 
-const page: React.FC = () => {
+const page: React.FC = ({ setSetting }: any) => {
   // Data
 
   const headers = [
@@ -221,110 +221,116 @@ const page: React.FC = () => {
       };
     }
   }, []);
+  const [isPageSetting, setIsPageSetting] = useState<boolean>(false);
 
+  const wrapperData = (data: any) => {
+    console.log("🚀 ~ file: page.tsx:227 ~ wrapperData ~ data:", data)
+    setIsPageSetting(data);
+  };
+  
   return (
     <>
-
-      <Wrapper>
-        <Navbar />
-        <div>
-          {isManageOpen ? <RoleDrawer onClose={() => setIsManageOpen(false)} />
-            : <div>
-              {/* NavBar */}
-              <div className="p-5 flex justify-between w-auto  bg-whiteSmoke">
-                <div className="flex justify-star mx-3">
-                  <Typography type="h5" className="!font-bold flex justify-center items-center text-center">Manage Users</Typography>
+      <Wrapper setWrapperSetting={wrapperData}>
+        {isPageSetting ? <div>Setting Drawer</div>
+          :
+          <div>
+            {isManageOpen ? <RoleDrawer onClose={() => setIsManageOpen(false)} />
+              : <div>
+                {/* NavBar */}
+                <div className="p-5 flex justify-between w-auto  bg-whiteSmoke ">
+                  <div className="flex justify-star mx-3">
+                    <Typography type="h5" className="!font-bold flex justify-center items-center text-center">Manage Users</Typography>
+                  </div>
+                  <div className="flex justify-end mx-3">
+                    <Button
+                      className="rounded-full !px-6 "
+                      variant="btn-primary"
+                      onClick={handleToggleChange}>
+                      <Typography type="h6" className="!font-bold flex justify-center items-center text-center"><span className="mr-1"> <PlusIcon /></span> CREATE USER</Typography>
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex justify-end mx-3">
-                  <Button
-                    className="rounded-full !px-6 "
-                    variant="btn-primary"
-                    onClick={handleToggleChange}>
-                    <Typography type="h6" className="!font-bold flex justify-center items-center text-center"><span className="mr-1"> <PlusIcon /></span> CREATE USER</Typography>
-                  </Button>
-                </div>
-              </div>
 
-              {/* Data Table */}
-              <div>
-                {userData.length > 0 && (
-                  <Table
-                    data={userData}
-                    headers={headers}
-                    actions={actions}
-                    getRowId={(userData: any) => {
-                      setKebabMenuOpen(userData);
-                    }}
-                    actionDesc={actionArray}
-                    getAction={(value: any) => {
-                      handleKebabChange(value);
-                    }}
-                    className={`!h-[439px]`}
-                    sticky
-                    sortable
-                    action
-                    actionSticky
-                  />
-                )}
-              </div>
-            </div>}
-
-
-          {isRemoveOpen && (
-            <Modal
-              isOpen={isRemoveOpen}
-              onClose={modalClose}
-              width="352px"
-            >
-              <ModalTitle>
-                <div className="py-3 px-4 font-bold">Remove</div>
-
-                <div className="" >
-                  <Close variant="medium" />
-                </div>
-              </ModalTitle>
-
-              <ModalContent>
-                <div className="p-2 my-5">
-                  Are you sure you want to remove the user ?
-                </div>
-              </ModalContent>
-
-              <ModalAction>
+                {/* Data Table */}
                 <div>
-                  <Button
-                    className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
-                    variant="btn-outline-error"
-                  >
-                    No
-                  </Button>
+                  {userData.length > 0 && (
+                    <Table
+                      data={userData}
+                      headers={headers}
+                      actions={actions}
+                      getRowId={(userData: any) => {
+                        setKebabMenuOpen(userData);
+                      }}
+                      actionDesc={actionArray}
+                      getAction={(value: any) => {
+                        handleKebabChange(value);
+                      }}
+                      className={`!h-[424px]`}
+                      sticky
+                      sortable
+                      action
+                      actionSticky
+                    />
+                  )}
                 </div>
+              </div>}
 
-                <div>
-                  <Button
-                    className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
-                    variant="btn-error"
-                  >
-                    Yes
-                  </Button>
-                </div>
-              </ModalAction>
-            </Modal>
-          )}
 
-          {/*  Drawer */}
-          <Drawer
-            onOpen={isToggleOpen || isEditOpen}
-            onClose={() => { setIsToggleOpen(false), setIsEditOpen(false) }}
-            onData={onDrawerData}
-            drawerFor={isToggleOpen && "Add" || isEditOpen && "Edit" || ""}
-          />
-          {/* Drawer Overlay */}
-          <DrawerOverlay
-            isOpen={isToggleOpen || isEditOpen}
-            onClose={() => { setIsToggleOpen(false), setIsEditOpen(false) }}
-          />
-        </div>
+            {isRemoveOpen && (
+              <Modal
+                isOpen={isRemoveOpen}
+                onClose={modalClose}
+                width="352px"
+              >
+                <ModalTitle>
+                  <div className="py-3 px-4 font-bold">Remove</div>
+
+                  <div className="" >
+                    <Close variant="medium" />
+                  </div>
+                </ModalTitle>
+
+                <ModalContent>
+                  <div className="p-2 my-5">
+                    Are you sure you want to remove the user ?
+                  </div>
+                </ModalContent>
+
+                <ModalAction>
+                  <div>
+                    <Button
+                      className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
+                      variant="btn-outline-error"
+                    >
+                      No
+                    </Button>
+                  </div>
+
+                  <div>
+                    <Button
+                      className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
+                      variant="btn-error"
+                    >
+                      Yes
+                    </Button>
+                  </div>
+                </ModalAction>
+              </Modal>
+            )}
+
+            {/*  Drawer */}
+            <Drawer
+              onOpen={isToggleOpen || isEditOpen}
+              onClose={() => { setIsToggleOpen(false), setIsEditOpen(false) }}
+              onData={onDrawerData}
+              drawerFor={isToggleOpen && "Add" || isEditOpen && "Edit" || ""}
+            />
+            {/* Drawer Overlay */}
+            <DrawerOverlay
+              isOpen={isToggleOpen || isEditOpen}
+              onClose={() => { setIsToggleOpen(false), setIsEditOpen(false) }}
+            />
+          </div>}
       </Wrapper>
     </>
   );

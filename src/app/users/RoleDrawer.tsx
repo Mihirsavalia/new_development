@@ -302,11 +302,11 @@ const RoleDrawer: React.FC<DrawerProps> = ({ onClose }) => {
                         expandable
                         sortable
                         sticky
-                        className={`!h-[431px]`}
+                        className={`h-[425px]`}
                     />
                 </div>
                 {/* Footer*/}
-                <div className="flex justify-end items-center border-t border-lightSilver">
+                <div className="flex sticky bottom-0 bg-white justify-end items-center border-t border-lightSilver">
                     <div className="my-3 mx-5">
                         <Button
                             className="rounded-full font-medium !w-28 mx-3"
