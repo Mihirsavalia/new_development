@@ -121,9 +121,10 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData, drawerFor }) =
 
     return (
         <>
+            
             {onOpen && (
                 <div
-                    className={`fixed top-0 bg-white right-0 h-full xs:!w-5/6 sm:!w-2/4 lg:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.slideInAnimation}`}
+                    className={`fixed top-0 bg-white right-0 h-full xs:!w-5/6 sm:!w-2/4 lg:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.slideOutAnimation}`}
                 >
                     <div className="p-4 flex justify-between items-center border-b border-lightSilver">
                         <Typography type="label" className="!font-bold !text-lg"> {isEdit ? "EDIT" : "ADD"} USER</Typography>

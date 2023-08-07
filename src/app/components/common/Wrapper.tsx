@@ -38,22 +38,20 @@ const Wrapper = ({ children, setWrapperSetting }: WrapperProps): JSX.Element => 
   }, []);
 
   const navbarData = (data: any) => {
-    console.log("🚀 ~ file: Wrapper.tsx:41 ~ navbarData ~ data:", data)
     setIsSetting(data);
     setWrapperSetting(data);
   };
 
   const handleSidebarData = (data: any) => {
-    console.log("🚀 ~ file: Wrapper.tsx:46 ~ handleSidebarData ~ data:", data)
     setIsSetting(data)
     window.location.href="/users";
   };
 
   return (
     <div className="lg:flex" >
-      <Sidebar setOpen={isOpen} setSettingSidebar={!isSetting} toggleDrawer={drawer} sendSidebarData={handleSidebarData} />
+      <Sidebar setOpen={isOpen} setSettingSidebar={isSetting} toggleDrawer={drawer} sendSidebarData={handleSidebarData} />
 
-      <main style={{ width: "-webkit-fill-available" }}>
+      <main className=" " style={{ width: "-webkit-fill-available" }}>
         <Navbar setSetting={navbarData} />
         <DrawerOverlay
           className="!top-[100px]"

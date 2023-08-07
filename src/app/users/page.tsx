@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Close, Modal, ModalAction, ModalContent, ModalTitle, Switch, Table, Typography } from "next-ts-lib";
+import { Button, Close, DataTable, Modal, ModalAction, ModalContent, ModalTitle, Switch, Table, Typography } from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
 import React, { useEffect, useState } from "react";
 import KebabMenuIcon from "../assets/icons/KebabMenuIcon";
@@ -25,44 +25,77 @@ interface FormData {
   status: any;
   company: any;
   // imageName: string;
-  children?: any
+  action: any;
 }
 
 const page: React.FC = ({ setSetting }: any) => {
   // Data
 
-  const headers = [
+  const columns = [
     {
-      heading: "#",
-      field: "id",
-      sort: true,
+      header: "#",
+      accessor: "id",
+      sortable: true,
     },
     {
-      heading: "Name",
-      field: "name",
-      sort: true,
+      header: "Name",
+      accessor: "name",
+      sortable: true,
     },
     {
-      heading: "E-mail ID",
-      field: "email",
-      sort: false,
+      header: "E-mail ID",
+      accessor: "email",
+      sortable: false,
     },
     {
-      heading: "Company",
-      field: "company",
-      sort: false,
+      header: "Company",
+      accessor: "company",
+      sortable: false,
     },
     {
-      heading: "Roles",
-      field: "role",
-      sort: true,
+      header: "Roles",
+      accessor: "role",
+      sortable: true,
     },
     {
-      heading: "Status",
-      field: "status",
-      sort: false,
+      header: "Status",
+      accessor: "status",
+      sortable: false,
+    },
+    {
+      header: "Action",
+      accessor: "action",
+      sortable: false,
     },
   ];
+  const actionArray = ["Manage Rights", "Edit", "Remove"];
+
+  const actionItem = actionArray.map((name: any, index: number) => {
+    return (
+      <React.Fragment key={name + index}>
+        <div className="action-div relative z-10 flex justify-center items-center">
+          <div className="visible absolute top-10 right-12 w-fit h-auto py-2 border border-lightSilver rounded-md bg-pureWhite shadow-lg ">
+            {/* <div className="w-40 h-auto "> */}
+            <ul className="w-40">
+              <li
+                key={index}
+                className="flex w-full h-9 px-3 hover:bg-lightGray !cursor-pointer">
+                <div className="flex justify-center items-center ml-2 cursor-pointer">
+                  <label className="inline-block text-xs cursor-pointer">
+                    {name}
+                  </label>
+                </div>
+              </li>
+            </ul>
+          </div>
+          {/* </div> */}
+        </div>
+
+      </React.Fragment>
+    );
+  });
+  const [kebabMenuOpen, setKebabMenuOpen] = useState<string>("");
+
   const [userData, setUserData] = useState<FormData[]>([
     {
       id: 1,
@@ -73,24 +106,12 @@ const page: React.FC = ({ setSetting }: any) => {
       state: "California",
       timezone: "Pacific Time",
       role: "Admin",
-      status: <Switch checked />,
+      status: <Switch checked={true} />,
       company: <MultiselectCompany width={48} />,
-      children: [
-        {
-          id: 11,
-          childName: "Child 1",
-          childAge: 5,
-          // Level 2 children
-          children: [
-            {
-              id: 111,
-              childName: "Grandchild 1",
-              childAge: 2,
-              // Add more nested levels if needed...
-            },
-          ],
-        },
-      ],
+      action: <div className="!h-8 !w-8 flex justify-center  items-center " onClick={(e: any) => {
+        console.log("Id 1 : ", e.id)
+        setKebabMenuOpen("1");
+      }}> <KebabMenuIcon /></div>
     },
     {
       id: 2,
@@ -101,24 +122,13 @@ const page: React.FC = ({ setSetting }: any) => {
       state: "Ontario",
       timezone: "Eastern Time",
       role: "User",
-      status: <Switch />,
+      status: <Switch checked={false} />,
       company: <MultiselectCompany width={48} />,
-      children: [
-        {
-          id: 12,
-          childName: "Child 2",
-          childAge: 8,
-          // Level 2 children
-          children: [
-            {
-              id: 121,
-              childName: "Grandchild 2",
-              childAge: 4,
-              // Add more nested levels if needed...
-            },
-          ],
-        },
-      ],
+      action: <div className="!h-8 !w-8 flex justify-center  items-center " onClick={(e: any) => {
+        console.log("Id 2 : ", e.id)
+        setKebabMenuOpen("2");
+
+      }}> <KebabMenuIcon /></div>
     },
     {
       id: 3,
@@ -129,30 +139,19 @@ const page: React.FC = ({ setSetting }: any) => {
       state: "England",
       timezone: "GMT",
       role: "Manager",
-      status: <Switch checked />,
-
+      status: <Switch checked={true} />,
       company: <MultiselectCompany width={48} />,
-      children: [
-        {
-          id: 12,
-          childName: "Child 2",
-          childAge: 8,
-          // Level 2 children
-          children: [
-            {
-              id: 121,
-              childName: "Grandchild 2",
-              childAge: 4,
-              // Add more nested levels if needed...
-            },
-          ],
-        },
-      ],
+      action: <div className="!h-8 !w-8 flex justify-center  items-center " onClick={(e: any) => {
+        setKebabMenuOpen("3");
+
+        console.log("Id 3 : ", e.id)
+      }}> <KebabMenuIcon /></div>
     },
 
   ]);
 
-  const [kebabMenuOpen, setKebabMenuOpen] = useState<string>("");
+
+
   const [isManageOpen, setIsManageOpen] = useState<boolean>(false);
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
   const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
@@ -180,8 +179,7 @@ const page: React.FC = ({ setSetting }: any) => {
       <KebabMenuIcon />
     </div>
   );
-  const actions = [actionButtons];
-  const actionArray = ["Manage Rights", "Edit", "Remove"];
+
 
   // States
   const [isToggleOpen, setIsToggleOpen] = useState<boolean>(false);
@@ -224,13 +222,13 @@ const page: React.FC = ({ setSetting }: any) => {
   const [isPageSetting, setIsPageSetting] = useState<boolean>(false);
 
   const wrapperData = (data: any) => {
-    console.log("🚀 ~ file: page.tsx:227 ~ wrapperData ~ data:", data)
     setIsPageSetting(data);
   };
-  
+
   return (
     <>
       <Wrapper setWrapperSetting={wrapperData}>
+        {kebabMenuOpen && actionItem}
         {isPageSetting ? <div>Setting Drawer</div>
           :
           <div>
@@ -254,22 +252,12 @@ const page: React.FC = ({ setSetting }: any) => {
                 {/* Data Table */}
                 <div>
                   {userData.length > 0 && (
-                    <Table
-                      data={userData}
-                      headers={headers}
-                      actions={actions}
-                      getRowId={(userData: any) => {
-                        setKebabMenuOpen(userData);
-                      }}
-                      actionDesc={actionArray}
-                      getAction={(value: any) => {
-                        handleKebabChange(value);
-                      }}
-                      className={`!h-[424px]`}
-                      sticky
-                      sortable
-                      action
-                      actionSticky
+                    <DataTable
+                      columns={columns} //mandatory
+                      data={userData} //mandatory
+                      headerInvisible={false} //not mandatory
+                      stickyHeader={true} //not mandatory
+                      hoverEffect={true} // not mandatory
                     />
                   )}
                 </div>
