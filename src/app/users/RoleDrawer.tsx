@@ -2,7 +2,7 @@
 
 import "next-ts-lib/dist/index.css";
 
-import { Button, CheckBox, Table, Typography } from "next-ts-lib";
+import { Button, CheckBox, DataTable, Typography } from "next-ts-lib";
 import React from "react";
 import ChevronLeftIcon from "../assets/icons/ChevronLeftIcon";
 
@@ -11,272 +11,276 @@ interface DrawerProps {
 }
 
 const RoleDrawer: React.FC<DrawerProps> = ({ onClose }) => {
-    const headers = [
+
+    const columns = [
         {
-            heading: "Module",
-            field: "module",
-            sort: false,
+            header: "Module",
+            accessor: "Module",
+            sortable: false,
         },
         {
-            heading: "View",
-            field: "view",
-            sort: false,
+            header: "View",
+            accessor: "View",
+            sortable: false,
         },
         {
-            heading: "Edit",
-            field: "edit",
-            sort: false,
+            header: "Edit",
+            accessor: "Edit",
+            sortable: false,
 
         },
         {
-            heading: "Create",
-            field: "create",
-            sort: false,
+            header: "Create",
+            accessor: "Create",
+            sortable: false,
 
         },
         {
-            heading: "Import",
-            field: "import",
-            sort: false,
+            header: "Import",
+            accessor: "Import",
+            sortable: false,
 
         },
         {
-            heading: "Sync",
-            field: "Viggew",
-            sort: false,
+            header: "Sync",
+            accessor: "Sync",
+            sortable: false,
         },
     ];
 
     const data = [
         {
             id: 1,
-            module: "Common", children: [{
-                id: "Vendor",
-                view: <CheckBox id={""} />,
+            Module: "Common",
+            details: <DataTable columns={columns} data={[{
+                Module: "Vendor",
+                View: <CheckBox id={""} />,
                 Edit: <CheckBox id={""} />,
                 Create: <CheckBox id={""} />,
-                import: <CheckBox id={""} />,
+                Import: <CheckBox id={""} />,
                 Sync: <CheckBox id={""} />,
             },
             {
-                id: "Dashboard",
-                view: <CheckBox id={""} />,
+                Module: "Dashboard",
+                View: <CheckBox id={""} />,
                 Edit: "",
                 Create: "",
-                import: "",
+                Import: "",
                 Sync: "",
             },
             {
-                id: "Documents (Inbox + File Upload)",
-                view: <CheckBox id={""} />,
+                Module: "Documents (Inbox + File Upload)",
+                View: <CheckBox id={""} />,
                 Edit: "",
                 Create: <CheckBox id={""} />,
-                import: "",
+                Import: "",
                 Sync: "",
             }
-            ]
+            ]} />
         },
-        { module: "Purchase Order", view: <CheckBox id={"v1"} />, edit: <CheckBox id={"e1"} />, create: <CheckBox id={"c1"} /> },
-        { module: "Bill Posting", view: <CheckBox id={"v2"} />, edit: <CheckBox id={"e2"} />, create: <CheckBox id={"c2"} />, import: <CheckBox id={"i1"} /> },
+        { Module: "Purchase Order", View: <CheckBox id={"v1"} />, Edit: <CheckBox id={"e1"} />, Create: <CheckBox id={"c1"} /> },
+        { Module: "Bill Posting", View: <CheckBox id={"v2"} />, Edit: <CheckBox id={"e2"} />, Create: <CheckBox id={"c2"} />, Import: <CheckBox id={"i1"} /> },
         {
-            module: "Approval",
-            children: [
-                {
-                    id: "Bill Approval",
-                    view: <CheckBox id={""} />,
-                    Edit: "",
+            Module: "Approval",
+            details:
+                <DataTable columns={columns} data={
+                    [
+                        {
+                            Module: "Bill Approval",
+                            View: <CheckBox id={""} />,
+                            Edit: "",
+                            Create: "",
+                            Import: "",
+                            Sync: "",
+                        },
+                        {
+                            Module: "Payment Approval",
+                            View: <CheckBox id={""} />,
+                            Edit: "",
+                            Create: "",
+                            Import: "",
+                            Sync: "",
+                        },
+                        {
+                            Module: "Purchase Approval",
+                            View: <CheckBox id={""} />,
+                            Edit: "",
+                            Create: "",
+                            Import: "",
+                            Sync: "",
+                        }
+                    ]} />
+        },
+        { Module: "Automation", View: <CheckBox id={"v3"} />, Edit: <CheckBox id={"e3"} />, Create: <CheckBox id={"c3"} /> },
+        {
+            Module: "Master Configuration",
+            details:
+                <DataTable columns={columns} data={[{
+                    Module: "Location",
+                    View: <CheckBox id={""} />,
+                    Edit: <CheckBox id={""} />,
                     Create: "",
-                    import: "",
-                    Sync: "",
-                },
-                {
-                    id: "Payment Approval",
-                    view: <CheckBox id={""} />,
-                    Edit: "",
+                    Import: "",
+                    Sync: <CheckBox id={""} />,
+                }, {
+                    Module: "Project",
+                    View: <CheckBox id={""} />,
+                    Edit: <CheckBox id={""} />,
                     Create: "",
-                    import: "",
-                    Sync: "",
-                },
-                {
-                    id: "Purchase Approval",
-                    view: <CheckBox id={""} />,
-                    Edit: "",
+                    Import: "",
+                    Sync: <CheckBox id={""} />,
+                }, {
+                    Module: "Class",
+                    View: <CheckBox id={""} />,
+                    Edit: <CheckBox id={""} />,
                     Create: "",
-                    import: "",
-                    Sync: "",
+                    Import: "",
+                    Sync: <CheckBox id={""} />,
+                }, {
+                    Module: "GL Account",
+                    View: <CheckBox id={""} />,
+                    Edit: <CheckBox id={""} />,
+                    Create: "",
+                    Import: "",
+                    Sync: <CheckBox id={""} />,
+                }, {
+                    Module: "AP Term",
+                    View: <CheckBox id={""} />,
+                    Edit: <CheckBox id={""} />,
+                    Create: "",
+                    Import: "",
+                    Sync: <CheckBox id={""} />,
+                }, {
+                    Module: "Product and Service",
+                    View: <CheckBox id={""} />,
+                    Edit: <CheckBox id={""} />,
+                    Create: "",
+                    Import: "",
+                    Sync: <CheckBox id={""} />,
+                }, {
+                    Module: "Description",
+                    View: <CheckBox id={""} />,
+                    Edit: <CheckBox id={""} />,
+                    Create: "",
+                    Import: "",
+                    Sync: <CheckBox id={""} />,
+                }, {
+                    Module: "Currency",
+                    View: <CheckBox id={""} />,
+                    Edit: <CheckBox id={""} />,
+                    Create: "",
+                    Import: "",
+                    Sync: <CheckBox id={""} />,
+                }, {
+                    Module: "Tax Rate",
+                    View: <CheckBox id={""} />,
+                    Edit: <CheckBox id={""} />,
+                    Create: "",
+                    Import: "",
+                    Sync: <CheckBox id={""} />,
+                }, {
+                    Module: "Payment Method",
+                    View: <CheckBox id={""} />,
+                    Edit: <CheckBox id={""} />,
+                    Create: "",
+                    Import: "",
+                    Sync: <CheckBox id={""} />,
+                }, {
+                    Module: "Payment Setup",
+                    View: <CheckBox id={""} />,
+                    Edit: <CheckBox id={""} />,
+                    Create: "",
+                    Import: "",
+                    Sync: <CheckBox id={""} />,
+                }, {
+                    Module: "AP Data Mapping",
+                    View: <CheckBox id={""} />,
+                    Edit: <CheckBox id={""} />,
+                    Create: "",
+                    Import: "",
+                    Sync: <CheckBox id={""} />,
+                }, {
+                    Module: "AP accessor Mapping",
+                    View: <CheckBox id={""} />,
+                    Edit: <CheckBox id={""} />,
+                    Create: "",
+                    Import: "",
+                    Sync: <CheckBox id={""} />,
                 }
-            ]
+                ]} />
         },
-        { module: "Automation", view: <CheckBox id={"v3"} />, edit: <CheckBox id={"e3"} />, create: <CheckBox id={"c3"} /> },
+        { Module: "Notification", View: <CheckBox id={"v4"} />, Edit: <CheckBox id={"e4"} /> },
+        { Module: "Cloud Configuration", View: <CheckBox id={"v5"} />, Edit: <CheckBox id={"e5"} /> },
         {
-            module: "Master Configuration",
-            children: [{
-                id: "Location",
-                view: <CheckBox id={""} />,
-                Edit: <CheckBox id={""} />,
-                Create: "",
-                import: "",
-                Sync: <CheckBox id={""} />,
-            }, {
-                id: "Project",
-                view: <CheckBox id={""} />,
-                Edit: <CheckBox id={""} />,
-                Create: "",
-                import: "",
-                Sync: <CheckBox id={""} />,
-            }, {
-                id: "Class",
-                view: <CheckBox id={""} />,
-                Edit: <CheckBox id={""} />,
-                Create: "",
-                import: "",
-                Sync: <CheckBox id={""} />,
-            }, {
-                id: "GL Account",
-                view: <CheckBox id={""} />,
-                Edit: <CheckBox id={""} />,
-                Create: "",
-                import: "",
-                Sync: <CheckBox id={""} />,
-            }, {
-                id: "AP Term",
-                view: <CheckBox id={""} />,
-                Edit: <CheckBox id={""} />,
-                Create: "",
-                import: "",
-                Sync: <CheckBox id={""} />,
-            }, {
-                id: "Product and Service",
-                view: <CheckBox id={""} />,
-                Edit: <CheckBox id={""} />,
-                Create: "",
-                import: "",
-                Sync: <CheckBox id={""} />,
-            }, {
-                id: "Description",
-                view: <CheckBox id={""} />,
-                Edit: <CheckBox id={""} />,
-                Create: "",
-                import: "",
-                Sync: <CheckBox id={""} />,
-            }, {
-                id: "Currency",
-                view: <CheckBox id={""} />,
-                Edit: <CheckBox id={""} />,
-                Create: "",
-                import: "",
-                Sync: <CheckBox id={""} />,
-            }, {
-                id: "Tax Rate",
-                view: <CheckBox id={""} />,
-                Edit: <CheckBox id={""} />,
-                Create: "",
-                import: "",
-                Sync: <CheckBox id={""} />,
-            }, {
-                id: "Payment Method",
-                view: <CheckBox id={""} />,
-                Edit: <CheckBox id={""} />,
-                Create: "",
-                import: "",
-                Sync: <CheckBox id={""} />,
-            }, {
-                id: "Payment Setup",
-                view: <CheckBox id={""} />,
-                Edit: <CheckBox id={""} />,
-                Create: "",
-                import: "",
-                Sync: <CheckBox id={""} />,
-            }, {
-                id: "AP Data Mapping",
-                view: <CheckBox id={""} />,
-                Edit: <CheckBox id={""} />,
-                Create: "",
-                import: "",
-                Sync: <CheckBox id={""} />,
-            }, {
-                id: "AP Field Mapping",
-                view: <CheckBox id={""} />,
-                Edit: <CheckBox id={""} />,
-                Create: "",
-                import: "",
-                Sync: <CheckBox id={""} />,
-            },]
-        },
-        { module: "Notification", view: <CheckBox id={"v4"} />, edit: <CheckBox id={"e4"} /> },
-        { module: "Cloud Configuration", view: <CheckBox id={"v5"} />, edit: <CheckBox id={"e5"} /> },
-        {
-            module: "Rights Management",
-            children: [{
-                id: "Role",
-                view: "",
+            Module: "Rights Management",
+            details:  <DataTable columns={columns} data={[{
+                Module: "Role",
+                View: "",
                 Edit: <CheckBox id={""} />,
                 Create: <CheckBox id={""} />,
-                import: "",
+                Import: "",
                 Sync: "",
             }, {
-                id: "Company",
-                view: "",
+                Module: "Company",
+                View: "",
                 Edit: <CheckBox id={""} />,
                 Create: <CheckBox id={""} />,
-                import: "",
+                Import: "",
                 Sync: "",
             }, {
-                id: "User",
-                view: <CheckBox id={""} />,
+                Module: "User",
+                View: <CheckBox id={""} />,
                 Edit: "",
                 Create: <CheckBox id={""} />,
-                import: "",
+                Import: "",
                 Sync: "",
-            }]
+            }]}/>
         },
         {
-            module: "Payments",
-            children: [{
-                id: "Bill to Pay",
-                view: <CheckBox id={""} />,
+            Module: "Payments",
+            details: 
+            <DataTable columns={columns} data={[{
+                Module: "Bill to Pay",
+                View: <CheckBox id={""} />,
                 Edit: <CheckBox id={""} />,
                 Create: "",
-                import: "",
+                Import: "",
                 Sync: "",
             }, {
-                id: "Check Cut",
-                view: <CheckBox id={""} />,
+                Module: "Check Cut",
+                View: <CheckBox id={""} />,
                 Edit: <CheckBox id={""} />,
                 Create: "",
-                import: "",
+                Import: "",
                 Sync: "",
             }, {
-                id: "Payment",
-                view: <CheckBox id={""} />,
+                Module: "Payment",
+                View: <CheckBox id={""} />,
                 Edit: <CheckBox id={""} />,
                 Create: "",
-                import: "",
+                Import: "",
                 Sync: "",
-            }]
+            }]}/>
         },
         {
-            module: "Reports",
-            children: [{
-                id: "Bill Analysis",
-                view: <CheckBox id={""} />,
+            Module: "Reports",
+            details: <DataTable columns={columns} data={ [{
+                Module: "Bill Analysis",
+                View: <CheckBox id={""} />,
                 Edit: "",
                 Create: "",
-                import: "",
+                Import: "",
                 Sync: "",
             }, {
-                id: "Vendor Aging",
-                view: <CheckBox id={""} />,
+                Module: "Vendor Aging",
+                View: <CheckBox id={""} />,
                 Edit: "",
                 Create: "",
-                import: "",
+                Import: "",
                 Sync: "",
-            }]
+            }]}/>
         },
     ];
-    // const checkbox =  {
-    //   view: (item: any) =>  <CheckBox id={""} /> 
-    // }
 
     return (
         <>
@@ -284,7 +288,7 @@ const RoleDrawer: React.FC<DrawerProps> = ({ onClose }) => {
                 <div className="py-5 flex justify-between w-auto bg-whiteSmoke">
                     <div className="flex justify-star ml-3">
                         <span className="mx-2 cursor-pointer" onClick={onClose} >
-                            <ChevronLeftIcon bgColor="white"/>
+                            <ChevronLeftIcon bgColor="white" />
                         </span>
                         <Typography type="h5" className="!font-bold flex justify-center items-center text-center">Admin Manage Rights</Typography>
 
@@ -292,17 +296,12 @@ const RoleDrawer: React.FC<DrawerProps> = ({ onClose }) => {
                 </div>
                 {/* Data Table */}
                 <div>
-                    <Table
+                    <DataTable
+                        columns={columns}
                         data={data}
-                        headers={headers}
-                        getRowId={(data: any) => {
-                            console.log(data);
-                            data.id
-                        }}
-                        expandable
-                        sortable
-                        sticky
-                        className={`h-[425px]`}
+                        headerInvisible={false}
+                        stickyHeader={true}
+                        hoverEffect={true}
                     />
                 </div>
                 {/* Footer*/}

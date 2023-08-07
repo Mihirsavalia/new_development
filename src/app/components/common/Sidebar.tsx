@@ -118,12 +118,8 @@ const settings_data: SettingsSection[] = [
     heading: "MASTER",
     items: [
       {
-        name: "Vendor",
-        href: "/users",
-      },
-      {
         name: "Dimension",
-        href: "/dimension",
+        href: "/users",
       },
       {
         name: "GL Account",
@@ -302,7 +298,7 @@ const Sidebar = ({ setOpen, setSettingSidebar, toggleDrawer, sendSidebarData }: 
               >
                 {setSettingSidebar
                   ? (<>
-                    <div className={`flex py-3 sticky ${windowSize<=1023 ?"" :"top-[64px]"} pl-[20px] justify-start`}>
+                    <div className={`flex py-3 sticky ${windowSize <= 1023 ? "" : "top-[64px]"} pl-[20px] justify-start`}>
                       <span className=" cursor-pointer mr-2.5" onClick={handleSettingChange}>
                         <ChevronLeftIcon bgColor="whiteSmoke" />
                       </span>
@@ -345,7 +341,7 @@ const Sidebar = ({ setOpen, setSettingSidebar, toggleDrawer, sendSidebarData }: 
             onClick={() => {
               setCollapse(!isCollapsed);
               setAnimate(!isCollapsed ? styles.rightToLeft : styles.leftToRight);
-              // setSetting(!isCollapsed);
+              // setSettingClick(!isCollapsed);
             }}
           >
             <MenuIcon />

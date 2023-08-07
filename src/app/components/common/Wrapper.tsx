@@ -7,6 +7,8 @@ import DrawerOverlay from "../../users/DrawerOverlay";
 import Navbar from "./Navbar";
 import { useRouter } from "next/navigation";
 
+import styles from "../../assets/scss/styles.module.scss";
+
 interface WrapperProps {
   children: ReactNode;
   setWrapperSetting: any;
@@ -44,14 +46,15 @@ const Wrapper = ({ children, setWrapperSetting }: WrapperProps): JSX.Element => 
 
   const handleSidebarData = (data: any) => {
     setIsSetting(data)
-    window.location.href="/users";
+    window.location.href = "/users";
   };
+
 
   return (
     <div className="lg:flex" >
-      <Sidebar setOpen={isOpen} setSettingSidebar={isSetting} toggleDrawer={drawer} sendSidebarData={handleSidebarData} />
+      <Sidebar setOpen={isOpen}  setSettingSidebar={!isSetting} toggleDrawer={drawer} sendSidebarData={handleSidebarData} />
 
-      <main className=" " style={{ width: "-webkit-fill-available" }}>
+      <main  style={{ width: "-webkit-fill-available" }}>
         <Navbar setSetting={navbarData} />
         <DrawerOverlay
           className="!top-[100px]"

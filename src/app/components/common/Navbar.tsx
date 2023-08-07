@@ -2,13 +2,13 @@ import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 // components
-import { Avatar, Badge, Close, Select, TextField, Tooltip } from "next-ts-lib";
+import { Avatar, Badge, Close, Select, Text, Tooltip } from "next-ts-lib";
 
 // icons
 import Bell from "../../assets/icons/BellIcon";
 import Setting from "../../assets/icons/SettingIcon";
 import Help from "../../assets/icons/HelpIcon";
-import Sync from "../../assets/icons/SyncIcon";
+import Sync from "../../assets/icons/SyncFilledIcon";
 import BI from "../../assets/icons/BiIcon";
 // import Close from "../../assets/icons/Close";
 import SearchIcon from "../../assets/icons/SearchIcon";
@@ -99,16 +99,20 @@ const Navbar = ({ setSetting }: NavbarProps): JSX.Element => {
             onSelect={() => console.log()}
             options={companies}
             id="companies"
-            search
-          />
+            search getValue={function (value: any): void {
+              throw new Error("Function not implemented.");
+            } } getError={function (arg1: boolean): void {
+              throw new Error("Function not implemented.");
+            } }          />
         </div>
         <div className="flex relative items-center">
-          <TextField
+          <Text
             value={searchValue}
             className="pl-10 pr-10"
             getValue={handleSearchValue}
-            onSubmit={() => console.log("hii")}
-          />
+            onSubmit={() => console.log("hii")} getError={function (arg1: boolean): void {
+              throw new Error("Function not implemented.");
+            } }          />
           <div className="flex absolute left-2 cursor-pointer">
             <SearchIcon />
           </div>

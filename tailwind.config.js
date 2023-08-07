@@ -16,7 +16,9 @@ module.exports = {
         primary: "#02B89D",
         whiteSmoke: "#F6F6F6",
         lightSilver: "#D8D8D8",
-        lightGray: "#F4F4F4"
+        lightGray: "#F4F4F4",
+        slatyGrey: "#6E6D7A",
+        pureWhite: "#FFF",
       },
       screens: {
         xs: "440px"

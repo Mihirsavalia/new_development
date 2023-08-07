@@ -1,8 +1,8 @@
 @keyframes slideInRight {
-  from {
+  0% {
     transform: translateX(100%);
   }
-  to {
+  100% {
     transform: translateX(0%);
   }
 }
@@ -11,11 +11,11 @@
 }
 
 @keyframes slideOutRight {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
+  0% {
     transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(100%);
   }
 }
 .slideOutAnimation {
@@ -28,22 +28,22 @@
     width: 215px;
     top: 64px;
     height: auto;
-    animation: leftToRightAnimation 0.3s ease-in-out both;
+    animation: leftToRight 0.3s ease-in-out both;
   }
   .collapsedDiv {
     left: -100%;
     width: 215px;
     top: 64px;
     height: auto;
-    animation: rightToLeftAnimation 0.3s ease-in-out both;
+    animation: rightToLeft 0.3s ease-in-out both;
   }
 }
 
 .leftToRight {
-  animation: leftToRightAnimation 0.3s ease-in-out both;
+  animation: leftToRight 0.5s ease-out ;
 }
 
-@keyframes leftToRightAnimation {
+@keyframes leftToRight {
   0% {
     transform: translateX(-100%);
   }
@@ -54,12 +54,40 @@
 }
 
 .rightToLeft {
-  animation: rightToLeftAnimation 0.3s ease-in-out both;
+  animation: rightToLeft 0.5s ease-out ;
 }
 
-@keyframes rightToLeftAnimation {
+@keyframes rightToLeft {
   0% {
     transform: translateX(100%);
+  }
+
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.rightAnimation {
+  animation: rightAnimation 0.5s ease-in-out both;
+}
+
+@keyframes rightAnimation {
+  0% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX(10%);
+  }
+}
+
+.leftAnimation {
+  animation: leftAnimation 0.5s ease-in-out both;
+}
+
+@keyframes leftAnimation {
+  0% {
+    transform: translateX(-10%);
   }
 
   100% {

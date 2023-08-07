@@ -2,9 +2,10 @@ import {
     Avatar,
     Button,
     Close,
+    Email,
     Select,
     Tel,
-    TextField,
+    Text,
     Typography
 } from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
@@ -121,10 +122,10 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData, drawerFor }) =
 
     return (
         <>
-            
+
             {onOpen && (
                 <div
-                    className={`fixed top-0 bg-white right-0 h-full xs:!w-5/6 sm:!w-2/4 lg:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.slideOutAnimation}`}
+                    className={`fixed top-0 bg-white right-0 h-full xs:!w-5/6 sm:!w-2/4 lg:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.rightAnimation}`}
                 >
                     <div className="p-4 flex justify-between items-center border-b border-lightSilver">
                         <Typography type="label" className="!font-bold !text-lg"> {isEdit ? "EDIT" : "ADD"} USER</Typography>
@@ -154,17 +155,18 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData, drawerFor }) =
                             />
                         </div>
                         <div className="flex-1 mt-3">
-                            <TextField
+                            <Text
                                 label="Full Name"
                                 id="name"
                                 name="name"
                                 // value={isEdit ? updatedFormData.name : ""}
                                 validate
-                                getValue={(value: any) => handleInputChange("name", (value))}
-                            ></TextField>
+                                getValue={(value: any) => handleInputChange("name", (value))} getError={function (arg1: boolean): void {
+                                    throw new Error("Function not implemented.");
+                                }}                            ></Text>
                         </div>
                         <div className="flex-1 mt-3">
-                            <TextField
+                            <Email
                                 label="Email"
                                 id="email"
                                 name="email"
@@ -172,7 +174,9 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData, drawerFor }) =
                                 // value={isEdit ? updatedFormData.email : ""}
                                 validate
                                 getValue={(value: any) => handleInputChange("email", value)}
-                            ></TextField>
+                                getError={function (arg1: boolean): void {
+                                    throw new Error("Function not implemented.");
+                                }}                            ></Email>
                         </div>
                         <div className="flex-1 mt-3">
                             <Tel
@@ -180,11 +184,10 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData, drawerFor }) =
                                 validate
                                 required
                                 // value={isEdit ? updatedFormData.phone : ""}
-                                getValue={(value: any) =>
-                                    handleInputChange("phone", value)
-                                }
-                                countryCode
-                            />
+                                getValue={(value: any) => handleInputChange("phone", value)}
+                                countryCode getError={function (arg1: boolean): void {
+                                    throw new Error("Function not implemented.");
+                                }} />
                         </div>
                         <div className="flex-1 mt-3">
                             <Select
@@ -193,10 +196,11 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData, drawerFor }) =
                                 id="country"
                                 required
                                 // defaultValue={isEdit ? updatedFormData.country : ""}
-                                onSelect={(value: any) =>
-                                    handleInputChange("country", value)
-                                }
-                            />
+                                onSelect={(value: any) => handleInputChange("country", value)} getValue={function (value: any): void {
+                                    throw new Error("Function not implemented.");
+                                }} getError={function (arg1: boolean): void {
+                                    throw new Error("Function not implemented.");
+                                }} />
                         </div>
                         <div className="flex-1 mt-3">
                             <Select
@@ -205,10 +209,11 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData, drawerFor }) =
                                 id="state"
                                 required
                                 defaultValue={isEdit ? updatedFormData.state : ""}
-                                onSelect={(value: any) =>
-                                    handleInputChange("state", value)
-                                }
-                            />
+                                onSelect={(value: any) => handleInputChange("state", value)} getValue={function (value: any): void {
+                                    throw new Error("Function not implemented.");
+                                }} getError={function (arg1: boolean): void {
+                                    throw new Error("Function not implemented.");
+                                }} />
                         </div>
                         <div className="flex-1 mt-3">
                             <Select
@@ -217,10 +222,11 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData, drawerFor }) =
                                 id="timezone"
                                 required
                                 defaultValue={isEdit ? updatedFormData.timezone : ""}
-                                onSelect={(value: any) =>
-                                    handleInputChange("timezone", value)
-                                }
-                            />
+                                onSelect={(value: any) => handleInputChange("timezone", value)} getValue={function (value: any): void {
+                                    throw new Error("Function not implemented.");
+                                }} getError={function (arg1: boolean): void {
+                                    throw new Error("Function not implemented.");
+                                }} />
                         </div>
                         <div className="flex-1 mt-3">
                             <Select
@@ -229,10 +235,11 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData, drawerFor }) =
                                 id="company"
                                 required
                                 // defaultValue={isEdit ? updatedFormData.company : ""}
-                                onSelect={(value: any) =>
-                                    handleInputChange("company", value)
-                                }
-                            />
+                                onSelect={(value: any) => handleInputChange("company", value)} getValue={function (value: any): void {
+                                    throw new Error("Function not implemented.");
+                                }} getError={function (arg1: boolean): void {
+                                    throw new Error("Function not implemented.");
+                                }} />
                         </div>
                         <div className="flex-1 mt-3">
                             <Select
@@ -241,10 +248,11 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData, drawerFor }) =
                                 id="assign_role"
                                 required
                                 defaultValue={isEdit ? updatedFormData.role : ""}
-                                onSelect={(value: any) =>
-                                    handleInputChange("role", value)
-                                }
-                            />
+                                onSelect={(value: any) => handleInputChange("role", value)} getValue={function (value: any): void {
+                                    throw new Error("Function not implemented.");
+                                }} getError={function (arg1: boolean): void {
+                                    throw new Error("Function not implemented.");
+                                }} />
                         </div>
                     </div>
                     <div className="flex flex-row justify-end items-center border-t border-lightSilver">

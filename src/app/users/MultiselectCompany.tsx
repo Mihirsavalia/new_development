@@ -14,7 +14,7 @@ interface AssignUserProps {
 }
 
 const clientNames: State[] = [
-  { id: "Google", name: "Googleeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" },
+  { id: "Google", name: "Google" },
   { id: "Microsoft", name: "Microsoft" },
   { id: "Apple", name: "Apple" },
   { id: "Amazon", name: "Amazon" },
