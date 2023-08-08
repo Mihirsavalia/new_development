@@ -1,19 +1,22 @@
 "use client";
 
-import { Button, Close, DataTable, Modal, ModalAction, ModalContent, ModalTitle, Switch, Table, Typography } from "next-ts-lib";
+import { Button, Close, DataTable, Modal, ModalAction, ModalContent, ModalTitle, Switch, Toast, Typography } from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
 import React, { useEffect, useRef, useState } from "react";
-import KebabMenuIcon from "../assets/icons/KebabMenuIcon";
-import PlusIcon from "../assets/icons/PlusIcon";
-import Navbar from "../components/common/Navbar";
-import Wrapper from "../components/common/Wrapper";
+import axios from "axios";
+
+import KebabMenuIcon from "@/app/assets/icons/KebabMenuIcon";
+import PlusIcon from "@/app/assets/icons/PlusIcon";
+import Wrapper from "@/app/components/common/Wrapper";
 import Drawer from "./Drawer";
 import DrawerOverlay from "./DrawerOverlay";
 import MultiselectCompany from "./MultiselectCompany";
 import RoleDrawer from "./RoleDrawer";
 import Dimension from "./Dimension";
+import APTerm from "./APTerm";
 
-interface FormData {
+
+interface userData {
   id: number;
   name: string;
   email: string;
@@ -28,13 +31,15 @@ interface FormData {
   action: any;
 }
 
-
 const page: React.FC = () => {
+
   const [isToggleOpen, setIsToggleOpen] = useState<boolean>(false);
   const [isManageOpen, setIsManageOpen] = useState<boolean>(false);
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
   const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
   const [isPageSetting, setIsPageSetting] = useState<boolean>(false);
+  const [editId, setEditId] = useState<number>();
+  const [userData, setUserData] = useState<userData[]>([]);
 
   const columns = [
     {
@@ -73,19 +78,96 @@ const page: React.FC = () => {
       sortable: false,
     },
   ];
+
   const actionArray = ["Manage Rights", "Edit", "Remove"];
 
   const handleKebabChange = (actionName: string, id: number) => {
+    setEditId(id);
     if (actionName === "Manage Rights") {
       setIsManageOpen(!isManageOpen)
     }
     if (actionName === "Edit") {
-      setIsEditOpen(!isEditOpen)
+      setIsToggleOpen(!isEditOpen)
     }
     if (actionName === "Remove") {
       setIsRemoveOpen(!isRemoveOpen)
     }
   };
+
+
+
+
+  //User List API
+  const getUserDataList = async () => {
+    try {
+      const params = {
+        "GlobalSearch": "",
+        "StatusFilter": null, //ALL= null, Active = 1, InActive = 0
+        "PageIndex": 1,
+        "PageSize": 10
+      }
+      const token = await localStorage.getItem("token");
+      const config = {
+        headers: {
+          Authorization: `bearer ${token}`,
+        },
+      };
+      const response = await axios.post(
+        `${process.env.base_url}/user/getlist`, params,
+        config
+      );
+
+      if (response.status === 200) {
+        if (response.data.ResponseStatus === "Success") {
+          setUserData(response.data.ResponseData.List);
+        } else {
+          const data = response.data.Message;
+          if (data === null) {
+            Toast.error("Error", "Please try again later.");
+          } else {
+            Toast.error("Error", data);
+          }
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  //Update User Status API
+  const updateStatus = async () => {
+    try {
+      const params = {
+        "Id": 96,
+        "Status": false
+      }
+      const token = await localStorage.getItem("token");
+      const config = {
+        headers: {
+          Authorization: `bearer ${token}`,
+        },
+      };
+      const response = await axios.post(
+        `${process.env.base_url}/user/updatestatus`, params,
+        config
+      );
+
+      if (response.status === 200) {
+        if (response.data.ResponseStatus === "Success") {
+          setUserData(response.data.ResponseData.List);
+        } else {
+          const data = response.data.Message;
+          if (data === null) {
+            Toast.error("Error", "Please try again later.");
+          } else {
+            Toast.error("Error", data);
+          }
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   const Actions = ({ actions, id }: any) => {
     const actionsRef = useRef<HTMLDivElement>(null);
@@ -135,48 +217,18 @@ const page: React.FC = () => {
       </div>
     );
   };
-
-  const [userData, setUserData] = useState<FormData[]>([
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john.doe@example.com",
-      phone: 1234567890,
-      country: "United States",
-      state: "California",
-      timezone: "Pacific Time",
-      role: "Admin",
-      status: <Switch checked={true} />,
-      company: <div className="!z-50"><MultiselectCompany width={24} /></div>,
-      action: <Actions actions={actionArray} />
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane.smith@example.com",
-      phone: 1234561111,
-      country: "Canada",
-      state: "Ontario",
-      timezone: "Eastern Time",
-      role: "User",
-      status: <Switch checked={false} />,
-      company: <MultiselectCompany width={48} />,
-      action: <Actions actions={actionArray} />
-    },
-    {
-      id: 3,
-      name: "Bob Johnson",
-      email: "bob.johnson@example.com",
-      phone: 9876543210,
-      country: "United Kingdom",
-      state: "England",
-      timezone: "GMT",
-      role: "Manager",
-      status: <Switch checked={true} />,
-      company: <MultiselectCompany width={48} />,
-      action: <Actions actions={actionArray} />
-    },
-  ]);
+  const updatedUserData = userData?.map((e: any) => new Object({
+    id: e.id,
+    name: e.first_name,
+    email: e.email,
+    company: e.company,
+    role: e.role,
+    status:
+      <div>
+        {e.is_Active ? <Switch checked={true} /> : <Switch checked={false} />}
+      </div>,
+    action: <Actions id={e.id} actions={actionArray} />
+  }))
 
   const modalClose = () => {
     setIsRemoveOpen(false);
@@ -194,10 +246,14 @@ const page: React.FC = () => {
     setIsPageSetting(data);
   };
 
+  useEffect(() => {
+    getUserDataList();
+  }, []);
+
   return (
     <>
       <Wrapper setWrapperSetting={wrapperData}>
-        {!isPageSetting ?
+        {isPageSetting ?
           <div><Dimension /></div>
           : <div>
             {isManageOpen ? <RoleDrawer onClose={() => setIsManageOpen(false)} />
@@ -218,11 +274,11 @@ const page: React.FC = () => {
                 </div>
 
                 {/* Data Table */}
-                <div>
+                <div className="!h-[27.8rem] border-b border-lightSilver ">
                   {userData.length > 0 && (
                     <DataTable
                       columns={columns}
-                      data={userData}
+                      data={updatedUserData}
                       headerInvisible={false}
                       stickyHeader={true}
                       hoverEffect={true}
@@ -232,54 +288,53 @@ const page: React.FC = () => {
               </div>}
 
 
-            {isRemoveOpen && (
-              <Modal
-                isOpen={isRemoveOpen}
-                onClose={modalClose}
-                width="352px"
-              >
-                <ModalTitle>
-                  <div className="py-3 px-4 font-bold">Remove</div>
+            {/* Modal */}
+            <Modal
+              isOpen={isRemoveOpen}
+              onClose={modalClose}
+              width="352px"
+            >
+              <ModalTitle>
+                <div className="py-3 px-4 font-bold">Remove</div>
 
-                  <div className="" >
-                    <Close variant="medium" />
-                  </div>
-                </ModalTitle>
+                <div className="" >
+                  <Close variant="medium" />
+                </div>
+              </ModalTitle>
 
-                <ModalContent>
-                  <div className="p-2 my-5">
-                    Are you sure you want to remove the user ?
-                  </div>
-                </ModalContent>
+              <ModalContent>
+                <div className="p-2 my-5">
+                  Are you sure you want to remove the user ?
+                </div>
+              </ModalContent>
 
-                <ModalAction>
-                  <div>
-                    <Button
-                      className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
-                      variant="btn-outline-error"
-                    >
-                      No
-                    </Button>
-                  </div>
+              <ModalAction>
+                <div>
+                  <Button
+                    className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
+                    variant="btn-outline-error"
+                  >
+                    No
+                  </Button>
+                </div>
 
-                  <div>
-                    <Button
-                      className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
-                      variant="btn-error"
-                    >
-                      Yes
-                    </Button>
-                  </div>
-                </ModalAction>
-              </Modal>
-            )}
+                <div>
+                  <Button
+                    className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
+                    variant="btn-error"
+                  >
+                    Yes
+                  </Button>
+                </div>
+              </ModalAction>
+            </Modal>
 
             {/*  Drawer */}
             <Drawer
-              onOpen={isToggleOpen || isEditOpen}
+              onOpen={isToggleOpen}
               onClose={() => { setIsToggleOpen(false), setIsEditOpen(false) }}
               onData={onDrawerData}
-              drawerFor={isToggleOpen && "Add" || isEditOpen && "Edit" || ""}
+              editId={typeof editId === 'number' ? editId : 0}
             />
             {/* Drawer Overlay */}
             <DrawerOverlay

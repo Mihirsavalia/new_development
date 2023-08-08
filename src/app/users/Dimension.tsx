@@ -1,13 +1,12 @@
-import { Button, Tooltip, Typography } from 'next-ts-lib';
-import React, { useState } from 'react'
-import SearchIcon from '../assets/icons/SearchIcon';
-import SyncIcon from "../assets/icons/SyncIcon";
-import Class from './tables/Class';
-import Location from './tables/Location';
-import Department from './tables/Department';
-import Project from './tables/Project';
-import PlusIcon from '../assets/icons/PlusIcon';
-import Drawer from './Drawer';
+import { Button, Close, Modal, ModalAction, ModalContent, ModalTitle, Tooltip, Typography } from 'next-ts-lib';
+import React, { useState } from 'react';
+import PlusIcon from '@/app/assets/icons/PlusIcon';
+import SearchIcon from '@/app/assets/icons/SearchIcon';
+import SyncIcon from "@/app/assets/icons/SyncIcon";
+import Class from './Tables/Class';
+import Department from './Tables/Department';
+import Location from './Tables/Location';
+import Project from './Tables/Project';
 import DrawerOverlay from './DrawerOverlay';
 
 const tabs = [
@@ -17,30 +16,27 @@ const tabs = [
     { id: "Project", label: "PROJECT" },
 ];
 
-const Dimension = () => {
+const Dimension: React.FC = () => {
     const [selectedTabIndex, setSelectedTabIndex] = useState<number>(0);
     const [tab, setTab] = useState<string>("Class");
-    const [openDrawer, setOpenDrawer] = useState(false);
+    const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
     const [hasEditId, setHasEditId] = useState("");
-    const [isToggleOpen, setIsToggleOpen] = useState<boolean>(false);
+    const [isSyncModalOpen, setIsSyncModalOpen] = useState<boolean>(false);
 
-    // To Toggle Drawer
-    const handleDrawerOpen = () => {
-        // setOpenDrawer(true);
+
+    const handleToggleChange = (tab: any) => {
+        setIsOpenDrawer(true);
     };
-
     const handleDrawerClose = () => {
-        // setOpenDrawer(false);
-        // setHasEditId("");
+        setIsOpenDrawer(false);
     }
-
-    const handleToggleChange = () => {
-        setIsToggleOpen(true);
+    const modalClose = () => {
+        setIsSyncModalOpen(false);
     };
-
     const handleTabClick = (tabId: string, index: number) => {
         setTab(tabId);
         setSelectedTabIndex(index);
+        setIsOpenDrawer(false);
     }
 
     return (
@@ -62,37 +58,68 @@ const Dimension = () => {
 
                 </div>
                 <div className="flex items-center px-[10px]">
-                    <Tooltip content={"Search"} position="bottom">
+                    <Tooltip content={"Search"} position="bottom" className='!z-[2]'>
                         <SearchIcon />
                     </Tooltip>
-                    <Tooltip content={`Sync ${tab}`} position="bottom">
-                        <SyncIcon />
+                    <Tooltip content={`Sync ${tab}`} position="bottom" className='!z-[2]'>
+                        <div onClick={() => setIsSyncModalOpen(true)}>
+                            <SyncIcon />
+                        </div>
                     </Tooltip>
                     <Button
                         className="rounded-full !px-6 "
                         variant="btn-primary"
-                        onClick={handleToggleChange}>
+                        onClick={(e: any) => handleToggleChange(tab)}>
                         <Typography type="h6" className="!font-bold flex justify-center items-center text-center"><span className="mr-1"> <PlusIcon /></span> CREATE NEW</Typography>
                     </Button>
                 </div>
             </div>
-            {/*  Drawer */}
-            <Drawer
-                onOpen={openDrawer}
-                tab={tab}
-                onClose={handleDrawerClose}
-            />
 
-            {/* Drawer Overlay */}
+            {/* Modal */}
+            <Modal
+                isOpen={isSyncModalOpen}
+                onClose={modalClose}
+                width="363px">
+                <ModalTitle>
+                    <div className="py-3 px-4 font-bold">Remove</div>
+                    <div className="" >
+                        <Close variant="medium" />
+                    </div>
+                </ModalTitle>
+                <ModalContent>
+                    <div className="p-2 my-5">
+                        <Typography type='h5' className='!font-normal'>
+                            Are you sure you want to sync class ?
+                        </Typography>
+                    </div>
+                </ModalContent>
+                <ModalAction>
+                    <div>
+                        <Button
+                            className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
+                            variant="btn-outline">
+                            NO
+                        </Button>
+                    </div>
+                    <div>
+                        <Button
+                            className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
+                            variant="btn-primary">
+                            YES
+                        </Button>
+                    </div>
+                </ModalAction>
+            </Modal>
+
+
+            {tab === "Class" && <Class onDrawerOpen={isOpenDrawer} onDrawerClose={handleDrawerClose} />}
+            {tab === "Location" && <Location onDrawerOpen={isOpenDrawer} onDrawerClose={handleDrawerClose} />}
+            {tab === "Department" && <Department onDrawerOpen={isOpenDrawer} onDrawerClose={handleDrawerClose} />}
+            {tab === "Project" && <Project onDrawerOpen={isOpenDrawer} onDrawerClose={handleDrawerClose} />}
             <DrawerOverlay
-                isOpen={openDrawer}
+                isOpen={isOpenDrawer}
                 onClose={handleDrawerClose}
             />
-
-            {tab === "Class" && <Class onOpen={handleDrawerOpen} />}
-            {tab === "Location" && <Location onOpen={handleDrawerOpen} />}
-            {tab === "Department" && <Department onOpen={handleDrawerOpen} />}
-            {tab === "Project" && <Project onOpen={handleDrawerOpen} />}
         </div>
     )
 }

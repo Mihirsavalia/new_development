@@ -6,15 +6,17 @@ import {
     Select,
     Tel,
     Text,
+    Toast,
     Typography
 } from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
-import styles from "../assets/scss/styles.module.scss";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import styles from "@/app/assets/scss/styles.module.scss";
+import EditIcon from "@/app/assets/icons/EditIcon";
 
-import { useState } from "react";
-import EditIcon from "../assets/icons/EditIcon";
-
-interface FormData {
+interface userData {
+    id: number;
     name: string;
     email: string;
     phone: number | null;
@@ -22,46 +24,28 @@ interface FormData {
     state: string;
     timezone: string;
     role: string;
-    status: string;
-    company: string[];
+    status: any;
+    company: any;
     // imageName: string;
+    action: any;
 }
 
 interface DrawerProps {
     onOpen: boolean;
     onClose: () => void;
     onData: (formData: FormData) => void;
-    drawerFor: any;
+    editId: number;
 }
 
-const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData, drawerFor }) => {
-    let isEdit = drawerFor === "Edit"
-    const initialFormData: FormData = {
-        name: "",
-        email: "",
-        phone: null,
-        country: "",
-        state: "",
-        timezone: "",
-        role: "",
-        status: "",
-        company: []
-    };
-    const [formData, setFormData] = useState<FormData>(initialFormData);
+const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData, editId }) => {
 
-    const updatedFormData: FormData = {
-        name: "Mihir",
-        email: "mihir@gmail.com",
-        phone: 1234568790,
-        country: "India",
-        state: "Gujarat",
-        timezone: "UTC - 13",
-        role: "Admin",
-        status: "Active",
-        company: ['Fb']
-    };
-
+    const [name, setName] = useState<string>("");
+    const [nameError, setNameError] = useState<boolean>(false);
+    const [email, setEmail] = useState<string>("");
+    const [emailError, setEmailError] = useState<boolean>(false);
     const [imagePreview, setImagePreview] = useState<string>("");
+    const [userData, setUserData] = useState<userData[]>([]);
+
     // const [selectedFile, setSelectedFile] = useState(null);
     // const [fileName, setFileName] = useState("");
 
@@ -73,10 +57,39 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData, drawerFor }) =
         { label: "Data Corp", value: "Data Corp" },
     ];
 
-    const handleSaveData = () => {
-        onData(formData);
-        onClose();
-        setFormData(initialFormData);
+    //User List API
+    const getUserData = async () => {
+        try {
+            const token = await localStorage.getItem("token");
+            const config = {
+                headers: {
+                    Authorization: `bearer ${token}`,
+                },
+            };
+            const response = await axios.get(
+                `${process.env.base_url}/user/getbyid?userId=${editId} `,
+                config
+            );
+
+            if (response.status === 200) {
+                if (response.data.ResponseStatus === "Success") {
+                    setUserData(response.data.ResponseData);
+                } else {
+                    const data = response.data.Message;
+                    if (data === null) {
+                        Toast.error("Error", "Please try again later.");
+                    } else {
+                        Toast.error("Error", data);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    const handleSubmit = (e: any) => {
+        e.preventDefault();
+        name.trim().length <= 0 && setNameError(true);
     };
 
     const onUploadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,25 +113,17 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData, drawerFor }) =
         fileInput && fileInput.click();
     };
 
-    const [emptyFields, setEmptyFields] = useState({
-        name: true,
-        email: true,
-        phone: true,
-        country: true,
-        state: true,
-        timezone: true,
-        role: true,
-    });
+    useEffect(() => {
+        if (onOpen) {
+            setName("");
+            setNameError(false);
+        }
+    }, [onOpen]);
 
-    const handleInputChange = (field: any, value: any) => {
-        setFormData((prevFormData) => ({ ...prevFormData, [field]: value }));
-        setEmptyFields((prevEmptyFields) =>
-            value.trim() === "" ? { ...prevEmptyFields, [field]: true } : { ...prevEmptyFields, [field]: false }
-        );
-    };
-    const fullNameRegex = /^\d{1,50}$/g;
-
-    const isFormDataEmpty = Object.values(emptyFields).every((value) => value === false) || fullNameRegex.test(formData.name);;
+    useEffect(() => {
+        getUserData();
+        // setEmail(editId ? userData?.email : "")
+    }, [editId]);
 
     return (
         <>
@@ -128,7 +133,7 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData, drawerFor }) =
                     className={`fixed top-0 bg-white right-0 h-full xs:!w-5/6 sm:!w-2/4 lg:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.rightAnimation}`}
                 >
                     <div className="p-4 flex justify-between items-center border-b border-lightSilver">
-                        <Typography type="label" className="!font-bold !text-lg"> {isEdit ? "EDIT" : "ADD"} USER</Typography>
+                        <Typography type="label" className="!font-bold !text-lg"> {editId ? "EDIT" : "ADD"} USER</Typography>
                         <div className="mx-2 cursor-pointer" onClick={() => { onClose() }}>
                             <Close variant="medium" />
                         </div>
@@ -159,11 +164,15 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData, drawerFor }) =
                                 label="Full Name"
                                 id="name"
                                 name="name"
-                                // value={isEdit ? updatedFormData.name : ""}
                                 validate
-                                getValue={(value: any) => handleInputChange("name", (value))} getError={function (arg1: boolean): void {
-                                    throw new Error("Function not implemented.");
-                                }}                            ></Text>
+                                hasError={nameError}
+                                value={name}
+                                getValue={(value: any) => setName(value)}
+                                getError={(e: any) => setNameError(e)}
+                                onChange={(e: any) => {
+                                    setNameError(true);
+                                }}
+                            ></Text>
                         </div>
                         <div className="flex-1 mt-3">
                             <Email
@@ -171,88 +180,15 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData, drawerFor }) =
                                 id="email"
                                 name="email"
                                 type="email"
-                                // value={isEdit ? updatedFormData.email : ""}
                                 validate
-                                getValue={(value: any) => handleInputChange("email", value)}
-                                getError={function (arg1: boolean): void {
-                                    throw new Error("Function not implemented.");
-                                }}                            ></Email>
-                        </div>
-                        <div className="flex-1 mt-3">
-                            <Tel
-                                label="Telephone"
-                                validate
-                                required
-                                // value={isEdit ? updatedFormData.phone : ""}
-                                getValue={(value: any) => handleInputChange("phone", value)}
-                                countryCode getError={function (arg1: boolean): void {
-                                    throw new Error("Function not implemented.");
-                                }} />
-                        </div>
-                        <div className="flex-1 mt-3">
-                            <Select
-                                label="Country"
-                                options={options}
-                                id="country"
-                                required
-                                // defaultValue={isEdit ? updatedFormData.country : ""}
-                                onSelect={(value: any) => handleInputChange("country", value)} getValue={function (value: any): void {
-                                    throw new Error("Function not implemented.");
-                                }} getError={function (arg1: boolean): void {
-                                    throw new Error("Function not implemented.");
-                                }} />
-                        </div>
-                        <div className="flex-1 mt-3">
-                            <Select
-                                label="State"
-                                options={options}
-                                id="state"
-                                required
-                                defaultValue={isEdit ? updatedFormData.state : ""}
-                                onSelect={(value: any) => handleInputChange("state", value)} getValue={function (value: any): void {
-                                    throw new Error("Function not implemented.");
-                                }} getError={function (arg1: boolean): void {
-                                    throw new Error("Function not implemented.");
-                                }} />
-                        </div>
-                        <div className="flex-1 mt-3">
-                            <Select
-                                label="Timezone"
-                                options={options}
-                                id="timezone"
-                                required
-                                defaultValue={isEdit ? updatedFormData.timezone : ""}
-                                onSelect={(value: any) => handleInputChange("timezone", value)} getValue={function (value: any): void {
-                                    throw new Error("Function not implemented.");
-                                }} getError={function (arg1: boolean): void {
-                                    throw new Error("Function not implemented.");
-                                }} />
-                        </div>
-                        <div className="flex-1 mt-3">
-                            <Select
-                                label="Company"
-                                options={options}
-                                id="company"
-                                required
-                                // defaultValue={isEdit ? updatedFormData.company : ""}
-                                onSelect={(value: any) => handleInputChange("company", value)} getValue={function (value: any): void {
-                                    throw new Error("Function not implemented.");
-                                }} getError={function (arg1: boolean): void {
-                                    throw new Error("Function not implemented.");
-                                }} />
-                        </div>
-                        <div className="flex-1 mt-3">
-                            <Select
-                                label="Assign Role"
-                                options={options}
-                                id="assign_role"
-                                required
-                                defaultValue={isEdit ? updatedFormData.role : ""}
-                                onSelect={(value: any) => handleInputChange("role", value)} getValue={function (value: any): void {
-                                    throw new Error("Function not implemented.");
-                                }} getError={function (arg1: boolean): void {
-                                    throw new Error("Function not implemented.");
-                                }} />
+                                hasError={emailError}
+                                value={email}
+                                getValue={(value: any) => setEmail(value)}
+                                getError={(e: any) => setEmailError(e)}
+                                onChange={(e: any) => {
+                                    setEmailError(true);
+                                }}
+                            ></Email>
                         </div>
                     </div>
                     <div className="flex flex-row justify-end items-center border-t border-lightSilver">
@@ -266,8 +202,8 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, onData, drawerFor }) =
                             </Button>
                             <Button
                                 type="submit"
-                                onClick={handleSaveData}
-                                className={`rounded-full font-medium w-28 xs:!px-1  ${isFormDataEmpty || isEdit ? 'opacity-100' : "opacity-30 pointer-events-none"} `}
+                                onClick={handleSubmit}
+                                className={`rounded-full font-medium w-28 xs:!px-1`}
                                 variant="btn-primary"
                             >
                                 <Typography type="h6" className="!font-bold"> SAVE</Typography>

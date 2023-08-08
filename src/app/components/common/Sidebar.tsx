@@ -3,17 +3,17 @@ import { Tooltip, Typography } from "next-ts-lib";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import ChevronLeftIcon from "tsconfig.json/app/assets/icons/ChevronLeftIcon";
-import ApprovalIcon from "../../assets/icons/ApprovalsIcon";
-import BillsIcon from "../../assets/icons/BillsIcon";
-import DashboardIcon from "../../assets/icons/DashboardIcon";
-import MenuIcon from "../../assets/icons/MenuIcon";
-import PQlogoIcon from "../../assets/icons/PQLogo";
-import PaymentsIcon from "../../assets/icons/PaymentsIcon";
-import PurchaseIcon from "../../assets/icons/PurchaseIcon";
-import ReportsIcon from "../../assets/icons/ReportsIcon";
-import VendorIcon from "../../assets/icons/VendorIcon";
-import styles from "../../assets/scss/styles.module.scss";
+import ChevronLeftIcon from "@/app/assets/icons/ChevronLeftIcon";
+import ApprovalIcon from "@/app/assets/icons/ApprovalsIcon";
+import BillsIcon from "@/app/assets/icons/BillsIcon";
+import DashboardIcon from "@/app/assets/icons/DashboardIcon";
+import MenuIcon from "@/app/assets/icons/MenuIcon";
+import PQlogoIcon from "@/app/assets/icons/PQLogo";
+import PaymentsIcon from "@/app/assets/icons/PaymentsIcon";
+import PurchaseIcon from "@/app/assets/icons/PurchaseIcon";
+import ReportsIcon from "@/app/assets/icons/ReportsIcon";
+import VendorIcon from "@/app/assets/icons/VendorIcon";
+import styles from "@/app/assets/scss/styles.module.scss";
 
 interface SidebarProps {
   setOpen: (data: any) => void;

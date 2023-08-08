@@ -3,11 +3,11 @@
 import React, { ReactNode, useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 
-import DrawerOverlay from "../../users/DrawerOverlay";
+import DrawerOverlay from "@/app/users/DrawerOverlay";
 import Navbar from "./Navbar";
 import { useRouter } from "next/navigation";
-
-import styles from "../../assets/scss/styles.module.scss";
+import styles from "@/app/assets/scss/styles.module.scss";
+import { Toast } from "next-ts-lib";
 
 interface WrapperProps {
   children: ReactNode;
@@ -52,9 +52,9 @@ const Wrapper = ({ children, setWrapperSetting }: WrapperProps): JSX.Element => 
 
   return (
     <div className="lg:flex" >
-      <Sidebar setOpen={isOpen}  setSettingSidebar={!isSetting} toggleDrawer={drawer} sendSidebarData={handleSidebarData} />
-
-      <main  style={{ width: "-webkit-fill-available" }}>
+      <Toast position="top_center" />
+      <Sidebar setOpen={isOpen} setSettingSidebar={isSetting} toggleDrawer={drawer} sendSidebarData={handleSidebarData} />
+      <main className={styles.mainWidth}>
         <Navbar setSetting={navbarData} />
         <DrawerOverlay
           className="!top-[100px]"

@@ -1,13 +1,19 @@
-import { DataTable, Switch } from 'next-ts-lib';
-import React, { useEffect, useRef, useState } from 'react'
-import MeatballsMenuIcon from "../../assets/icons/MeatballsMenu";
+import { Button, Close, DataTable, Modal, ModalAction, ModalContent, ModalTitle, Switch, Typography } from 'next-ts-lib';
+import React, { useEffect, useRef, useState } from 'react';
+import MeatballsMenuIcon from "@/app/assets/icons/MeatballsMenu";
+import DepartmentContent from './Drawer/DepartmentContent';
 
 interface TableData {
   name: string;
   status: any;
   action: any;
 }
-const Class = ({ onOpen, onEdit }: any) => {
+
+interface ClassProps {
+  onDrawerOpen: boolean;
+  onDrawerClose: () => void;
+}
+const Department: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
   const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
 
@@ -38,7 +44,9 @@ const Class = ({ onOpen, onEdit }: any) => {
       setIsRemoveOpen(!isRemoveOpen)
     }
   };
-
+  const modalClose = () => {
+    setIsRemoveOpen(false);
+  };
   const Actions = ({ actions, id }: any) => {
     const actionsRef = useRef<HTMLDivElement>(null);
     const [open, setOpen] = useState(false);
@@ -59,7 +67,7 @@ const Class = ({ onOpen, onEdit }: any) => {
     return (
       <div
         ref={actionsRef}
-        className="w-8 h-8 cursor-pointer relative"
+        className="cursor-pointer flex justify-end"
         onClick={() => setOpen(!open)}>
         <MeatballsMenuIcon />
         {open && (
@@ -87,6 +95,7 @@ const Class = ({ onOpen, onEdit }: any) => {
       </div>
     );
   };
+
   const [tableData, setTableData] = useState<TableData[]>([
     {
       name: "John Doe",
@@ -102,11 +111,12 @@ const Class = ({ onOpen, onEdit }: any) => {
       name: "Bob Johnson",
       status: <Switch checked={true} />,
       action: <Actions actions={actionArray} />
-    },
+    }
   ]);
 
   return (
     <div>
+      {/* DataTable */}
       {tableData.length > 0 && (
         <DataTable
           columns={columns}
@@ -116,8 +126,48 @@ const Class = ({ onOpen, onEdit }: any) => {
           hoverEffect={true}
         />
       )}
+
+      {/* Modal */}
+      {isRemoveOpen && (
+        <Modal
+          isOpen={isRemoveOpen}
+          onClose={modalClose}
+          width="363px">
+          <ModalTitle>
+            <div className="py-3 px-4 font-bold">Remove</div>
+            <div className="" >
+              <Close variant="medium" />
+            </div>
+          </ModalTitle>
+          <ModalContent>
+            <div className="p-2 my-5">
+              <Typography type='h5' className='!font-normal'>
+                Are you sure you want to remove the Location ?
+              </Typography>
+            </div>
+          </ModalContent>
+          <ModalAction>
+            <div>
+              <Button
+                className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
+                variant="btn-outline">
+                NO
+              </Button>
+            </div>
+            <div>
+              <Button
+                className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
+                variant="btn-error">
+                YES
+              </Button>
+            </div>
+          </ModalAction>
+        </Modal>
+      )}
+
+      <DepartmentContent onOpen={onDrawerOpen} onClose={onDrawerClose} onEdit={tableData} />
     </div>
   )
 }
 
-export default Class
+export default Department
