@@ -1,21 +1,26 @@
-import { Button, Close, DataTable, Modal, ModalAction, ModalContent, ModalTitle, Switch, Typography } from 'next-ts-lib';
+import { Button, Close, DataTable, Modal, ModalAction, ModalContent, ModalTitle, Switch, Toast, Typography } from 'next-ts-lib';
 import React, { useEffect, useRef, useState } from 'react';
+import axios from "axios";
 import MeatballsMenuIcon from "@/app/assets/icons/MeatballsMenu";
 import ProjectContent from './Drawer/ProjectContent ';
 
-interface TableData {
+interface projectList {
   name: string;
   status: any;
   action: any;
 }
 
-interface ClassProps {
+interface ProjectProps {
   onDrawerOpen: boolean;
   onDrawerClose: () => void;
 }
-const Project: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
+
+const Project : React.FC<ProjectProps> = ({ onDrawerOpen, onDrawerClose }) => {
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
   const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
+  const [projectList, setProjectList] = useState<projectList[]>([]);
+  const [projectEditId, setProjectEditId] = useState<number | null>();
+
 
   const columns = [
     {
@@ -34,9 +39,71 @@ const Project: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
       sortable: false,
     },
   ];
+
+  //Project List API
+  const getProjectList = async () => {
+    try {
+      const params = {
+        "FilterObj": {
+          "Status": "active",
+          "ClassId": "",
+          "Name": ""
+        },
+        "CompanyId": 69,
+        "Index": 1,
+        "PageSize": 10
+      }
+      const token = await localStorage.getItem("token");
+      const config = {
+        headers: {
+          Authorization: `bearer ${token}`,
+        },
+      };
+      const response = await axios.post(
+        `${process.env.base_url}/project/getlist`, params,
+        config
+      );
+      const { ResponseStatus, ResponseData, Message } = response.data;
+      if (response.status === 200) {
+        if (ResponseStatus === "Success") {
+          if (ResponseData !== null && typeof ResponseData === 'object') {
+            setProjectList(ResponseData);
+          }
+        } else {
+          if (Message === null) {
+            Toast.error("Error", "Please try again later.");
+          } else {
+            Toast.error("Error", Message);
+          }
+        }
+      }
+      else {
+        if (Message === null) {
+          Toast.error("Error", "Please try again later.");
+        } else {
+          Toast.error("Error", Message);
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  useEffect(() => {
+    getProjectList();
+  }, []);
+
   const actionArray = ["Edit", "Remove"];
+  const projectListData = projectList?.map((e: any) => new Object({
+    name: e.first_name,
+    status:
+      <div>
+        {e.is_Active ? <Switch checked={true} /> : <Switch checked={false} />}
+      </div>,
+    action: <Actions id={e.id} actions={actionArray} />
+  }))
 
   const handleKebabChange = (actionName: string, id: number) => {
+    setProjectEditId(id);
     if (actionName === "Edit") {
       setIsEditOpen(!isEditOpen)
     }
@@ -44,9 +111,11 @@ const Project: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
       setIsRemoveOpen(!isRemoveOpen)
     }
   };
+
   const modalClose = () => {
     setIsRemoveOpen(false);
   };
+
   const Actions = ({ actions, id }: any) => {
     const actionsRef = useRef<HTMLDivElement>(null);
     const [open, setOpen] = useState(false);
@@ -96,31 +165,56 @@ const Project: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
     );
   };
 
-  const [tableData, setTableData] = useState<TableData[]>([
-    {
-      name: "John Doe",
-      status: <Switch checked={true} />,
-      action: <Actions actions={actionArray} />
-    },
-    {
-      name: "Jane Smith",
-      status: <Switch checked={false} />,
-      action: <Actions actions={actionArray} />
-    },
-    {
-      name: "Bob Johnson",
-      status: <Switch checked={true} />,
-      action: <Actions actions={actionArray} />
+  //Delete Project API 
+  const handleProjectDelete = async () => {
+    try {
+      const token = await localStorage.getItem("token");
+      const params = {
+        "CompanyId": 65,
+        "Id": 354,
+        "RecordNo": "124"
+      }
+      const config = {
+        headers: {
+          Authorization: `bearer ${token}`,
+        },
+      };
+      const response = await axios.post(
+        `${process.env.base_url}/project/delete `,
+        params,
+        config
+      );
+      const { ResponseStatus, ResponseData, Message } = response.data;
+      if (response.status === 200) {
+        if (ResponseStatus === "Success") {
+          if (ResponseData !== null && typeof ResponseData === 'object') {
+            Toast.success("Error", "Project Remove successfully");
+          }
+        } else {
+          if (Message != null) {
+            Toast.error("Error", Message);
+          }
+        }
+      }
+      else {
+        if (Message === null) {
+          Toast.error("Error", "Please try again later.");
+        } else {
+          Toast.error("Error", Message);
+        }
+      }
+    } catch (error) {
+      console.error(error);
     }
-  ]);
+  }
 
   return (
     <div>
       {/* DataTable */}
-      {tableData.length > 0 && (
+      {projectListData.length > 0 && (
         <DataTable
           columns={columns}
-          data={tableData}
+          data={projectListData}
           headerInvisible={false}
           stickyHeader={true}
           hoverEffect={true}
@@ -128,44 +222,42 @@ const Project: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
       )}
 
       {/* Modal */}
-      {isRemoveOpen && (
-        <Modal
-          isOpen={isRemoveOpen}
-          onClose={modalClose}
-          width="363px">
-          <ModalTitle>
-            <div className="py-3 px-4 font-bold">Remove</div>
-            <div className="" >
-              <Close variant="medium" />
-            </div>
-          </ModalTitle>
-          <ModalContent>
-            <div className="p-2 my-5">
-              <Typography type='h5' className='!font-normal'>
-                Are you sure you want to remove the class ?
-              </Typography>
-            </div>
-          </ModalContent>
-          <ModalAction>
-            <div>
-              <Button
-                className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
-                variant="btn-outline">
-                NO
-              </Button>
-            </div>
-            <div>
-              <Button
-                className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
-                variant="btn-error">
-                YES
-              </Button>
-            </div>
-          </ModalAction>
-        </Modal>
-      )}
+      <Modal
+        isOpen={isRemoveOpen}
+        onClose={modalClose}
+        width="363px">
+        <ModalTitle>
+          <div className="py-3 px-4 font-bold">Remove</div>
+          <div className="" >
+            <Close variant="medium" />
+          </div>
+        </ModalTitle>
+        <ModalContent>
+          <div className="p-2 my-5">
+            <Typography type='h5' className='!font-normal'>
+              Are you sure you want to remove the project ?
+            </Typography>
+          </div>
+        </ModalContent>
+        <ModalAction>
+          <div>
+            <Button
+              className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
+              variant="btn-outline">
+              NO
+            </Button>
+          </div>
+          <div>
+            <Button
+              className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
+              variant="btn-error" onClick={handleProjectDelete} >
+              YES
+            </Button>
+          </div>
+        </ModalAction>
+      </Modal>
 
-      <ProjectContent onOpen={onDrawerOpen} onClose={onDrawerClose} onEdit={tableData} />
+      <ProjectContent onOpen={onDrawerOpen} onClose={onDrawerClose} projectEditId={typeof projectEditId === 'number' ? projectEditId : 0} />
     </div>
   )
 }

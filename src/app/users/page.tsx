@@ -14,7 +14,7 @@ import MultiselectCompany from "./MultiselectCompany";
 import RoleDrawer from "./RoleDrawer";
 import Dimension from "./Dimension";
 import APTerm from "./APTerm";
-
+import Product_Service from "./Product&Service";
 
 interface userData {
   id: number;
@@ -33,12 +33,12 @@ interface userData {
 
 const page: React.FC = () => {
 
-  const [isToggleOpen, setIsToggleOpen] = useState<boolean>(false);
+  const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
   const [isManageOpen, setIsManageOpen] = useState<boolean>(false);
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
   const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
   const [isPageSetting, setIsPageSetting] = useState<boolean>(false);
-  const [editId, setEditId] = useState<number>();
+  const [editId, setEditId] = useState<number | null>();
   const [userData, setUserData] = useState<userData[]>([]);
 
   const columns = [
@@ -87,16 +87,16 @@ const page: React.FC = () => {
       setIsManageOpen(!isManageOpen)
     }
     if (actionName === "Edit") {
-      setIsToggleOpen(!isEditOpen)
+      setIsOpenDrawer(!isEditOpen)
     }
     if (actionName === "Remove") {
       setIsRemoveOpen(!isRemoveOpen)
     }
   };
-
-
-
-
+  const handleDrawerClose = () => {
+    setIsOpenDrawer(false);
+    setEditId(null);
+  }
   //User List API
   const getUserDataList = async () => {
     try {
@@ -104,7 +104,7 @@ const page: React.FC = () => {
         "GlobalSearch": "",
         "StatusFilter": null, //ALL= null, Active = 1, InActive = 0
         "PageIndex": 1,
-        "PageSize": 10
+        "PageSize": 100
       }
       const token = await localStorage.getItem("token");
       const config = {
@@ -217,6 +217,7 @@ const page: React.FC = () => {
       </div>
     );
   };
+
   const updatedUserData = userData?.map((e: any) => new Object({
     id: e.id,
     name: e.first_name,
@@ -235,7 +236,7 @@ const page: React.FC = () => {
   };
 
   const handleToggleChange = () => {
-    setIsToggleOpen(true);
+    setIsOpenDrawer(true);
   };
 
   const onDrawerData = (data: any) => {
@@ -253,8 +254,8 @@ const page: React.FC = () => {
   return (
     <>
       <Wrapper setWrapperSetting={wrapperData}>
-        {isPageSetting ?
-          <div><Dimension /></div>
+        {!isPageSetting ?
+          <div><Product_Service /></div>
           : <div>
             {isManageOpen ? <RoleDrawer onClose={() => setIsManageOpen(false)} />
               : <div>
@@ -331,15 +332,14 @@ const page: React.FC = () => {
 
             {/*  Drawer */}
             <Drawer
-              onOpen={isToggleOpen}
-              onClose={() => { setIsToggleOpen(false), setIsEditOpen(false) }}
-              onData={onDrawerData}
+              onOpen={isOpenDrawer}
+              onClose={handleDrawerClose}
               editId={typeof editId === 'number' ? editId : 0}
             />
             {/* Drawer Overlay */}
             <DrawerOverlay
-              isOpen={isToggleOpen || isEditOpen}
-              onClose={() => { setIsToggleOpen(false), setIsEditOpen(false) }}
+              isOpen={isOpenDrawer}
+              onClose={handleDrawerClose}
             />
           </div>}
       </Wrapper>

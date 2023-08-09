@@ -2,33 +2,27 @@ import { Button, Close, DataTable, Modal, ModalAction, ModalContent, ModalTitle,
 import React, { useEffect, useRef, useState } from 'react';
 import axios from "axios";
 import MeatballsMenuIcon from "@/app/assets/icons/MeatballsMenu";
-import LocationContent from './Drawer/LocationContent';
+import ClassContent from './Drawer/ClassContent';
 
-interface locationList {
-  locationId:number;
+interface classList {
   name: string;
   status: any;
   action: any;
 }
 
-interface LocationProps {
+interface ClassProps {
   onDrawerOpen: boolean;
   onDrawerClose: () => void;
 }
 
-const Location : React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => {
+const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
   const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
-  const [locationList, setLocationList] = useState<locationList[]>([]);
-  const [locationEditId, setLocationEditId] = useState<number | null>();
+  const [classList, setClassList] = useState<classList[]>([]);
+  const [classEditId, setClassEditId] = useState<number | null>();
 
 
   const columns = [
-    {
-      header: "LOCATION ID",
-      accessor: "locationId",
-      sortable: true,
-    },
     {
       header: "NAME",
       accessor: "name",
@@ -46,8 +40,8 @@ const Location : React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => 
     },
   ];
 
-  //Location List API
-  const getLocationList = async () => {
+  //Class List API
+  const getClassList = async () => {
     try {
       const params = {
         "FilterObj": {
@@ -66,14 +60,14 @@ const Location : React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => 
         },
       };
       const response = await axios.post(
-        `${process.env.base_url}/location/getlist`, params,
+        `${process.env.base_url}/class/getlist`, params,
         config
       );
       const { ResponseStatus, ResponseData, Message } = response.data;
       if (response.status === 200) {
         if (ResponseStatus === "Success") {
           if (ResponseData !== null && typeof ResponseData === 'object') {
-            setLocationList(ResponseData);
+            setClassList(ResponseData);
           }
         } else {
           if (Message === null) {
@@ -95,12 +89,11 @@ const Location : React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => 
     }
   }
   useEffect(() => {
-    getLocationList();
+    getClassList();
   }, []);
 
   const actionArray = ["Edit", "Remove"];
-  const locationListData = locationList?.map((e: any) => new Object({
-    locationId:e.id,
+  const classListData = classList?.map((e: any) => new Object({
     name: e.first_name,
     status:
       <div>
@@ -110,7 +103,7 @@ const Location : React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => 
   }))
 
   const handleKebabChange = (actionName: string, id: number) => {
-    setLocationEditId(id);
+    setClassEditId(id);
     if (actionName === "Edit") {
       setIsEditOpen(!isEditOpen)
     }
@@ -172,8 +165,8 @@ const Location : React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => 
     );
   };
 
-  //Delete Location API 
-  const handleLocationDelete = async () => {
+  //Delete Class API 
+  const handleClassDelete = async () => {
     try {
       const token = await localStorage.getItem("token");
       const params = {
@@ -187,7 +180,7 @@ const Location : React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => 
         },
       };
       const response = await axios.post(
-        `${process.env.base_url}/location/delete `,
+        `${process.env.base_url}/class/delete `,
         params,
         config
       );
@@ -195,7 +188,7 @@ const Location : React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => 
       if (response.status === 200) {
         if (ResponseStatus === "Success") {
           if (ResponseData !== null && typeof ResponseData === 'object') {
-            Toast.success("Error", "Location Remove successfully");
+            Toast.success("Error", "Class Remove successfully");
           }
         } else {
           if (Message != null) {
@@ -218,10 +211,10 @@ const Location : React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => 
   return (
     <div>
       {/* DataTable */}
-      {locationListData.length > 0 && (
+      {classListData.length > 0 && (
         <DataTable
           columns={columns}
-          data={locationListData}
+          data={classListData}
           headerInvisible={false}
           stickyHeader={true}
           hoverEffect={true}
@@ -242,7 +235,7 @@ const Location : React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => 
         <ModalContent>
           <div className="p-2 my-5">
             <Typography type='h5' className='!font-normal'>
-              Are you sure you want to remove the location ?
+              Are you sure you want to remove the Class ?
             </Typography>
           </div>
         </ModalContent>
@@ -257,16 +250,16 @@ const Location : React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => 
           <div>
             <Button
               className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
-              variant="btn-error" onClick={handleLocationDelete} >
+              variant="btn-error" onClick={handleClassDelete} >
               YES
             </Button>
           </div>
         </ModalAction>
       </Modal>
 
-      <LocationContent onOpen={onDrawerOpen} onClose={onDrawerClose} locationEditId={typeof locationEditId === 'number' ? locationEditId : 0} />
+      <ClassContent onOpen={onDrawerOpen} onClose={onDrawerClose} classEditId={typeof classEditId === 'number' ? classEditId : 0} />
     </div>
   )
 }
 
-export default Location
+export default Class
