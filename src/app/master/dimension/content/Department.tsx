@@ -2,24 +2,24 @@ import { Button, Close, DataTable, Modal, ModalAction, ModalContent, ModalTitle,
 import React, { useEffect, useRef, useState } from 'react';
 import axios from "axios";
 import MeatballsMenuIcon from "@/app/assets/icons/MeatballsMenu";
-import ClassContent from './Drawer/ClassContent';
+import DepartmentContent from '../Drawer/DepartmentContent';
 
-interface classList {
+interface departmentList {
   name: string;
   status: any;
   action: any;
 }
 
-interface ClassProps {
+interface DepartmentProps {
   onDrawerOpen: boolean;
   onDrawerClose: () => void;
 }
 
-const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
+const Department: React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose }) => {
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
   const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
-  const [classList, setClassList] = useState<classList[]>([]);
-  const [classEditId, setClassEditId] = useState<number | null>();
+  const [departmentList, setDepartmentList] = useState<departmentList[]>([]);
+  const [departmentEditId, setDepartmentEditId] = useState<number | null>();
 
 
   const columns = [
@@ -40,16 +40,17 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
     },
   ];
 
-  //Class List API
-  const getClassList = async () => {
+  //Department List API
+  const getDepartmentList = async () => {
     try {
       const params = {
         "FilterObj": {
+          "DepartmentCode": "",
+          "Title": "",
           "Status": "active",
-          "ClassId": "",
-          "Name": ""
+          "GlobalFilter": ""
         },
-        "CompanyId": 69,
+        "CompanyId":76,
         "Index": 1,
         "PageSize": 10
       }
@@ -60,14 +61,15 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
         },
       };
       const response = await axios.post(
-        `${process.env.base_url}/class/getlist`, params,
+        `${process.env.base_url}/department/getlist`, params,
         config
       );
       const { ResponseStatus, ResponseData, Message } = response.data;
       if (response.status === 200) {
         if (ResponseStatus === "Success") {
           if (ResponseData !== null && typeof ResponseData === 'object') {
-            setClassList(ResponseData);
+            setDepartmentList(ResponseData.List);
+            Toast.success("Success", "Department list fetched successfully!.");
           }
         } else {
           if (Message === null) {
@@ -89,11 +91,11 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
     }
   }
   useEffect(() => {
-    getClassList();
+    getDepartmentList();
   }, []);
 
   const actionArray = ["Edit", "Remove"];
-  const classListData = classList?.map((e: any) => new Object({
+  const departmentListData = departmentList?.map((e: any) => new Object({
     name: e.first_name,
     status:
       <div>
@@ -103,7 +105,7 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
   }))
 
   const handleKebabChange = (actionName: string, id: number) => {
-    setClassEditId(id);
+    setDepartmentEditId(id);
     if (actionName === "Edit") {
       setIsEditOpen(!isEditOpen)
     }
@@ -165,12 +167,12 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
     );
   };
 
-  //Delete Class API 
-  const handleClassDelete = async () => {
+  //Delete Department API 
+  const handleDepartmentDelete = async () => {
     try {
       const token = await localStorage.getItem("token");
       const params = {
-        "CompanyId": 65,
+        "CompanyId":76,
         "Id": 354,
         "RecordNo": "124"
       }
@@ -180,7 +182,7 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
         },
       };
       const response = await axios.post(
-        `${process.env.base_url}/class/delete `,
+        `${process.env.base_url}/department/delete `,
         params,
         config
       );
@@ -188,7 +190,7 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
       if (response.status === 200) {
         if (ResponseStatus === "Success") {
           if (ResponseData !== null && typeof ResponseData === 'object') {
-            Toast.success("Error", "Class Remove successfully");
+            Toast.success("Error", "Department Remove successfully");
           }
         } else {
           if (Message != null) {
@@ -211,10 +213,10 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
   return (
     <div>
       {/* DataTable */}
-      {classListData.length > 0 && (
+      {departmentListData.length > 0 && (
         <DataTable
           columns={columns}
-          data={classListData}
+          data={departmentListData}
           headerInvisible={false}
           stickyHeader={true}
           hoverEffect={true}
@@ -235,7 +237,7 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
         <ModalContent>
           <div className="p-2 my-5">
             <Typography type='h5' className='!font-normal'>
-              Are you sure you want to remove the Class ?
+              Are you sure you want to remove the department ?
             </Typography>
           </div>
         </ModalContent>
@@ -250,16 +252,16 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
           <div>
             <Button
               className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
-              variant="btn-error" onClick={handleClassDelete} >
+              variant="btn-error" onClick={handleDepartmentDelete} >
               YES
             </Button>
           </div>
         </ModalAction>
       </Modal>
 
-      <ClassContent onOpen={onDrawerOpen} onClose={onDrawerClose} classEditId={typeof classEditId === 'number' ? classEditId : 0} />
+      <DepartmentContent onOpen={onDrawerOpen} onClose={onDrawerClose} departmentEditId={typeof departmentEditId === 'number' ? departmentEditId : 0} />
     </div>
   )
 }
 
-export default Class
+export default Department

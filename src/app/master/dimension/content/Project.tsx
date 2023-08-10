@@ -2,7 +2,7 @@ import { Button, Close, DataTable, Modal, ModalAction, ModalContent, ModalTitle,
 import React, { useEffect, useRef, useState } from 'react';
 import axios from "axios";
 import MeatballsMenuIcon from "@/app/assets/icons/MeatballsMenu";
-import ProjectContent from './Drawer/ProjectContent ';
+import ProjectContent from '../Drawer/ProjectContent ';
 
 interface projectList {
   name: string;
@@ -15,7 +15,7 @@ interface ProjectProps {
   onDrawerClose: () => void;
 }
 
-const Project : React.FC<ProjectProps> = ({ onDrawerOpen, onDrawerClose }) => {
+const Project: React.FC<ProjectProps> = ({ onDrawerOpen, onDrawerClose }) => {
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
   const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
   const [projectList, setProjectList] = useState<projectList[]>([]);
@@ -45,11 +45,13 @@ const Project : React.FC<ProjectProps> = ({ onDrawerOpen, onDrawerClose }) => {
     try {
       const params = {
         "FilterObj": {
+          "ProjectId": "p1",
+          "Name": "",
+          "Category": "",
           "Status": "active",
-          "ClassId": "",
-          "Name": ""
+          "GlobalFilter": ""
         },
-        "CompanyId": 69,
+        "CompanyId":76,
         "Index": 1,
         "PageSize": 10
       }
@@ -67,7 +69,8 @@ const Project : React.FC<ProjectProps> = ({ onDrawerOpen, onDrawerClose }) => {
       if (response.status === 200) {
         if (ResponseStatus === "Success") {
           if (ResponseData !== null && typeof ResponseData === 'object') {
-            setProjectList(ResponseData);
+            setProjectList(ResponseData.List);
+            Toast.success("Success", "Project list fetched successfully!.");
           }
         } else {
           if (Message === null) {
@@ -170,7 +173,7 @@ const Project : React.FC<ProjectProps> = ({ onDrawerOpen, onDrawerClose }) => {
     try {
       const token = await localStorage.getItem("token");
       const params = {
-        "CompanyId": 65,
+        "CompanyId":76,
         "Id": 354,
         "RecordNo": "124"
       }

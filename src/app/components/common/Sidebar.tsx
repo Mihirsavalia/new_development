@@ -17,11 +17,10 @@ import styles from "@/app/assets/scss/styles.module.scss";
 
 interface SidebarProps {
   setOpen: (data: any) => void;
-  setSettingSidebar: boolean;
+  setSettingSidebar?: boolean;
   toggleDrawer: boolean;
-  sendSidebarData: (data: any) => void;
-
 }
+
 //Sidebar Props
 interface SidebarItem {
   name: string;
@@ -118,20 +117,24 @@ const settings_data: SettingsSection[] = [
     heading: "MASTER",
     items: [
       {
+        name: "Vendor",
+        href: "/vendor",
+      },
+      {
         name: "Dimension",
-        href: "/users",
+        href: "/dimension",
       },
       {
         name: "GL Account",
-        href: "/gl_account",
+        href: "/glaccount",
       },
       {
         name: "AP Term",
-        href: "/ap_term",
+        href: "/apterm",
       },
       {
         name: "Product Service",
-        href: "/product_service",
+        href: "/productservice",
       },
       {
         name: "Description",
@@ -196,9 +199,9 @@ const SettingItems = ({ pathname, isCollapsed }: any) => {
           <Typography type="h6" className={`!font-bold flex items-start pl-[20px] ${index > 0 ? "pt-[20px] pb-[5px]" : "pt-[13px] pb-[5px]"}`}>{item.heading}</Typography>
           {item.items.map((subItem, subIndex) => (
             <Link
-              href={subItem.href}
+              href={`/master${subItem.href}`}
               className={`flex items-center pl-[20px]  py-[10px] border-l-2 border-white hover:bg-whiteSmoke hover:border-primary
-               ${pathname === `${subItem.href}`
+                ${pathname === `/master${subItem.href}`
                   ? "border-primary bg-whiteSmoke"
                   : "border-pureWhite"
                 }`}
@@ -213,7 +216,7 @@ const SettingItems = ({ pathname, isCollapsed }: any) => {
   );
 };
 
-const Sidebar = ({ setOpen, setSettingSidebar, toggleDrawer, sendSidebarData }: SidebarProps): JSX.Element => {
+const Sidebar = ({ setOpen, setSettingSidebar, toggleDrawer }: SidebarProps): JSX.Element => {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -246,7 +249,7 @@ const Sidebar = ({ setOpen, setSettingSidebar, toggleDrawer, sendSidebarData }: 
   }, 250);
 
   const handleSettingChange = () => {
-    sendSidebarData(false);
+router.push('/manage/users')
   }
 
   return (

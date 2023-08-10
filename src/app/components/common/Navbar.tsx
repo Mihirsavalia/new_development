@@ -13,7 +13,6 @@ import BI from "../../assets/icons/BiIcon";
 // import Close from "../../assets/icons/Close";
 import SearchIcon from "../../assets/icons/SearchIcon";
 
-
 interface NavbarProps {
   setSetting: (data: any) => void;
 }
@@ -33,40 +32,94 @@ const companies = [
   { value: "11", label: "Company 11" },
 ];
 
-const global_settings = [{
-  heading: "Global Setting",
-  items: ["Manage Company", "Manage Users", "Manage Roles"],
-},]
-
-const settings_data = [
+const global_settings = [
   {
-    heading: "Masters",
+    heading: "Global Setting",
     items: [
-      "Vendor",
-      "Dimension",
-      "GL Account",
-      "AP Term",
-      "Product Service",
-      "Description",
-    ],
-  },
-  {
-    heading: "Payment Policies",
-    items: ["Currency", "Tax Rate", "Payment Method", "Payment Setup"],
-  },
-  {
-    heading: "Setup",
-    items: [
-      "AP Field Mapping",
-      "AP Data Mapping",
-      "Notifications",
-      "Cloud configuration",
-      "Automation",
+      { name: "Manage Company", href: "/manage/companies" },
+      { name: "Manage Users", href: "/manage/users" },
+      { name: "Manage Roles", href: "/manage/roles" },
     ],
   },
 ];
 
-
+const settings_data = [
+  {
+    heading: "MASTER",
+    items: [
+      {
+        name: "Vendor",
+        href: "/vendor",
+      },
+      {
+        name: "Dimension",
+        href: "/dimension",
+      },
+      {
+        name: "GL Account",
+        href: "/glaccount",
+      },
+      {
+        name: "AP Term",
+        href: "/apterm",
+      },
+      {
+        name: "Product Service",
+        href: "/productservice",
+      },
+      {
+        name: "Description",
+        href: "/description",
+      }
+    ]
+  },
+  {
+    heading: "Payment Policies",
+    items: [
+      {
+        name: "Currency",
+        href: "/currency",
+      },
+      {
+        name: "Tax Rate",
+        href: "/tax_rate",
+      },
+      {
+        name: "Payment Method",
+        href: "/payment_method",
+      },
+      {
+        name: "Payment Setup",
+        href: "/payment_setup",
+      }
+    ]
+  },
+  {
+    heading: "Setup",
+    items: [
+      {
+        name: "AP Field Mapping",
+        href: "/ap_field_mapping",
+      },
+      {
+        name: "AP Data Mapping",
+        href: "/ap_data_mapping",
+      },
+      {
+        name: "Notifications",
+        href: "/notifications",
+      },
+      {
+        name: "Cloud configuration",
+        href: "/cloud_configuration",
+      },
+      {
+        name: "Automation",
+        href: "/automation",
+      }
+    ]
+  },
+];
 
 const Navbar = ({ setSetting }: NavbarProps): JSX.Element => {
   const navbarX_elements = [
@@ -99,20 +152,25 @@ const Navbar = ({ setSetting }: NavbarProps): JSX.Element => {
             onSelect={() => console.log()}
             options={companies}
             id="companies"
-            search getValue={function (value: any): void {
+            search
+            getValue={function (value: any): void {
               throw new Error("Function not implemented.");
-            } } getError={function (arg1: boolean): void {
+            }}
+            getError={function (arg1: boolean): void {
               throw new Error("Function not implemented.");
-            } }          />
+            }}
+          />
         </div>
         <div className="flex relative items-center">
           <Text
             value={searchValue}
             className="pl-10 pr-10"
             getValue={handleSearchValue}
-            onSubmit={() => console.log("hii")} getError={function (arg1: boolean): void {
+            onSubmit={() => console.log("hii")}
+            getError={function (arg1: boolean): void {
               throw new Error("Function not implemented.");
-            } }          />
+            }}
+          />
           <div className="flex absolute left-2 cursor-pointer">
             <SearchIcon />
           </div>
@@ -153,7 +211,7 @@ const NotificationButton = () => {
           <Badge
             badgetype="error"
             variant="dot"
-          // text={notifications.length.toString()}
+            // text={notifications.length.toString()}
           />
         </div>
         {/* {open && (
@@ -206,7 +264,7 @@ const SettingButton = ({ setSetting }: any) => {
 
   const handleSettingChange = () => {
     setSetting(true);
-  }
+  };
 
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
@@ -232,9 +290,8 @@ const SettingButton = ({ setSetting }: any) => {
           <Setting />
         </div>
         {open && (
-
           <div className=" flex flex-row !z-[3] p-8 w-[700px] bg-white shadow-lg absolute top-7 right-0  justify-center gap-10">
-            <div className="flex flex-col bg-lightGray border-r-2 border-lightSilver " >
+            <div className="flex flex-col bg-lightGray border-r-2 border-lightSilver ">
               {global_settings.map((data, index) => (
                 <div className="  flex flex-col gap-4" key={index}>
                   <span className="pb-3 font-semibold border-b border-b-[#d8d8d8]">
@@ -246,7 +303,7 @@ const SettingButton = ({ setSetting }: any) => {
                       href="/users"
                       className="font-light text-sm hover:text-[#02b89d]"
                     >
-                      {element}
+                      {element.name}
                     </Link>
                   ))}
                 </div>
@@ -260,11 +317,11 @@ const SettingButton = ({ setSetting }: any) => {
                 {data.items.map((element, index) => (
                   <Link
                     key={index}
-                    href="/users"
+                    href={`/master/${element.href}`}
                     onClick={handleSettingChange}
                     className="font-light text-sm hover:text-[#02b89d]"
                   >
-                    {element}
+                    {element.name}
                   </Link>
                 ))}
               </div>

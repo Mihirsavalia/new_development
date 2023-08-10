@@ -1,20 +1,16 @@
 "use client";
 
+import axios from "axios";
 import { Button, Close, DataTable, Modal, ModalAction, ModalContent, ModalTitle, Switch, Toast, Typography } from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
 import React, { useEffect, useRef, useState } from "react";
-import axios from "axios";
 
 import KebabMenuIcon from "@/app/assets/icons/KebabMenuIcon";
 import PlusIcon from "@/app/assets/icons/PlusIcon";
 import Wrapper from "@/app/components/common/Wrapper";
 import Drawer from "./Drawer";
 import DrawerOverlay from "./DrawerOverlay";
-import MultiselectCompany from "./MultiselectCompany";
 import RoleDrawer from "./RoleDrawer";
-import Dimension from "./Dimension";
-import APTerm from "./APTerm";
-import Product_Service from "./Product&Service";
 
 interface userData {
   id: number;
@@ -93,6 +89,7 @@ const page: React.FC = () => {
       setIsRemoveOpen(!isRemoveOpen)
     }
   };
+
   const handleDrawerClose = () => {
     setIsOpenDrawer(false);
     setEditId(null);
@@ -239,13 +236,7 @@ const page: React.FC = () => {
     setIsOpenDrawer(true);
   };
 
-  const onDrawerData = (data: any) => {
-    userData.push(data);
-  };
 
-  const wrapperData = (data: any) => {
-    setIsPageSetting(data);
-  };
 
   useEffect(() => {
     getUserDataList();
@@ -253,95 +244,93 @@ const page: React.FC = () => {
 
   return (
     <>
-      <Wrapper setWrapperSetting={wrapperData}>
-        {!isPageSetting ?
-          <div><Product_Service /></div>
-          : <div>
-            {isManageOpen ? <RoleDrawer onClose={() => setIsManageOpen(false)} />
-              : <div>
-                {/* NavBar */}
-                <div className="p-5 flex justify-between w-auto  bg-whiteSmoke ">
-                  <div className="flex justify-star mx-3">
-                    <Typography type="h5" className="!font-bold flex justify-center items-center text-center">Manage Users</Typography>
-                  </div>
-                  <div className="flex justify-end mx-3">
-                    <Button
-                      className="rounded-full !px-6 "
-                      variant="btn-primary"
-                      onClick={handleToggleChange}>
-                      <Typography type="h6" className="!font-bold flex justify-center items-center text-center"><span className="mr-1"> <PlusIcon /></span> CREATE USER</Typography>
-                    </Button>
-                  </div>
+      <Wrapper masterSettings={false}>
+        <div>
+          {isManageOpen ? <RoleDrawer onClose={() => setIsManageOpen(false)} />
+            : <div>
+              {/* NavBar */}
+              <div className="p-5 flex justify-between w-auto  bg-whiteSmoke ">
+                <div className="flex justify-star mx-3">
+                  <Typography type="h5" className="!font-bold flex justify-center items-center text-center">Manage Users</Typography>
                 </div>
-
-                {/* Data Table */}
-                <div className="!h-[27.8rem] border-b border-lightSilver ">
-                  {userData.length > 0 && (
-                    <DataTable
-                      columns={columns}
-                      data={updatedUserData}
-                      headerInvisible={false}
-                      stickyHeader={true}
-                      hoverEffect={true}
-                    />
-                  )}
-                </div>
-              </div>}
-
-
-            {/* Modal */}
-            <Modal
-              isOpen={isRemoveOpen}
-              onClose={modalClose}
-              width="352px"
-            >
-              <ModalTitle>
-                <div className="py-3 px-4 font-bold">Remove</div>
-
-                <div className="" >
-                  <Close variant="medium" />
-                </div>
-              </ModalTitle>
-
-              <ModalContent>
-                <div className="p-2 my-5">
-                  Are you sure you want to remove the user ?
-                </div>
-              </ModalContent>
-
-              <ModalAction>
-                <div>
+                <div className="flex justify-end mx-3">
                   <Button
-                    className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
-                    variant="btn-outline-error"
-                  >
-                    No
+                    className="rounded-full !px-6 "
+                    variant="btn-primary"
+                    onClick={handleToggleChange}>
+                    <Typography type="h6" className="!font-bold flex justify-center items-center text-center"><span className="mr-1"> <PlusIcon /></span> CREATE USER</Typography>
                   </Button>
                 </div>
+              </div>
 
-                <div>
-                  <Button
-                    className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
-                    variant="btn-error"
-                  >
-                    Yes
-                  </Button>
-                </div>
-              </ModalAction>
-            </Modal>
+              {/* Data Table */}
+              <div className="!h-[27.8rem] border-b border-lightSilver ">
+                {userData.length > 0 && (
+                  <DataTable
+                    columns={columns}
+                    data={updatedUserData}
+                    headerInvisible={false}
+                    stickyHeader={true}
+                    hoverEffect={true}
+                  />
+                )}
+              </div>
+            </div>}
 
-            {/*  Drawer */}
-            <Drawer
-              onOpen={isOpenDrawer}
-              onClose={handleDrawerClose}
-              editId={typeof editId === 'number' ? editId : 0}
-            />
-            {/* Drawer Overlay */}
-            <DrawerOverlay
-              isOpen={isOpenDrawer}
-              onClose={handleDrawerClose}
-            />
-          </div>}
+
+          {/* Remove Modal */}
+          <Modal
+            isOpen={isRemoveOpen}
+            onClose={modalClose}
+            width="352px"
+          >
+            <ModalTitle>
+              <div className="py-3 px-4 font-bold">Remove</div>
+
+              <div className="" >
+                <Close variant="medium" />
+              </div>
+            </ModalTitle>
+
+            <ModalContent>
+              <div className="p-2 my-5">
+                Are you sure you want to remove the user ?
+              </div>
+            </ModalContent>
+
+            <ModalAction>
+              <div>
+                <Button
+                  className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
+                  variant="btn-outline-error"
+                >
+                  No
+                </Button>
+              </div>
+
+              <div>
+                <Button
+                  className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
+                  variant="btn-error"
+                >
+                  Yes
+                </Button>
+              </div>
+            </ModalAction>
+          </Modal>
+
+          {/*  Drawer */}
+          <Drawer
+            onOpen={isOpenDrawer}
+            onClose={handleDrawerClose}
+            editId={typeof editId === 'number' ? editId : 0}
+          />
+          {/* Drawer Overlay */}
+          <DrawerOverlay
+            isOpen={isOpenDrawer}
+            onClose={handleDrawerClose}
+          />
+        </div>
       </Wrapper>
     </>
   );

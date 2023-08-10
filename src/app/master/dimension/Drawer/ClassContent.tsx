@@ -13,11 +13,11 @@ import styles from "@/app/assets/scss/styles.module.scss";
 interface DrawerProps {
     onOpen: boolean;
     onClose: () => void;
-    locationEditId?: number;
+    classEditId?: number;
 }
-const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, locationEditId }) => {
+const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, classEditId }) => {
 
-    const [locationId, setLocationId] = useState<string>("");
+    const [classId, setClassId] = useState<string>("");
     const [idHasError, setIdHasError] = useState<boolean>(false);
     const [idError, setIdError] = useState<boolean>(false);
 
@@ -29,14 +29,13 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, locationEditI
         onClose();
     };
 
-    //Location Data API
-    const getLocationById = async () => {
+    //Class Data API
+    const getClassById = async () => {
         try {
             const token = await localStorage.getItem("token");
             const params = {
-                "CompanyId": 69,
-                "Id": locationEditId
-
+                "CompanyId":process.env.CompanyId,
+                "Id": classEditId
             }
             const config = {
                 headers: {
@@ -44,7 +43,7 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, locationEditI
                 },
             };
             const response = await axios.post(
-                `${process.env.base_url}/location/getbyid `,
+                `${process.env.base_url}/class/getbyid `,
                 params,
                 config
             );
@@ -53,7 +52,7 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, locationEditI
                 if (ResponseStatus === "Success") {
                     if (ResponseData !== null && typeof ResponseData === 'object') {
                         const { id, name } = ResponseData;
-                        setLocationId(id);
+                        setClassId(id);
                         setName(name);
                     }
                 } else {
@@ -75,7 +74,7 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, locationEditI
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
-        locationId.trim().length <= 0 && setIdError(true);
+        classId.trim().length <= 0 && setIdError(true);
         name.trim().length <= 0 && setNameError(true);
 
         if (idHasError && nameHasError) {
@@ -83,10 +82,10 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, locationEditI
                 const token = await localStorage.getItem("token");
                 const params = {
                     "Id": 0,
-                    "LocationId": locationId,
-                    "Description": "f4g4",
+                    "ClassId": classId,
+                    "Description": "Class 1",
                     "RecordNo": "",
-                    "CompanyId": 12,
+                    "CompanyId":process.env.CompanyId,
                     "Name": name,
                     "ParentId": "",
                     "ParentName": "",
@@ -99,14 +98,14 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, locationEditI
                     },
                 };
                 const response = await axios.post(
-                    `${process.env.base_url}/location/save`, params,
+                    `${process.env.base_url}/class/save`, params,
                     config
                 );
 
                 const { ResponseStatus, Message } = response.data;
                 if (response.status === 200) {
                     if (ResponseStatus === "Success") {
-                        Toast.success(`Location ${locationEditId ? "updated" : "added"} successfully.`);
+                        Toast.success(`Class ${classEditId ? "updated" : "added"} successfully.`);
                         onClose();
                     } else {
                         onClose();
@@ -131,14 +130,14 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, locationEditI
     };
 
     useEffect(() => {
-        if (onOpen && locationEditId) {
-            getLocationById();
+        if (onOpen && classEditId) {
+            getClassById();
         }
-    }, [locationEditId]);
+    }, [classEditId]);
 
     useEffect(() => {
         if (onOpen) {
-            setLocationId("");
+            setClassId("");
             setIdError(false);
             setName("");
             setNameError(false);
@@ -152,7 +151,7 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, locationEditI
                     className={`fixed top-0 bg-white  right-0 h-full xs:!w-5/6 sm:!w-2/4 lg:!w-2/6 xl:!w-2/6 2xl:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.rightAnimation}`}
                 >
                     <div className="p-4 flex justify-between items-center border-b border-lightSilver">
-                        <Typography type="label" className="!font-bold !text-lg"> ADD Location</Typography>
+                        <Typography type="label" className="!font-bold !text-lg"> ADD Class</Typography>
                         <div className="mx-2 cursor-pointer" onClick={handleClose}>
                             <Close variant="medium" />
                         </div>
@@ -165,9 +164,9 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, locationEditI
                                 name="id"
                                 placeholder="Please Enter ID Name"
                                 validate
-                                value={locationId}
+                                value={classId}
                                 hasError={idError}
-                                getValue={(value: any) => setLocationId(value)}
+                                getValue={(value: any) => setClassId(value)}
                                 getError={(e: any) => setIdHasError(e)}
                                 onChange={(e: any) => {
                                     setIdError(true);
@@ -180,7 +179,7 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, locationEditI
                                 label="Name"
                                 id="name"
                                 name="name"
-                                placeholder="Please Enter Location Name"
+                                placeholder="Please Enter Class Name"
                                 validate
                                 hasError={nameError}
                                 value={name}
@@ -218,4 +217,4 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, locationEditI
     );
 }
 
-export default LocationContent
+export default ClassContent

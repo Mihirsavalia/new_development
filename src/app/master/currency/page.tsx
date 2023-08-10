@@ -1,17 +1,27 @@
+"use client";
+
 import { Button, Close, DataTable, Modal, ModalAction, ModalContent, ModalTitle, Switch, Toast, Tooltip, Typography } from 'next-ts-lib';
 import React, { useEffect, useRef, useState } from 'react';
 import PlusIcon from '@/app/assets/icons/PlusIcon';
 import SearchIcon from '@/app/assets/icons/SearchIcon';
 import SyncIcon from "@/app/assets/icons/SyncIcon";
-import DrawerOverlay from './DrawerOverlay';
+import DrawerOverlay from '@/app/manage/users/DrawerOverlay';
 import MeatballsMenuIcon from "@/app/assets/icons/MeatballsMenu";
+import Wrapper from '@/app/components/common/Wrapper';
 import axios from 'axios';
 
-const Product_Service: React.FC = () => {
+interface accountList {
+    name: string;
+    status: any;
+    action: any;
+}
+
+const GLAccount: React.FC = () => {
     const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
     const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
     const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
-    const [hasEditId, setHasEditId] = useState("");
+    const [accountEditId, setAccountEditId] = useState<number | null>();
+    const [accountList, setAccountList] = useState<accountList[]>([]);
     const [isSyncModalOpen, setIsSyncModalOpen] = useState<boolean>(false);
 
     const handleToggleChange = () => {
@@ -30,7 +40,7 @@ const Product_Service: React.FC = () => {
         try {
             const token = await localStorage.getItem("token");
             const params = {
-                "CompanyId": 65,
+                "CompanyId":76,
             }
             const config = {
                 headers: {
@@ -38,7 +48,7 @@ const Product_Service: React.FC = () => {
                 },
             };
             const response = await axios.post(
-                `${process.env.base_url}/productandservice/sync`,
+                `${process.env.base_url}/account/sync`,
                 params,
                 config
             );
@@ -46,7 +56,7 @@ const Product_Service: React.FC = () => {
             if (response.status === 200) {
                 if (ResponseStatus === "Success") {
                     if (ResponseData !== null && typeof ResponseData === 'object') {
-                        Toast.success("Error", "Product Sync successfully");
+                        Toast.success("Success", "Account Sync successfully");
                     }
                 } else {
                     if (Message != null) {
@@ -96,6 +106,7 @@ const Product_Service: React.FC = () => {
     const actionArray = ["Edit", "Remove"];
 
     const handleKebabChange = (actionName: string, id: number) => {
+        setAccountEditId(id);
         if (actionName === "Edit") {
             setIsEditOpen(!isEditOpen)
         }
@@ -103,6 +114,7 @@ const Product_Service: React.FC = () => {
             setIsRemoveOpen(!isRemoveOpen)
         }
     };
+
     const Actions = ({ actions, id }: any) => {
         const actionsRef = useRef<HTMLDivElement>(null);
         const [open, setOpen] = useState(false);
@@ -151,36 +163,97 @@ const Product_Service: React.FC = () => {
             </div>
         );
     };
+
+    //Account List API
+    const getAccountList = async () => {
+        try {
+            const params = {
+                "FilterObj": {
+                    "AccountNo": "",
+                    "Name": "GL1",
+                    "FullyQualifiedName": "AP GL",
+                    "AccountType": "",
+                    "ClosingType": "",
+                    "NormalBalance": "",
+                    "CurrentBalance": "",
+                    "Status": "active",
+                    "GlobalFilter": ""
+                },
+                "CompanyId":76,
+                "Index": 1,
+                "PageSize": 10
+            }
+            const token = await localStorage.getItem("token");
+            const config = {
+                headers: {
+                    Authorization: `bearer ${token}`,
+                },
+            };
+            const response = await axios.post(
+                `${process.env.base_url}/account/getlist`, params,
+                config
+            );
+            console.log("🚀 ~ file: GLAccount.tsx:194 ~ getAccountList ~ response:", response)
+            const { ResponseStatus, ResponseData, Message } = response.data;
+            if (response.status === 200) {
+                if (ResponseStatus === "Success") {
+                    if (ResponseData !== null && typeof ResponseData === 'object') {
+                        setAccountList(ResponseData);
+                    }
+                } else {
+                    if (Message === null) {
+                        Toast.error("Error", "Please try again later.");
+                    } else {
+                        Toast.error("Error", Message);
+                    }
+                }
+            }
+            else {
+                if (Message === null) {
+                    Toast.error("Error", "Please try again later.");
+                } else {
+                    Toast.error("Error", Message);
+                }
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    useEffect(() => {
+        getAccountList();
+    }, []);
+
     const [tableData, setTableData] = useState([
         {
-            itemId:"V-616",
+            itemId: "V-616",
             name: "John Doe",
             type: "service",
-            account:"AP",
+            account: "AP",
             action: <Actions actions={actionArray} />
         },
         {
-            itemId:"V-615",
+            itemId: "V-615",
             name: "Jane Smith",
             type: "Category",
-            account:"AP",
+            account: "AP",
             action: <Actions actions={actionArray} />
         },
         {
-            itemId:"V-620",
+            itemId: "V-620",
             name: "Bob Johnson",
             type: "service",
-            account:"AP BI",
+            account: "AP BI",
             action: <Actions actions={actionArray} />
         }
     ]);
 
     return (
+        <Wrapper masterSettings={true}>
         <div>
             <div className="bg-whiteSmoke flex justify-between items-center">
                 <div className="flex items-center py-[10px] px-3">
                     <Typography type="h5" className="!font-bold flex justify-center items-center text-center">
-                        Product & Service
+                        GL Account
                     </Typography>
 
                 </div>
@@ -188,7 +261,7 @@ const Product_Service: React.FC = () => {
                     <Tooltip content={"Search"} position="bottom" className='!z-[2]'>
                         <SearchIcon />
                     </Tooltip>
-                    <Tooltip content={`Sync Product`} position="bottom" className='!z-[2]'>
+                    <Tooltip content={`Sync GL Account`} position="bottom" className='!z-[2]'>
                         <div onClick={() => setIsSyncModalOpen(true)}>
                             <SyncIcon />
                         </div>
@@ -216,7 +289,7 @@ const Product_Service: React.FC = () => {
                 <ModalContent>
                     <div className="px-4 py-6">
                         <Typography type='h5' className='!font-normal'>
-                            Are you sure you want to sync project ?
+                            Are you sure you want to sync GL Account ?
                         </Typography>
                     </div>
                 </ModalContent>
@@ -254,7 +327,8 @@ const Product_Service: React.FC = () => {
                 onClose={handleDrawerClose}
             />
         </div>
+        </Wrapper>
     )
 }
 
-export default Product_Service
+export default GLAccount

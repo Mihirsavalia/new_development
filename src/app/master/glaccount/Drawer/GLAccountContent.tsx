@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
 import {
     Button,
     Close,
@@ -6,18 +8,16 @@ import {
     Typography
 } from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
-import { useEffect, useState } from "react";
-import axios from "axios";
 import styles from "@/app/assets/scss/styles.module.scss";
 
 interface DrawerProps {
     onOpen: boolean;
     onClose: () => void;
-    projectEditId?: number;
+    accountEditId?: number;
 }
-const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, projectEditId }) => {
+const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, accountEditId }) => {
 
-    const [projectId, setProjectId] = useState<string>("");
+    const [accountId, setAccountId] = useState<string>("");
     const [idHasError, setIdHasError] = useState<boolean>(false);
     const [idError, setIdError] = useState<boolean>(false);
 
@@ -25,18 +25,23 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, projectEditId 
     const [nameError, setNameError] = useState<boolean>(false);
     const [nameHasError, setNameHasError] = useState<boolean>(false);
 
+    const [type, setType] = useState<string>("");
+    const [typeError, setTypeError] = useState<boolean>(false);
+    const [typeHasError, setTypeHasError] = useState<boolean>(false);
+
+
+
     const handleClose = () => {
         onClose();
     };
 
-    //Project Data API
-    const getProjectById = async () => {
+    //Account Data API
+    const getAccountById = async () => {
         try {
             const token = await localStorage.getItem("token");
             const params = {
-                "CompanyId": 69,
-                "Id": projectEditId
-
+                "CompanyId":process.env.CompanyId,
+                "Id": accountEditId
             }
             const config = {
                 headers: {
@@ -44,7 +49,7 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, projectEditId 
                 },
             };
             const response = await axios.post(
-                `${process.env.base_url}/project/getbyid `,
+                `${process.env.base_url}/account/getbyid `,
                 params,
                 config
             );
@@ -52,9 +57,10 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, projectEditId 
             if (response.status === 200) {
                 if (ResponseStatus === "Success") {
                     if (ResponseData !== null && typeof ResponseData === 'object') {
-                        const { id, name } = ResponseData;
-                        setProjectId(id);
+                        const { id, name, type } = ResponseData;
+                        setAccountId(id);
                         setName(name);
+                        setType(type)
                     }
                 } else {
                     if (Message != null) {
@@ -75,18 +81,19 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, projectEditId 
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
-        projectId.trim().length <= 0 && setIdError(true);
+        accountId.trim().length <= 0 && setIdError(true);
         name.trim().length <= 0 && setNameError(true);
+        type.trim().length <= 0 && setTypeError(true);
 
-        if (idHasError && nameHasError) {
+        if (idHasError && nameHasError && typeHasError) {
             try {
                 const token = await localStorage.getItem("token");
                 const params = {
                     "Id": 0,
-                    "ProjectId": projectId,
+                    "AccountId": accountId,
                     "Description": "f4g4",
                     "RecordNo": "",
-                    "CompanyId": 12,
+                    "CompanyId":process.env.CompanyId,
                     "Name": name,
                     "ParentId": "",
                     "ParentName": "",
@@ -99,14 +106,14 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, projectEditId 
                     },
                 };
                 const response = await axios.post(
-                    `${process.env.base_url}/project/save`, params,
+                    `${process.env.base_url}/account/save`, params,
                     config
                 );
 
                 const { ResponseStatus, Message } = response.data;
                 if (response.status === 200) {
                     if (ResponseStatus === "Success") {
-                        Toast.success(`Project ${projectEditId ? "updated" : "added"} successfully.`);
+                        Toast.success(`Account ${accountEditId ? "updated" : "added"} successfully.`);
                         onClose();
                     } else {
                         onClose();
@@ -131,17 +138,22 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, projectEditId 
     };
 
     useEffect(() => {
-        if (onOpen && projectEditId) {
-            getProjectById();
+        if (onOpen && accountEditId) {
+            getAccountById();
         }
-    }, [projectEditId]);
+    }, [accountEditId]);
 
     useEffect(() => {
         if (onOpen) {
-            setProjectId("");
+            setAccountId("");
             setIdError(false);
+            setIdHasError(false);
             setName("");
             setNameError(false);
+            setNameHasError(false);
+            setType("");
+            setTypeError(false);
+            setTypeHasError(false);
         }
     }, [onOpen]);
 
@@ -152,7 +164,7 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, projectEditId 
                     className={`fixed top-0 bg-white  right-0 h-full xs:!w-5/6 sm:!w-2/4 lg:!w-2/6 xl:!w-2/6 2xl:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.rightAnimation}`}
                 >
                     <div className="p-4 flex justify-between items-center border-b border-lightSilver">
-                        <Typography type="label" className="!font-bold !text-lg"> ADD Project</Typography>
+                        <Typography type="label" className="!font-bold !text-lg"> ADD Account</Typography>
                         <div className="mx-2 cursor-pointer" onClick={handleClose}>
                             <Close variant="medium" />
                         </div>
@@ -160,14 +172,14 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, projectEditId 
                     <div className="flex-1 mx-5 mt-2 mb-12 ">
                         <div className="flex-1 mt-3">
                             <Text
-                                label="ID"
+                                label="Item ID"
                                 id="id"
                                 name="id"
-                                placeholder="Please Enter ID Name"
+                                placeholder="Please Enter Item ID"
                                 validate
-                                value={projectId}
+                                value={accountId}
                                 hasError={idError}
-                                getValue={(value: any) => setProjectId(value)}
+                                getValue={(value: any) => setAccountId(value)}
                                 getError={(e: any) => setIdHasError(e)}
                                 onChange={(e: any) => {
                                     setIdError(true);
@@ -177,10 +189,10 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, projectEditId 
                         </div>
                         <div className="flex-1 mt-3">
                             <Text
-                                label="Name"
+                                label="Item Name"
                                 id="name"
                                 name="name"
-                                placeholder="Please Enter Project Name"
+                                placeholder="Please Enter Item Name"
                                 validate
                                 hasError={nameError}
                                 value={name}
@@ -188,6 +200,22 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, projectEditId 
                                 getError={(e: any) => setNameHasError(e)}
                                 onChange={(e: any) => {
                                     setNameError(true);
+                                }}
+                            ></Text>
+                        </div>
+                        <div className="flex-1 mt-3">
+                            <Text
+                                label="Item Type"
+                                id="itemType"
+                                name="itemType"
+                                placeholder="Please Enter Item Type"
+                                validate
+                                hasError={typeError}
+                                value={type}
+                                getValue={(value: any) => setType(value)}
+                                getError={(e: any) => setTypeHasError(e)}
+                                onChange={(e: any) => {
+                                    setTypeError(true);
                                 }}
                             ></Text>
                         </div>
@@ -218,4 +246,4 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, projectEditId 
     );
 }
 
-export default ProjectContent
+export default AccountContent

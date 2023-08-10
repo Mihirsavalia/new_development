@@ -1,6 +1,7 @@
 import {
     Button,
     Close,
+    Select,
     Text,
     Toast,
     Typography
@@ -13,11 +14,11 @@ import styles from "@/app/assets/scss/styles.module.scss";
 interface DrawerProps {
     onOpen: boolean;
     onClose: () => void;
-    departmentEditId?: number;
+    productEditId?: number;
 }
-const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, departmentEditId }) => {
+const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, productEditId }) => {
 
-    const [departmentId, setDepartmentId] = useState<string>("");
+    const [productId, setProductId] = useState<string>("");
     const [idHasError, setIdHasError] = useState<boolean>(false);
     const [idError, setIdError] = useState<boolean>(false);
 
@@ -25,18 +26,26 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, departmentE
     const [nameError, setNameError] = useState<boolean>(false);
     const [nameHasError, setNameHasError] = useState<boolean>(false);
 
+    const [type, setType] = useState<string>("");
+    const [typeError, setTypeError] = useState<boolean>(false);
+    const [typeHasError, setTypeHasError] = useState<boolean>(false);
+
+    const [account, setAccount] = useState([]);
+    const [accountId, setAccountId] = useState<number>();
+    const [accountError, setAccountError] = useState<boolean>(false);
+    const [accountHasError, setAccountHasError] = useState<boolean>(false);
+
     const handleClose = () => {
         onClose();
     };
 
-    //Department Data API
-    const getDepartmentById = async () => {
+    //Product Data API
+    const getProductById = async () => {
         try {
             const token = await localStorage.getItem("token");
             const params = {
-                "CompanyId": 69,
-                "Id": departmentEditId
-
+                "CompanyId":process.env.CompanyId,
+                "Id": productEditId
             }
             const config = {
                 headers: {
@@ -44,7 +53,7 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, departmentE
                 },
             };
             const response = await axios.post(
-                `${process.env.base_url}/department/getbyid `,
+                `${process.env.base_url}/product/getbyid `,
                 params,
                 config
             );
@@ -52,9 +61,10 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, departmentE
             if (response.status === 200) {
                 if (ResponseStatus === "Success") {
                     if (ResponseData !== null && typeof ResponseData === 'object') {
-                        const { id, name } = ResponseData;
-                        setDepartmentId(id);
+                        const { id, name, type } = ResponseData;
+                        setProductId(id);
                         setName(name);
+                        setType(type)
                     }
                 } else {
                     if (Message != null) {
@@ -72,21 +82,65 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, departmentE
         } catch (error) {
         }
     }
+    //GL Account List API
+    const getAccountList = async () => {
+        try {
+            const token = await localStorage.getItem("token");
+            const params = {
+                "CompanyId":process.env.CompanyId,
+            }
+            const config = {
+                headers: {
+                    Authorization: `bearer ${token}`,
+                },
+            };
+            const response = await axios.post(
+                `${process.env.base_url}/account/getlist`,
+                params,
+                config
+            );
+            const { ResponseStatus, ResponseData, Message } = response.data;
+            if (response.status === 200) {
+                if (ResponseStatus === "Success") {
+                    if (ResponseData !== null && typeof ResponseData === 'object') {
+                        setAccount(ResponseData);
+                    }
+                } else {
+                    if (Message != null) {
+                        Toast.error("Error", Message);
+                    }
+                }
+            }
+            else {
+                if (Message === null) {
+                    Toast.error("Error", "Please try again later.");
+                } else {
+                    Toast.error("Error", Message);
+                }
+            }
+        } catch (error) {
+        }
+    }
+    useEffect(() => {
+        getAccountList();
+    }, []);
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
-        departmentId.trim().length <= 0 && setIdError(true);
+        productId.trim().length <= 0 && setIdError(true);
         name.trim().length <= 0 && setNameError(true);
+        type.trim().length <= 0 && setTypeError(true);
+        account.length <= 0 && setAccountError(true);
 
-        if (idHasError && nameHasError) {
+        if (idHasError && nameHasError && typeHasError && (account.length<=0)) {
             try {
                 const token = await localStorage.getItem("token");
                 const params = {
                     "Id": 0,
-                    "DepartmentId": departmentId,
+                    "ProductId": productId,
                     "Description": "f4g4",
                     "RecordNo": "",
-                    "CompanyId": 12,
+                    "CompanyId":76,
                     "Name": name,
                     "ParentId": "",
                     "ParentName": "",
@@ -99,14 +153,14 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, departmentE
                     },
                 };
                 const response = await axios.post(
-                    `${process.env.base_url}/department/save`, params,
+                    `${process.env.base_url}/product/save`, params,
                     config
                 );
 
                 const { ResponseStatus, Message } = response.data;
                 if (response.status === 200) {
                     if (ResponseStatus === "Success") {
-                        Toast.success(`Department ${departmentEditId ? "updated" : "added"} successfully.`);
+                        Toast.success(`Product ${productEditId ? "updated" : "added"} successfully.`);
                         onClose();
                     } else {
                         onClose();
@@ -131,17 +185,25 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, departmentE
     };
 
     useEffect(() => {
-        if (onOpen && departmentEditId) {
-            getDepartmentById();
+        if (onOpen && productEditId) {
+            getProductById();
         }
-    }, [departmentEditId]);
+    }, [productEditId]);
 
     useEffect(() => {
         if (onOpen) {
-            setDepartmentId("");
+            setProductId("");
             setIdError(false);
+            setIdHasError(false);
             setName("");
             setNameError(false);
+            setNameHasError(false);
+            setType("");
+            setTypeError(false);
+            setTypeHasError(false);
+            setAccount([]);
+            setAccountError(false);
+            setAccountHasError(false);
         }
     }, [onOpen]);
 
@@ -152,7 +214,7 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, departmentE
                     className={`fixed top-0 bg-white  right-0 h-full xs:!w-5/6 sm:!w-2/4 lg:!w-2/6 xl:!w-2/6 2xl:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.rightAnimation}`}
                 >
                     <div className="p-4 flex justify-between items-center border-b border-lightSilver">
-                        <Typography type="label" className="!font-bold !text-lg"> ADD Department</Typography>
+                        <Typography type="label" className="!font-bold !text-lg"> ADD Item</Typography>
                         <div className="mx-2 cursor-pointer" onClick={handleClose}>
                             <Close variant="medium" />
                         </div>
@@ -160,14 +222,14 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, departmentE
                     <div className="flex-1 mx-5 mt-2 mb-12 ">
                         <div className="flex-1 mt-3">
                             <Text
-                                label="ID"
+                                label="Item ID"
                                 id="id"
                                 name="id"
-                                placeholder="Please Enter ID Name"
+                                placeholder="Please Enter Item ID"
                                 validate
-                                value={departmentId}
+                                value={productId}
                                 hasError={idError}
-                                getValue={(value: any) => setDepartmentId(value)}
+                                getValue={(value: any) => setProductId(value)}
                                 getError={(e: any) => setIdHasError(e)}
                                 onChange={(e: any) => {
                                     setIdError(true);
@@ -177,10 +239,10 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, departmentE
                         </div>
                         <div className="flex-1 mt-3">
                             <Text
-                                label="Name"
+                                label="Item Name"
                                 id="name"
                                 name="name"
-                                placeholder="Please Enter Department Name"
+                                placeholder="Please Enter Item Name"
                                 validate
                                 hasError={nameError}
                                 value={name}
@@ -190,6 +252,34 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, departmentE
                                     setNameError(true);
                                 }}
                             ></Text>
+                        </div>
+                        <div className="flex-1 mt-3">
+                            <Text
+                                label="Item Type"
+                                id="itemType"
+                                name="itemType"
+                                placeholder="Please Enter Item Type"
+                                validate
+                                hasError={typeError}
+                                value={type}
+                                getValue={(value: any) => setType(value)}
+                                getError={(e: any) => setTypeHasError(e)}
+                                onChange={(e: any) => {
+                                    setTypeError(true);
+                                }}
+                            ></Text>
+                        </div>
+                        <div className="flex-1 mt-3">
+                            <Select
+                                id="account"
+                                label="GL Account"
+                                options={account}
+                                validate
+                                defaultValue={accountId}
+                                getValue={(value: any) => setAccountId(value)}
+                                getError={(e: any) => { setAccountHasError(e) }}
+                                hasError={accountError}
+                            />
                         </div>
                     </div>
                     <span className="flex absolute bottom-16 w-full right-0 border-t border-lightSilver"></span>
@@ -218,4 +308,4 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, departmentE
     );
 }
 
-export default DepartmentContent
+export default ProductContent

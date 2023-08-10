@@ -66,6 +66,7 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
         { label: "Data Corp", value: "Data Corp" },
     ];
 
+
     //Country List API
     const getCountryList = async () => {
         try {
@@ -105,7 +106,7 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
         }
     }
     //State List API
-    const getStateList = async () => {
+    const getStateList = async (Id: number) => {
         try {
             const token = await localStorage.getItem("token");
             const config = {
@@ -114,7 +115,7 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                 },
             };
             const response = await axios.get(
-                `${process.env.select_url}/state/list?countryId=${countryId}`,
+                `${process.env.select_url}/state/list?countryId=${countryId || Id}`,
                 config
             );
             const { ResponseStatus, ResponseData, Message } = response.data;
@@ -141,12 +142,7 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
         }
     }
 
-    useEffect(() => {
-        getCountryList();
-        getStateList();
-    }, []);
-
-    //User List API
+    //User Data API
     const getUserData = async () => {
         try {
             const token = await localStorage.getItem("token");
@@ -163,11 +159,18 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
             if (response.status === 200) {
                 if (ResponseStatus === "Success") {
                     if (ResponseData !== null && typeof ResponseData === 'object') {
-                        const { id, first_name, email, phone } = ResponseData;
+                        const { id, first_name, email, phone, country_id, state_id } = ResponseData;
+                        if (editId) {
+                            getCountryList();
+                            getStateList(country_id);
+                        }
                         setId(id);
                         setName(first_name || "");
                         setEmail(email || "");
                         setPhone(phone || null);
+                        setCountryId(country_id || null);
+                        setStateId(state_id || null)
+
                     }
                 } else {
                     if (Message === null) {
@@ -188,6 +191,15 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
             console.error(error);
         }
     }
+    useEffect(() => {
+        if (onOpen) {
+            getUserData();
+            getCountryList();
+            getStateList(1);
+        }
+    }, [onOpen]);
+
+
 
     //Save Data API
     const handleSubmit = async (e: any) => {
@@ -195,7 +207,6 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
         name.trim().length <= 0 && setNameError(true);
         email.trim().length <= 0 && setEmailError(true);
         phone.trim().length <= 0 && setPhoneError(true);
-
         const [firstName, ...lastNamePart] = name.split(" ");
         const lastName = lastNamePart.join(" ");
 
@@ -284,9 +295,6 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
     }, [onOpen]);
 
 
-    useEffect(() => {
-        getUserData();
-    }, [editId]);
 
     return (
         <>
@@ -339,9 +347,7 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                                 value={name}
                                 getValue={(value: any) => setName(value)}
                                 getError={(e: any) => setNameError(e)}
-                                onChange={(e: any) => {
-                                    setNameError(true);
-                                }}
+                                onChange={(e: any) => setNameError(true)}
                             ></Text>
                         </div>
                         <div className="flex-1 mt-3">
@@ -357,9 +363,7 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                                 value={email}
                                 getValue={(value: any) => setEmail(value)}
                                 getError={(e: any) => setEmailError(e)}
-                                onChange={(e: any) => {
-                                    setEmailError(true);
-                                }}
+                                onChange={(e: any) => setEmailError(true)}
                             ></Email>
                         </div>
                         <div className="flex-1 mt-3">
@@ -373,9 +377,7 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                                 countryCode
                                 max={10}
                                 getError={(e: any) => setPhoneError(e)}
-                                onChange={(e: any) => {
-                                    setPhoneError(true);
-                                }}
+                                onChange={(e: any) => setPhoneError(true)}
                             />
                         </div>
                         <div className="flex-1 mt-3">
@@ -385,8 +387,8 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                                 options={country}
                                 validate
                                 defaultValue={countryId}
-                                getValue={(value: any) => { setCountryId(value), console.log(value) }}
-                                getError={(e: any) => { setCountryError(e) }}
+                                getValue={(value: any) => setCountryId(value)}
+                                getError={(e: any) => setCountryError(e)}
                                 hasError={countryError}
                             />
                         </div>
@@ -398,7 +400,7 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                                 validate
                                 defaultValue={stateId}
                                 getValue={(value: any) => setStateId(value)}
-                                getError={(e: any) => { setStateError(e) }}
+                                getError={(e: any) => setStateError(e)}
                                 hasError={stateError}
                             />
                         </div>

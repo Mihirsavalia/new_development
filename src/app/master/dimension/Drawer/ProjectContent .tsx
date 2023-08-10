@@ -13,11 +13,11 @@ import styles from "@/app/assets/scss/styles.module.scss";
 interface DrawerProps {
     onOpen: boolean;
     onClose: () => void;
-    classEditId?: number;
+    projectEditId?: number;
 }
-const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, classEditId }) => {
+const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, projectEditId }) => {
 
-    const [classId, setClassId] = useState<string>("");
+    const [projectId, setProjectId] = useState<string>("");
     const [idHasError, setIdHasError] = useState<boolean>(false);
     const [idError, setIdError] = useState<boolean>(false);
 
@@ -29,13 +29,13 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, classEditId }) =
         onClose();
     };
 
-    //Class Data API
-    const getClassById = async () => {
+    //Project Data API
+    const getProjectById = async () => {
         try {
             const token = await localStorage.getItem("token");
             const params = {
-                "CompanyId": 69,
-                "Id": classEditId
+                "CompanyId":76,
+                "Id": projectEditId
 
             }
             const config = {
@@ -44,7 +44,7 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, classEditId }) =
                 },
             };
             const response = await axios.post(
-                `${process.env.base_url}/class/getbyid `,
+                `${process.env.base_url}/project/getbyid `,
                 params,
                 config
             );
@@ -53,7 +53,7 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, classEditId }) =
                 if (ResponseStatus === "Success") {
                     if (ResponseData !== null && typeof ResponseData === 'object') {
                         const { id, name } = ResponseData;
-                        setClassId(id);
+                        setProjectId(id);
                         setName(name);
                     }
                 } else {
@@ -75,7 +75,7 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, classEditId }) =
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
-        classId.trim().length <= 0 && setIdError(true);
+        projectId.trim().length <= 0 && setIdError(true);
         name.trim().length <= 0 && setNameError(true);
 
         if (idHasError && nameHasError) {
@@ -83,10 +83,10 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, classEditId }) =
                 const token = await localStorage.getItem("token");
                 const params = {
                     "Id": 0,
-                    "ClassId": classId,
+                    "ProjectId": projectId,
                     "Description": "f4g4",
                     "RecordNo": "",
-                    "CompanyId": 12,
+                    "CompanyId":76,
                     "Name": name,
                     "ParentId": "",
                     "ParentName": "",
@@ -99,14 +99,14 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, classEditId }) =
                     },
                 };
                 const response = await axios.post(
-                    `${process.env.base_url}/class/save`, params,
+                    `${process.env.base_url}/project/save`, params,
                     config
                 );
 
                 const { ResponseStatus, Message } = response.data;
                 if (response.status === 200) {
                     if (ResponseStatus === "Success") {
-                        Toast.success(`Class ${classEditId ? "updated" : "added"} successfully.`);
+                        Toast.success(`Project ${projectEditId ? "updated" : "added"} successfully.`);
                         onClose();
                     } else {
                         onClose();
@@ -131,14 +131,14 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, classEditId }) =
     };
 
     useEffect(() => {
-        if (onOpen && classEditId) {
-            getClassById();
+        if (onOpen && projectEditId) {
+            getProjectById();
         }
-    }, [classEditId]);
+    }, [projectEditId]);
 
     useEffect(() => {
         if (onOpen) {
-            setClassId("");
+            setProjectId("");
             setIdError(false);
             setName("");
             setNameError(false);
@@ -152,7 +152,7 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, classEditId }) =
                     className={`fixed top-0 bg-white  right-0 h-full xs:!w-5/6 sm:!w-2/4 lg:!w-2/6 xl:!w-2/6 2xl:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.rightAnimation}`}
                 >
                     <div className="p-4 flex justify-between items-center border-b border-lightSilver">
-                        <Typography type="label" className="!font-bold !text-lg"> ADD Class</Typography>
+                        <Typography type="label" className="!font-bold !text-lg"> ADD Project</Typography>
                         <div className="mx-2 cursor-pointer" onClick={handleClose}>
                             <Close variant="medium" />
                         </div>
@@ -165,9 +165,9 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, classEditId }) =
                                 name="id"
                                 placeholder="Please Enter ID Name"
                                 validate
-                                value={classId}
+                                value={projectId}
                                 hasError={idError}
-                                getValue={(value: any) => setClassId(value)}
+                                getValue={(value: any) => setProjectId(value)}
                                 getError={(e: any) => setIdHasError(e)}
                                 onChange={(e: any) => {
                                     setIdError(true);
@@ -180,7 +180,7 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, classEditId }) =
                                 label="Name"
                                 id="name"
                                 name="name"
-                                placeholder="Please Enter Class Name"
+                                placeholder="Please Enter Project Name"
                                 validate
                                 hasError={nameError}
                                 value={name}
@@ -218,4 +218,4 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, classEditId }) =
     );
 }
 
-export default ClassContent
+export default ProjectContent

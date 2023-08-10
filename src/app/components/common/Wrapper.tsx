@@ -3,7 +3,7 @@
 import React, { ReactNode, useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 
-import DrawerOverlay from "@/app/users/DrawerOverlay";
+import DrawerOverlay from "@/app/manage/users/DrawerOverlay";
 import Navbar from "./Navbar";
 import { useRouter } from "next/navigation";
 import styles from "@/app/assets/scss/styles.module.scss";
@@ -11,10 +11,10 @@ import { Toast } from "next-ts-lib";
 
 interface WrapperProps {
   children: ReactNode;
-  setWrapperSetting: any;
+  masterSettings?: boolean;
 }
 
-const Wrapper = ({ children, setWrapperSetting }: WrapperProps): JSX.Element => {
+const Wrapper = ({ children, masterSettings }: WrapperProps): JSX.Element => {
   const router = useRouter();
   const [isSetting, setIsSetting] = useState<boolean>(false);
   const [drawer, setDrawer] = useState<boolean>(false);
@@ -41,19 +41,12 @@ const Wrapper = ({ children, setWrapperSetting }: WrapperProps): JSX.Element => 
 
   const navbarData = (data: any) => {
     setIsSetting(data);
-    setWrapperSetting(data);
   };
-
-  const handleSidebarData = (data: any) => {
-    setIsSetting(data)
-    window.location.href = "/users";
-  };
-
 
   return (
     <div className="lg:flex" >
       <Toast position="top_center" />
-      <Sidebar setOpen={isOpen} setSettingSidebar={isSetting} toggleDrawer={drawer} sendSidebarData={handleSidebarData} />
+      <Sidebar setOpen={isOpen} setSettingSidebar={masterSettings} toggleDrawer={drawer} />
       <main className={styles.mainWidth}>
         <Navbar setSetting={navbarData} />
         <DrawerOverlay

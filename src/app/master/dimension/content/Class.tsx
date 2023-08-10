@@ -1,9 +1,10 @@
-import { Button, Close, DataTable, Modal, ModalAction, ModalContent, ModalTitle, Switch, Typography } from 'next-ts-lib';
+import { Button, Close, DataTable, Modal, ModalAction, ModalContent, ModalTitle, Switch, Toast, Typography } from 'next-ts-lib';
 import React, { useEffect, useRef, useState } from 'react';
+import axios from "axios";
 import MeatballsMenuIcon from "@/app/assets/icons/MeatballsMenu";
-import ClassContent from './Drawer/ClassContent';
+import ClassContent from '../Drawer/ClassContent';
 
-interface TableData {
+interface classList {
   name: string;
   status: any;
   action: any;
@@ -13,9 +14,13 @@ interface ClassProps {
   onDrawerOpen: boolean;
   onDrawerClose: () => void;
 }
+
 const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
   const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
+  const [classList, setClassList] = useState<classList[]>([]);
+  const [classEditId, setClassEditId] = useState<number | null>();
+
 
   const columns = [
     {
@@ -34,9 +39,75 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
       sortable: false,
     },
   ];
+
+  //Class List API
+  const getClassList = async () => {
+    try {
+      const params = {
+        "FilterObj": {
+          "ClassId": "1",
+          "Name": "Class 1",
+          "FullyQualifiedName": "",
+          "Status": "active",
+          "GlobalFilter": ""
+        },
+        "CompanyId": 76,
+        "Index": 1,
+        "PageSize": 10
+      }
+
+      const token = await localStorage.getItem("token");
+      const config = {
+        headers: {
+          Authorization: `bearer ${token}`,
+        },
+      };
+      const response = await axios.post(
+        `${process.env.base_url}/class/getlist`, params,
+        config
+      );
+      const { ResponseStatus, ResponseData, Message } = response.data;
+      if (response.status === 200) {
+        if (ResponseStatus === "Success") {
+          if (ResponseData !== null && typeof ResponseData === 'object') {
+            setClassList(ResponseData.List);
+            Toast.success("Success", "Class list fetched successfully!.");
+          }
+        } else {
+          if (Message === null) {
+            Toast.error("Error", "Please try again later.");
+          } else {
+            Toast.error("Error", Message);
+          }
+        }
+      }
+      else {
+        if (Message === null) {
+          Toast.error("Error", "Please try again later.");
+        } else {
+          Toast.error("Error", Message);
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  useEffect(() => {
+    getClassList();
+  }, []);
+
   const actionArray = ["Edit", "Remove"];
+  const classListData = classList?.map((e: any) => new Object({
+    name: e.first_name,
+    status:
+      <div>
+        {e.is_Active ? <Switch checked={true} /> : <Switch checked={false} />}
+      </div>,
+    action: <Actions id={e.id} actions={actionArray} />
+  }))
 
   const handleKebabChange = (actionName: string, id: number) => {
+    setClassEditId(id);
     if (actionName === "Edit") {
       setIsEditOpen(!isEditOpen)
     }
@@ -44,7 +115,7 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
       setIsRemoveOpen(!isRemoveOpen)
     }
   };
-  
+
   const modalClose = () => {
     setIsRemoveOpen(false);
   };
@@ -98,38 +169,63 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
     );
   };
 
-  const [tableData, setTableData] = useState<TableData[]>([
-    {
-      name: "John Doe",
-      status: <Switch checked={true} />,
-      action: <Actions actions={actionArray} />
-    },
-    {
-      name: "Jane Smith",
-      status: <Switch checked={false} />,
-      action: <Actions actions={actionArray} />
-    },
-    {
-      name: "Bob Johnson",
-      status: <Switch checked={true} />,
-      action: <Actions actions={actionArray} />
+  //Delete Class API 
+  const handleClassDelete = async () => {
+    try {
+      const token = await localStorage.getItem("token");
+      const params = {
+        "CompanyId": 76,
+        "Id": 354,
+        "RecordNo": "124"
+      }
+      const config = {
+        headers: {
+          Authorization: `bearer ${token}`,
+        },
+      };
+      const response = await axios.post(
+        `${process.env.base_url}/class/delete `,
+        params,
+        config
+      );
+      const { ResponseStatus, ResponseData, Message } = response.data;
+      if (response.status === 200) {
+        if (ResponseStatus === "Success") {
+          if (ResponseData !== null && typeof ResponseData === 'object') {
+            Toast.success("Error", "Class Remove successfully");
+          }
+        } else {
+          if (Message != null) {
+            Toast.error("Error", Message);
+          }
+        }
+      }
+      else {
+        if (Message === null) {
+          Toast.error("Error", "Please try again later.");
+        } else {
+          Toast.error("Error", Message);
+        }
+      }
+    } catch (error) {
+      console.error(error);
     }
-  ]);
+  }
 
   return (
     <div>
       {/* DataTable */}
-      {tableData.length > 0 && (
+      {classListData.length > 0 && (
         <DataTable
           columns={columns}
-          data={tableData}
+          data={classListData}
           headerInvisible={false}
           stickyHeader={true}
           hoverEffect={true}
         />
       )}
 
-      {/* Modal */}
+      {/* Remove Modal */}
       <Modal
         isOpen={isRemoveOpen}
         onClose={modalClose}
@@ -158,15 +254,14 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
           <div>
             <Button
               className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
-              variant="btn-error">
+              variant="btn-error" onClick={handleClassDelete} >
               YES
             </Button>
           </div>
         </ModalAction>
       </Modal>
 
-      <ClassContent onOpen={onDrawerOpen} onClose={onDrawerClose} onEdit={tableData} />
-
+      <ClassContent onOpen={onDrawerOpen} onClose={onDrawerClose} classEditId={typeof classEditId === 'number' ? classEditId : 0} />
     </div>
   )
 }

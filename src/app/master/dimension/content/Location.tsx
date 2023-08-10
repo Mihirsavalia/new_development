@@ -2,27 +2,33 @@ import { Button, Close, DataTable, Modal, ModalAction, ModalContent, ModalTitle,
 import React, { useEffect, useRef, useState } from 'react';
 import axios from "axios";
 import MeatballsMenuIcon from "@/app/assets/icons/MeatballsMenu";
-import DepartmentContent from './Drawer/DepartmentContent';
+import LocationContent from '../Drawer/LocationContent';
 
-interface departmentList {
+interface locationList {
+  locationId: number;
   name: string;
   status: any;
   action: any;
 }
 
-interface DepartmentProps {
+interface LocationProps {
   onDrawerOpen: boolean;
   onDrawerClose: () => void;
 }
 
-const Department : React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose }) => {
+const Location: React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => {
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
   const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
-  const [departmentList, setDepartmentList] = useState<departmentList[]>([]);
-  const [departmentEditId, setDepartmentEditId] = useState<number | null>();
+  const [locationList, setLocationList] = useState<locationList[]>([]);
+  const [locationEditId, setLocationEditId] = useState<number | null>();
 
 
   const columns = [
+    {
+      header: "LOCATION ID",
+      accessor: "locationId",
+      sortable: true,
+    },
     {
       header: "NAME",
       accessor: "name",
@@ -40,16 +46,18 @@ const Department : React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose })
     },
   ];
 
-  //Department List API
-  const getDepartmentList = async () => {
+  //Location List API
+  const getLocationList = async () => {
     try {
       const params = {
         "FilterObj": {
+          "LocationId": "L1",
+          "Name": "Loc1",
+          "FullyQualifiedName": "AP Location",
           "Status": "active",
-          "ClassId": "",
-          "Name": ""
+          "GlobalFilter": ""
         },
-        "CompanyId": 69,
+        "CompanyId":76,
         "Index": 1,
         "PageSize": 10
       }
@@ -60,14 +68,15 @@ const Department : React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose })
         },
       };
       const response = await axios.post(
-        `${process.env.base_url}/department/getlist`, params,
+        `${process.env.base_url}/location/getlist`, params,
         config
       );
       const { ResponseStatus, ResponseData, Message } = response.data;
       if (response.status === 200) {
         if (ResponseStatus === "Success") {
           if (ResponseData !== null && typeof ResponseData === 'object') {
-            setDepartmentList(ResponseData);
+            setLocationList(ResponseData.List);
+            Toast.success("Success", "Location list fetched successfully!.");
           }
         } else {
           if (Message === null) {
@@ -89,11 +98,12 @@ const Department : React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose })
     }
   }
   useEffect(() => {
-    getDepartmentList();
+    getLocationList();
   }, []);
 
   const actionArray = ["Edit", "Remove"];
-  const departmentListData = departmentList?.map((e: any) => new Object({
+  const locationListData = locationList?.map((e: any) => new Object({
+    locationId: e.id,
     name: e.first_name,
     status:
       <div>
@@ -103,7 +113,7 @@ const Department : React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose })
   }))
 
   const handleKebabChange = (actionName: string, id: number) => {
-    setDepartmentEditId(id);
+    setLocationEditId(id);
     if (actionName === "Edit") {
       setIsEditOpen(!isEditOpen)
     }
@@ -165,12 +175,12 @@ const Department : React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose })
     );
   };
 
-  //Delete Department API 
-  const handleDepartmentDelete = async () => {
+  //Delete Location API 
+  const handleLocationDelete = async () => {
     try {
       const token = await localStorage.getItem("token");
       const params = {
-        "CompanyId": 65,
+        "CompanyId":76,
         "Id": 354,
         "RecordNo": "124"
       }
@@ -180,7 +190,7 @@ const Department : React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose })
         },
       };
       const response = await axios.post(
-        `${process.env.base_url}/department/delete `,
+        `${process.env.base_url}/location/delete `,
         params,
         config
       );
@@ -188,7 +198,7 @@ const Department : React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose })
       if (response.status === 200) {
         if (ResponseStatus === "Success") {
           if (ResponseData !== null && typeof ResponseData === 'object') {
-            Toast.success("Error", "Department Remove successfully");
+            Toast.success("Error", "Location Remove successfully");
           }
         } else {
           if (Message != null) {
@@ -211,10 +221,10 @@ const Department : React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose })
   return (
     <div>
       {/* DataTable */}
-      {departmentListData.length > 0 && (
+      {locationListData.length > 0 && (
         <DataTable
           columns={columns}
-          data={departmentListData}
+          data={locationListData}
           headerInvisible={false}
           stickyHeader={true}
           hoverEffect={true}
@@ -235,7 +245,7 @@ const Department : React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose })
         <ModalContent>
           <div className="p-2 my-5">
             <Typography type='h5' className='!font-normal'>
-              Are you sure you want to remove the department ?
+              Are you sure you want to remove the location ?
             </Typography>
           </div>
         </ModalContent>
@@ -250,16 +260,16 @@ const Department : React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose })
           <div>
             <Button
               className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
-              variant="btn-error" onClick={handleDepartmentDelete} >
+              variant="btn-error" onClick={handleLocationDelete} >
               YES
             </Button>
           </div>
         </ModalAction>
       </Modal>
 
-      <DepartmentContent onOpen={onDrawerOpen} onClose={onDrawerClose} departmentEditId={typeof departmentEditId === 'number' ? departmentEditId : 0} />
+      <LocationContent onOpen={onDrawerOpen} onClose={onDrawerClose} locationEditId={typeof locationEditId === 'number' ? locationEditId : 0} />
     </div>
   )
 }
 
-export default Department
+export default Location
