@@ -1,7 +1,7 @@
 import { Button, Close, DataTable, Modal, ModalAction, ModalContent, ModalTitle, Switch, Toast, Typography } from 'next-ts-lib';
 import React, { useEffect, useRef, useState } from 'react';
 import axios from "axios";
-import MeatballsMenuIcon from "@/app/assets/icons/MeatballsMenu";
+import MeatballsMenuIcon from "@/assets/Icons/MeatballsMenu";
 import DepartmentContent from '../Drawer/DepartmentContent';
 
 interface departmentList {

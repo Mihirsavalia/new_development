@@ -6,7 +6,7 @@ import Sidebar from "./Sidebar";
 import DrawerOverlay from "@/app/manage/users/DrawerOverlay";
 import Navbar from "./Navbar";
 import { useRouter } from "next/navigation";
-import styles from "@/app/assets/scss/styles.module.scss";
+import styles from "@/assets/scss/styles.module.scss";
 import { Toast } from "next-ts-lib";
 
 interface WrapperProps {

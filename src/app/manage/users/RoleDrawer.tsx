@@ -4,7 +4,7 @@ import "next-ts-lib/dist/index.css";
 
 import { Button, CheckBox, DataTable, Typography } from "next-ts-lib";
 import React from "react";
-import ChevronLeftIcon from "@/app/assets/icons/ChevronLeftIcon";
+import ChevronLeftIcon from "@/assets/Icons/ChevronLeftIcon";
 
 interface DrawerProps {
     onClose: () => void;

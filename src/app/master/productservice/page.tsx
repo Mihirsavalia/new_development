@@ -2,14 +2,14 @@
 
 import { Button, Close, DataTable, Modal, ModalAction, ModalContent, ModalTitle, Switch, Toast, Tooltip, Typography } from 'next-ts-lib';
 import React, { useEffect, useRef, useState } from 'react';
-import PlusIcon from '@/app/assets/icons/PlusIcon';
-import SearchIcon from '@/app/assets/icons/SearchIcon';
-import SyncIcon from "@/app/assets/icons/SyncIcon";
+import PlusIcon from '@/assets/Icons/PlusIcon';
+import SearchIcon from '@/assets/Icons/SearchIcon';
+import SyncIcon from "@/assets/Icons/SyncIcon";
 import DrawerOverlay from '@/app/manage/users/DrawerOverlay';
-import MeatballsMenuIcon from "@/app/assets/icons/MeatballsMenu";
+import MeatballsMenuIcon from "@/assets/Icons/MeatballsMenu";
 import axios from 'axios';
 import ProductContent from './Drawer/Product&ServiceContent';
-import Wrapper from '@/app/components/common/Wrapper';
+import Wrapper from '@/components/common/Wrapper';
 
 interface productList {
     name: string;

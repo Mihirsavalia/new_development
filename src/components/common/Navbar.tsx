@@ -5,13 +5,13 @@ import Link from "next/link";
 import { Avatar, Badge, Close, Select, Text, Tooltip } from "next-ts-lib";
 
 // icons
-import Bell from "../../assets/icons/BellIcon";
-import Setting from "../../assets/icons/SettingIcon";
-import Help from "../../assets/icons/HelpIcon";
-import Sync from "../../assets/icons/SyncFilledIcon";
-import BI from "../../assets/icons/BiIcon";
+import Bell from "../../assets/Icons/BellIcon";
+import Setting from "../../assets/Icons/SettingIcon";
+import Help from "../../assets/Icons/HelpIcon";
+import Sync from "../../assets/Icons/SyncFilledIcon";
+import BI from "../../assets/Icons/BiIcon";
 // import Close from "../../assets/icons/Close";
-import SearchIcon from "../../assets/icons/SearchIcon";
+import SearchIcon from "../../assets/Icons/SearchIcon";
 
 interface NavbarProps {
   setSetting: (data: any) => void;

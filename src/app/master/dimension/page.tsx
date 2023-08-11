@@ -1,16 +1,16 @@
 "use client"
 import { Button, Close, Modal, ModalAction, ModalContent, ModalTitle, Toast, Tooltip, Typography } from 'next-ts-lib';
 import React, { useState } from 'react';
-import PlusIcon from '@/app/assets/icons/PlusIcon';
-import SearchIcon from '@/app/assets/icons/SearchIcon';
-import SyncIcon from "@/app/assets/icons/SyncIcon";
+import PlusIcon from '@/assets/Icons/PlusIcon';
+import SearchIcon from '@/assets/Icons/SearchIcon';
+import SyncIcon from "@/assets/Icons/SyncIcon";
 import Class from './content/Class';
 import Department from './content/Department';
 import Location from './content/Location';
 import Project from './content/Project';
 import DrawerOverlay from '@/app/manage/users/DrawerOverlay';
 import axios from 'axios';
-import Wrapper from '@/app/components/common/Wrapper';
+import Wrapper from '@/components/common/Wrapper';
 
 const tabs = [
     { id: "class", label: "CLASS" },

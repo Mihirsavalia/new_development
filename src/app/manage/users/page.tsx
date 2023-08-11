@@ -5,9 +5,9 @@ import { Button, Close, DataTable, Modal, ModalAction, ModalContent, ModalTitle,
 import "next-ts-lib/dist/index.css";
 import React, { useEffect, useRef, useState } from "react";
 
-import KebabMenuIcon from "@/app/assets/icons/KebabMenuIcon";
-import PlusIcon from "@/app/assets/icons/PlusIcon";
-import Wrapper from "@/app/components/common/Wrapper";
+import KebabMenuIcon from "@/assets/Icons/KebabMenuIcon";
+import PlusIcon from "@/assets/Icons/PlusIcon";
+import Wrapper from "@/components/common/Wrapper";
 import Drawer from "./Drawer";
 import DrawerOverlay from "./DrawerOverlay";
 import RoleDrawer from "./RoleDrawer";

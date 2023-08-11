@@ -9,7 +9,7 @@ import {
 import "next-ts-lib/dist/index.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import styles from "@/app/assets/scss/styles.module.scss";
+import styles from "@/assets/scss/styles.module.scss";
 
 interface DrawerProps {
     onOpen: boolean;
@@ -277,7 +277,7 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
         <>
             {onOpen && (
                 <div
-                    className={`fixed top-0 bg-white  right-0 h-full xs:!w-5/6 sm:!w-2/4 lg:!w-2/6 xl:!w-2/6 2xl:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.rightAnimation}`}
+                    className={`fixed top-0 bg-white  right-0 h-full xsm:!w-5/6 sm:!w-2/4 lg:!w-2/6 xl:!w-2/6 2xl:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.rightAnimation}`}
                 >
                     <div className="p-4 flex justify-between items-center border-b border-lightSilver">
                         <Typography type="label" className="!font-bold !text-lg"> ADD Item</Typography>
@@ -382,7 +382,7 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                         <div className="py-3 px-5">
                             <Button
                                 onClick={onClose}
-                                className="rounded-full font-medium w-28 mx-3 xs:!px-1"
+                                className="rounded-full font-medium w-28 mx-3 xsm:!px-1"
                                 variant="btn-outline-primary"
                             >
                                 <Typography type="h6" className="!font-bold"> CANCLE</Typography>
@@ -390,7 +390,7 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                             <Button
                                 type="submit"
                                 onClick={handleSubmit}
-                                className={`rounded-full font-medium w-28 xs:!px-1`}
+                                className={`rounded-full font-medium w-28 xsm:!px-1`}
                                 variant="btn-primary"
                             >
                                 <Typography type="h6" className="!font-bold"> SAVE</Typography>
