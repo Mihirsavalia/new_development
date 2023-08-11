@@ -14,9 +14,9 @@ import styles from "@/app/assets/scss/styles.module.scss";
 interface DrawerProps {
     onOpen: boolean;
     onClose: () => void;
-    productEditId?: number;
+    editId?: number;
 }
-const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, productEditId }) => {
+const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
 
     const [productId, setProductId] = useState<string>("");
     const [idHasError, setIdHasError] = useState<boolean>(false);
@@ -45,7 +45,7 @@ const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, productEditId 
             const token = await localStorage.getItem("token");
             const params = {
                 "CompanyId":process.env.CompanyId,
-                "Id": productEditId
+                "Id": editId
             }
             const config = {
                 headers: {
@@ -80,6 +80,7 @@ const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, productEditId 
                 }
             }
         } catch (error) {
+            console.log(error);
         }
     }
     //GL Account List API
@@ -119,6 +120,7 @@ const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, productEditId 
                 }
             }
         } catch (error) {
+            console.log(error);
         }
     }
     useEffect(() => {
@@ -160,7 +162,7 @@ const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, productEditId 
                 const { ResponseStatus, Message } = response.data;
                 if (response.status === 200) {
                     if (ResponseStatus === "Success") {
-                        Toast.success(`Product ${productEditId ? "updated" : "added"} successfully.`);
+                        Toast.success(`Product ${editId ? "updated" : "added"} successfully.`);
                         onClose();
                     } else {
                         onClose();
@@ -177,6 +179,7 @@ const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, productEditId 
                     }
                 }
             } catch (error) {
+                console.log(error);
             }
         }
         else {
@@ -185,10 +188,10 @@ const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, productEditId 
     };
 
     useEffect(() => {
-        if (onOpen && productEditId) {
+        if (onOpen && editId) {
             getProductById();
         }
-    }, [productEditId]);
+    }, [editId]);
 
     useEffect(() => {
         if (onOpen) {

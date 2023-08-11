@@ -13,9 +13,9 @@ import styles from "@/app/assets/scss/styles.module.scss";
 interface DrawerProps {
     onOpen: boolean;
     onClose: () => void;
-    accountEditId?: number;
+    editId?: number;
 }
-const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, accountEditId }) => {
+const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
 
     const [accountId, setAccountId] = useState<string>("");
     const [idHasError, setIdHasError] = useState<boolean>(false);
@@ -41,7 +41,7 @@ const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, accountEditId 
             const token = await localStorage.getItem("token");
             const params = {
                 "CompanyId":process.env.CompanyId,
-                "Id": accountEditId
+                "Id": editId
             }
             const config = {
                 headers: {
@@ -76,6 +76,7 @@ const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, accountEditId 
                 }
             }
         } catch (error) {
+            console.log(error);
         }
     }
 
@@ -113,7 +114,7 @@ const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, accountEditId 
                 const { ResponseStatus, Message } = response.data;
                 if (response.status === 200) {
                     if (ResponseStatus === "Success") {
-                        Toast.success(`Account ${accountEditId ? "updated" : "added"} successfully.`);
+                        Toast.success(`Account ${editId ? "updated" : "added"} successfully.`);
                         onClose();
                     } else {
                         onClose();
@@ -130,6 +131,7 @@ const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, accountEditId 
                     }
                 }
             } catch (error) {
+                console.log(error);
             }
         }
         else {
@@ -138,10 +140,10 @@ const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, accountEditId 
     };
 
     useEffect(() => {
-        if (onOpen && accountEditId) {
+        if (onOpen && editId) {
             getAccountById();
         }
-    }, [accountEditId]);
+    }, [editId]);
 
     useEffect(() => {
         if (onOpen) {

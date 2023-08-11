@@ -20,7 +20,7 @@ const GLAccount: React.FC = () => {
     const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
     const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
     const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
-    const [accountEditId, setAccountEditId] = useState<number | null>();
+    const [editIt, setAccountEditId] = useState<number | null>();
     const [accountList, setAccountList] = useState<accountList[]>([]);
     const [isSyncModalOpen, setIsSyncModalOpen] = useState<boolean>(false);
 

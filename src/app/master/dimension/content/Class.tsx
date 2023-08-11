@@ -51,7 +51,7 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
           "Status": "active",
           "GlobalFilter": ""
         },
-        "CompanyId": 76,
+        "CompanyId": 80,
         "Index": 1,
         "PageSize": 10
       }
@@ -174,7 +174,7 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
     try {
       const token = await localStorage.getItem("token");
       const params = {
-        "CompanyId": 76,
+        "CompanyId": 80,
         "Id": 354,
         "RecordNo": "124"
       }

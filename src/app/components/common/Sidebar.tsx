@@ -133,7 +133,7 @@ const settings_data: SettingsSection[] = [
         href: "/apterm",
       },
       {
-        name: "Product Service",
+        name: "Product & Service",
         href: "/productservice",
       },
       {

@@ -45,7 +45,7 @@ const Dimension: React.FC = () => {
         try {
             const token = await localStorage.getItem("token");
             const params = {
-                "CompanyId": 76,
+                "CompanyId": 80,
             }
             const config = {
                 headers: {

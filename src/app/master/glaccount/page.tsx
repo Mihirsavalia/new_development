@@ -21,7 +21,7 @@ const GLAccount: React.FC = () => {
     const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
     const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
     const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
-    const [accountEditId, setAccountEditId] = useState<number | null>();
+    const [editId, setEditId] = useState<number | null>();
     const [accountList, setAccountList] = useState<accountList[]>([]);
     const [isSyncModalOpen, setIsSyncModalOpen] = useState<boolean>(false);
 
@@ -41,7 +41,7 @@ const GLAccount: React.FC = () => {
         try {
             const token = await localStorage.getItem("token");
             const params = {
-                "CompanyId": 76,
+                "CompanyId": 80,
             }
             const config = {
                 headers: {
@@ -107,7 +107,7 @@ const GLAccount: React.FC = () => {
     const actionArray = ["Edit", "Remove"];
 
     const handleKebabChange = (actionName: string, id: number) => {
-        setAccountEditId(id);
+        setEditId(id);
         if (actionName === "Edit") {
             setIsEditOpen(!isEditOpen)
         }
@@ -180,7 +180,7 @@ const GLAccount: React.FC = () => {
                     "Status": "active",
                     "GlobalFilter": ""
                 },
-                "CompanyId": 76,
+                "CompanyId": 80,
                 "Index": 1,
                 "PageSize": 10
             }
@@ -323,7 +323,7 @@ const GLAccount: React.FC = () => {
                     />
                 )}
 
-                <GLAccountContent onOpen={isOpenDrawer} onClose={handleDrawerClose} accountEditId={typeof accountEditId === 'number' ? accountEditId : 0} />
+                <GLAccountContent onOpen={isOpenDrawer} onClose={handleDrawerClose} editId={typeof editId === 'number' ? editId : 0} />
 
                 <DrawerOverlay
                     isOpen={isOpenDrawer}

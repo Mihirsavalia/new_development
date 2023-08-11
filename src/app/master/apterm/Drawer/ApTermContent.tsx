@@ -14,21 +14,30 @@ import styles from "@/app/assets/scss/styles.module.scss";
 interface DrawerProps {
     onOpen: boolean;
     onClose: () => void;
-    apTermEditId?: number;
+    editId?: number;
 }
-const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, apTermEditId }) => {
-
-    const [apTermId, setAPTermId] = useState<string>("");
-    const [idHasError, setIdHasError] = useState<boolean>(false);
-    const [idError, setIdError] = useState<boolean>(false);
+const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
 
     const [name, setName] = useState<string>("");
     const [nameError, setNameError] = useState<boolean>(false);
     const [nameHasError, setNameHasError] = useState<boolean>(false);
 
-    const [type, setType] = useState<string>("");
-    const [typeError, setTypeError] = useState<boolean>(false);
-    const [typeHasError, setTypeHasError] = useState<boolean>(false);
+    const [description, setDescription] = useState<string>("");
+    const [descriptionError, setDescriptionError] = useState<boolean>(false);
+    const [descriptionHasError, setDescriptionHasError] = useState<boolean>(false);
+
+    const [dueDay, setDueDay] = useState<string>("");
+    const [dueDayError, setDueDayError] = useState<boolean>(false);
+    const [dueDayHasError, setDueDayHasError] = useState<boolean>(false);
+
+    const [dueForm, setDueForm] = useState([]);
+    const [dueFormId, setDueFormId] = useState<number>();
+    const [dueFormError, setDueFormError] = useState<boolean>(false);
+    const [dueFormHasError, setDueFormHasError] = useState<boolean>(false);
+
+    const [discount, setDiscount] = useState<string>("");
+    const [discountError, setDiscountError] = useState<boolean>(false);
+    const [discountHasError, setDiscountHasError] = useState<boolean>(false);
 
     const [account, setAccount] = useState([]);
     const [accountId, setAccountId] = useState<number>();
@@ -45,7 +54,7 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, apTermEditId })
             const token = await localStorage.getItem("token");
             const params = {
                 "CompanyId": process.env.CompanyId,
-                "Id": apTermEditId
+                "Id": editId
             }
             const config = {
                 headers: {
@@ -61,10 +70,10 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, apTermEditId })
             if (response.status === 200) {
                 if (ResponseStatus === "Success") {
                     if (ResponseData !== null && typeof ResponseData === 'object') {
-                        const { id, name, type } = ResponseData;
-                        setAPTermId(id);
+                        const { name, description, due_day } = ResponseData;
+                        setDescription(description);
                         setName(name);
-                        setType(type)
+                        setDueDay(due_day)
                     }
                 } else {
                     if (Message != null) {
@@ -80,14 +89,59 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, apTermEditId })
                 }
             }
         } catch (error) {
+            console.log(error);
         }
     }
-    //GL Account List API
-    const getAccountList = async () => {
+    //GL DueForm List API
+    const getDueFormList = async () => {
         try {
             const token = await localStorage.getItem("token");
             const params = {
                 "CompanyId": process.env.CompanyId,
+            }
+            const config = {
+                headers: {
+                    Authorization: `bearer ${token}`,
+                },
+            };
+            const response = await axios.post(
+                `${process.env.base_url}/account/getlist`,
+                params,
+                config
+            );
+            const { ResponseStatus, ResponseData, Message } = response.data;
+            if (response.status === 200) {
+                if (ResponseStatus === "Success") {
+                    if (ResponseData !== null && typeof ResponseData === 'object') {
+                        setDueForm(ResponseData);
+                    }
+                } else {
+                    if (Message != null) {
+                        Toast.error("Error", Message);
+                    }
+                }
+            }
+            else {
+                if (Message === null) {
+                    Toast.error("Error", "Please try again later.");
+                } else {
+                    Toast.error("Error", Message);
+                }
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    useEffect(() => {
+        getDueFormList();
+    }, []);
+
+    //Default Account List API
+    const getAccountList = async () => {
+        try {
+            const token = await localStorage.getItem("token");
+            const params = {
+                "CompanyId": 81,
             }
             const config = {
                 headers: {
@@ -119,28 +173,28 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, apTermEditId })
                 }
             }
         } catch (error) {
+            console.log(error);
         }
     }
-    useEffect(() => {
-        getAccountList();
-    }, []);
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
-        apTermId.trim().length <= 0 && setIdError(true);
+        description.trim().length <= 0 && setDescriptionError(true);
         name.trim().length <= 0 && setNameError(true);
-        type.trim().length <= 0 && setTypeError(true);
+        dueDay.trim().length <= 0 && setDueDayError(true);
+        dueForm.length <= 0 && setDueFormError(true);
+        discount.trim().length <= 0 && setDiscountError(true);
         account.length <= 0 && setAccountError(true);
 
-        if (idHasError && nameHasError && typeHasError && (account.length <= 0)) {
+        if (nameHasError && descriptionHasError && dueDayHasError && dueFormHasError && discountHasError && accountHasError) {
             try {
                 const token = await localStorage.getItem("token");
                 const params = {
                     "Id": 0,
-                    "APTermId": apTermId,
+                    "APTermId": editId,
                     "Description": "f4g4",
                     "RecordNo": "",
-                    "CompanyId": 76,
+                    "CompanyId": 80,
                     "Name": name,
                     "ParentId": "",
                     "ParentName": "",
@@ -160,7 +214,7 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, apTermEditId })
                 const { ResponseStatus, Message } = response.data;
                 if (response.status === 200) {
                     if (ResponseStatus === "Success") {
-                        Toast.success(`APTerm ${apTermEditId ? "updated" : "added"} successfully.`);
+                        Toast.success(`APTerm ${editId ? "updated" : "added"} successfully.`);
                         onClose();
                     } else {
                         onClose();
@@ -177,6 +231,7 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, apTermEditId })
                     }
                 }
             } catch (error) {
+                console.log(error);
             }
         }
         else {
@@ -185,22 +240,33 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, apTermEditId })
     };
 
     useEffect(() => {
-        if (onOpen && apTermEditId) {
+        if (onOpen && editId) {
             getAPTermById();
         }
-    }, [apTermEditId]);
+    }, [editId]);
 
     useEffect(() => {
         if (onOpen) {
-            setAPTermId("");
-            setIdError(false);
-            setIdHasError(false);
             setName("");
             setNameError(false);
             setNameHasError(false);
-            setType("");
-            setTypeError(false);
-            setTypeHasError(false);
+
+            setDescription("");
+            setDescriptionError(false);
+            setDescriptionHasError(false);
+
+            setDueDay("");
+            setDueDayError(false);
+            setDueDayHasError(false);
+
+            setDueForm([]);
+            setDueFormError(false);
+            setDueFormHasError(false);
+
+            setDiscount("");
+            setDiscountError(false);
+            setDiscountHasError(false);
+
             setAccount([]);
             setAccountError(false);
             setAccountHasError(false);
@@ -221,7 +287,7 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, apTermEditId })
                     </div>
                     <div className="flex-1 mx-5 mt-2 mb-12 ">
 
-                        <div className="flex-1 mt-3">
+                        <div className="flex-1 mt-4">
                             <Text
                                 label="Name"
                                 id="name"
@@ -237,43 +303,71 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, apTermEditId })
                                 }}
                             ></Text>
                         </div>
-                        <div className="flex-1 mt-3">
+                        <div className="flex-1 mt-4">
                             <Text
-                                label="Item ID"
-                                id="id"
-                                name="id"
-                                placeholder="Please Enter Item ID"
+                                label="Description"
+                                id="description"
+                                name="description"
+                                placeholder="Please Enter Description"
                                 validate
-                                value={apTermId}
-                                hasError={idError}
-                                getValue={(value: any) => setAPTermId(value)}
-                                getError={(e: any) => setIdHasError(e)}
+                                value={description}
+                                hasError={descriptionError}
+                                getValue={(value: any) => setDescription(value)}
+                                getError={(e: any) => setDescriptionHasError(e)}
                                 onChange={(e: any) => {
-                                    setIdError(true);
+                                    setDescriptionError(true);
                                 }}
                             >
                             </Text>
                         </div>
-                        <div className="flex-1 mt-3">
+                        <div className="flex-1 mt-4">
                             <Text
-                                label="Item Type"
-                                id="itemType"
-                                name="itemType"
-                                placeholder="Please Enter Item Type"
+                                label="Due Day"
+                                id="dueDay"
+                                name="dueDay"
+                                placeholder="Please Enter Due Day"
                                 validate
-                                hasError={typeError}
-                                value={type}
-                                getValue={(value: any) => setType(value)}
-                                getError={(e: any) => setTypeHasError(e)}
+                                hasError={dueDayError}
+                                value={dueDay}
+                                getValue={(value: any) => setDueDay(value)}
+                                getError={(e: any) => setDueDayHasError(e)}
                                 onChange={(e: any) => {
-                                    setTypeError(true);
+                                    setDueDayError(true);
                                 }}
                             ></Text>
                         </div>
-                        <div className="flex-1 mt-3">
+                        <div className="flex-1 mt-4">
+                            <Select
+                                id="dueForm"
+                                label="Due Form"
+                                options={dueForm}
+                                validate
+                                defaultValue={dueFormId}
+                                getValue={(value: any) => setDueForm(value)}
+                                getError={(e: any) => { setDueFormHasError(e) }}
+                                hasError={dueFormError}
+                            />
+                        </div>
+                        <div className="flex-1 mt-4">
+                            <Text
+                                label="Discount"
+                                id="discount"
+                                name="discount"
+                                placeholder="Please Enter Discount"
+                                validate
+                                hasError={discountError}
+                                value={discount}
+                                getValue={(value: any) => setDiscount(value)}
+                                getError={(e: any) => setDiscountHasError(e)}
+                                onChange={(e: any) => {
+                                    setDiscountError(true);
+                                }}
+                            ></Text>
+                        </div>
+                        <div className="flex-1 mt-4">
                             <Select
                                 id="account"
-                                label="GL Account"
+                                label="Default Account"
                                 options={account}
                                 validate
                                 defaultValue={accountId}

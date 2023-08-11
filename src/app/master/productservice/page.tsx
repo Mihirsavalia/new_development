@@ -9,6 +9,7 @@ import DrawerOverlay from '@/app/manage/users/DrawerOverlay';
 import MeatballsMenuIcon from "@/app/assets/icons/MeatballsMenu";
 import axios from 'axios';
 import ProductContent from './Drawer/Product&ServiceContent';
+import Wrapper from '@/app/components/common/Wrapper';
 
 interface productList {
     name: string;
@@ -20,7 +21,7 @@ const Product_Service: React.FC = () => {
     const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
     const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
     const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
-    const [productEditId, setProductEditId] = useState<number | null>();
+    const [editId, setEditId] = useState<number | null>();
     const [productList, setProductList] = useState<productList[]>([]);
     const [isSyncModalOpen, setIsSyncModalOpen] = useState<boolean>(false);
 
@@ -40,7 +41,7 @@ const Product_Service: React.FC = () => {
         try {
             const token = await localStorage.getItem("token");
             const params = {
-                "CompanyId":76,
+                "CompanyId": 76,
             }
             const config = {
                 headers: {
@@ -106,7 +107,7 @@ const Product_Service: React.FC = () => {
     const actionArray = ["Edit", "Remove"];
 
     const handleKebabChange = (actionName: string, id: number) => {
-        setProductEditId(id);
+        setEditId(id);
         if (actionName === "Edit") {
             setIsEditOpen(!isEditOpen)
         }
@@ -176,7 +177,7 @@ const Product_Service: React.FC = () => {
                     "Status": "",
                     "GlobalFilter": ""
                 },
-                "CompanyId":76,
+                "CompanyId": 76,
                 "PageSize": 10,
                 "Index": 1
             }
@@ -244,86 +245,89 @@ const Product_Service: React.FC = () => {
     ]);
 
     return (
-        <div>
-            <div className="bg-whiteSmoke flex justify-between items-center">
-                <div className="flex items-center py-[10px] px-3">
-                    <Typography type="h5" className="!font-bold flex justify-center items-center text-center">
-                        Product & Service
-                    </Typography>
+        <Wrapper masterSettings={true}>
 
-                </div>
-                <div className="flex items-center px-[10px]">
-                    <Tooltip content={"Search"} position="bottom" className='!z-[2]'>
-                        <SearchIcon />
-                    </Tooltip>
-                    <Tooltip content={`Sync Product`} position="bottom" className='!z-[2]'>
-                        <div onClick={() => setIsSyncModalOpen(true)}>
-                            <SyncIcon />
-                        </div>
-                    </Tooltip>
-                    <Button
-                        className="rounded-full !px-6 "
-                        variant="btn-primary"
-                        onClick={handleToggleChange}>
-                        <Typography type="h6" className="!font-bold flex justify-center items-center text-center"><span className="mr-1"> <PlusIcon /></span> CREATE NEW</Typography>
-                    </Button>
-                </div>
-            </div>
-
-            {/* Sync Modal */}
-            <Modal
-                isOpen={isSyncModalOpen}
-                onClose={modalClose}
-                width="363px">
-                <ModalTitle>
-                    <div className="py-3 px-4 font-bold">Sync</div>
-                    <div className="" >
-                        <Close variant="medium" />
-                    </div>
-                </ModalTitle>
-                <ModalContent>
-                    <div className="px-4 py-6">
-                        <Typography type='h5' className='!font-normal'>
-                            Are you sure you want to sync product ?
+            <div>
+                <div className="bg-whiteSmoke flex justify-between items-center">
+                    <div className="flex items-center py-[10px] px-3">
+                        <Typography type="h5" className="!font-bold flex justify-center items-center text-center">
+                            Product & Service
                         </Typography>
-                    </div>
-                </ModalContent>
-                <ModalAction>
-                    <div>
-                        <Button
-                            className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
-                            variant="btn-outline">
-                            NO
-                        </Button>
-                    </div>
-                    <div>
-                        <Button
-                            className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
-                            variant="btn-primary" onClick={handleSync}>
-                            YES
-                        </Button>
-                    </div>
-                </ModalAction>
-            </Modal>
 
-            {/* DataTable */}
-            {tableData.length > 0 && (
-                <DataTable
-                    columns={columns}
-                    data={tableData}
-                    headerInvisible={false}
-                    stickyHeader={true}
-                    hoverEffect={true}
+                    </div>
+                    <div className="flex items-center px-[10px]">
+                        <Tooltip content={"Search"} position="bottom" className='!z-[2]'>
+                            <SearchIcon />
+                        </Tooltip>
+                        <Tooltip content={`Sync Product`} position="bottom" className='!z-[2]'>
+                            <div onClick={() => setIsSyncModalOpen(true)}>
+                                <SyncIcon />
+                            </div>
+                        </Tooltip>
+                        <Button
+                            className="rounded-full !px-6 "
+                            variant="btn-primary"
+                            onClick={handleToggleChange}>
+                            <Typography type="h6" className="!font-bold flex justify-center items-center text-center"><span className="mr-1"> <PlusIcon /></span> CREATE NEW</Typography>
+                        </Button>
+                    </div>
+                </div>
+
+                {/* Sync Modal */}
+                <Modal
+                    isOpen={isSyncModalOpen}
+                    onClose={modalClose}
+                    width="363px">
+                    <ModalTitle>
+                        <div className="py-3 px-4 font-bold">Sync</div>
+                        <div className="" >
+                            <Close variant="medium" />
+                        </div>
+                    </ModalTitle>
+                    <ModalContent>
+                        <div className="px-4 py-6">
+                            <Typography type='h5' className='!font-normal'>
+                                Are you sure you want to sync product ?
+                            </Typography>
+                        </div>
+                    </ModalContent>
+                    <ModalAction>
+                        <div>
+                            <Button
+                                className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
+                                variant="btn-outline">
+                                NO
+                            </Button>
+                        </div>
+                        <div>
+                            <Button
+                                className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
+                                variant="btn-primary" onClick={handleSync}>
+                                YES
+                            </Button>
+                        </div>
+                    </ModalAction>
+                </Modal>
+
+                {/* DataTable */}
+                {tableData.length > 0 && (
+                    <DataTable
+                        columns={columns}
+                        data={tableData}
+                        headerInvisible={false}
+                        stickyHeader={true}
+                        hoverEffect={true}
+                    />
+                )}
+
+                <ProductContent onOpen={isOpenDrawer} onClose={handleDrawerClose} editId={typeof editId === 'number' ? editId : 0} />
+
+                <DrawerOverlay
+                    isOpen={isOpenDrawer}
+                    onClose={handleDrawerClose}
                 />
-            )}
-
-            <ProductContent onOpen={isOpenDrawer} onClose={handleDrawerClose} productEditId={typeof productEditId === 'number' ? productEditId : 0} />
-
-            <DrawerOverlay
-                isOpen={isOpenDrawer}
-                onClose={handleDrawerClose}
-            />
-        </div>
+            </div>
+        </Wrapper>
     )
 }
 
