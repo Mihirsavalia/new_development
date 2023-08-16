@@ -236,8 +236,6 @@ const page: React.FC = () => {
     setIsOpenDrawer(true);
   };
 
-
-
   useEffect(() => {
     getUserDataList();
   }, []);

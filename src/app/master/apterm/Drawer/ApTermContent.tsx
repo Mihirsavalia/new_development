@@ -194,7 +194,7 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                     "APTermId": editId,
                     "Description": "f4g4",
                     "RecordNo": "",
-                    "CompanyId": 80,
+                    "CompanyId": 86,
                     "Name": name,
                     "ParentId": "",
                     "ParentName": "",

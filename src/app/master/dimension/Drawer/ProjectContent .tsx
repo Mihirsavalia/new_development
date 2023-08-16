@@ -13,10 +13,11 @@ import styles from "@/assets/scss/styles.module.scss";
 interface DrawerProps {
     onOpen: boolean;
     onClose: () => void;
-    projectEditId?: number;
+    EditId?: number;
 }
-const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, projectEditId }) => {
+const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
 
+    const [Id, setId] = useState<string>("");
     const [projectId, setProjectId] = useState<string>("");
     const [idHasError, setIdHasError] = useState<boolean>(false);
     const [idError, setIdError] = useState<boolean>(false);
@@ -34,8 +35,8 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, projectEditId 
         try {
             const token = await localStorage.getItem("token");
             const params = {
-                "CompanyId":76,
-                "Id": projectEditId
+                "CompanyId": 86,
+                "Id": EditId
 
             }
             const config = {
@@ -52,12 +53,17 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, projectEditId 
             if (response.status === 200) {
                 if (ResponseStatus === "Success") {
                     if (ResponseData !== null && typeof ResponseData === 'object') {
-                        const { id, name } = ResponseData;
-                        setProjectId(id);
-                        setName(name);
+                        const { Id, ProjectId, Name } = ResponseData;
+                        setId(Id || "");
+                        setProjectId(ProjectId || "");
+                        setName(Name || "");
+                        setIdHasError(true);
+                        setNameHasError(true);
                     }
                 } else {
-                    if (Message != null) {
+                    if (Message === null) {
+                        Toast.error("Error", "Please try again later.");
+                    } else {
                         Toast.error("Error", Message);
                     }
                 }
@@ -78,20 +84,18 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, projectEditId 
         projectId.trim().length <= 0 && setIdError(true);
         name.trim().length <= 0 && setNameError(true);
 
-        if (idHasError && nameHasError) {
+        if (!(projectId.length <= 0) && !(name.length <= 0)) {
             try {
                 const token = await localStorage.getItem("token");
                 const params = {
-                    "Id": 0,
+                    "Id": Id || 0,
                     "ProjectId": projectId,
-                    "Description": "f4g4",
                     "RecordNo": "",
-                    "CompanyId":76,
+                    "CompanyId": 86,
                     "Name": name,
-                    "ParentId": "",
-                    "ParentName": "",
+                    "Description": "f4g4",
+                    "Category": "Capitalized",
                     "Status": "active",
-                    "FullyQualifiedName": ""
                 }
                 const config = {
                     headers: {
@@ -106,11 +110,13 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, projectEditId 
                 const { ResponseStatus, Message } = response.data;
                 if (response.status === 200) {
                     if (ResponseStatus === "Success") {
-                        Toast.success(`Project ${projectEditId ? "updated" : "added"} successfully.`);
+                        Toast.success(`Project ${EditId ? "updated" : "added"} successfully.`);
                         onClose();
                     } else {
                         onClose();
-                        if (Message != null) {
+                        if (Message === null) {
+                            Toast.error("Error", "Please try again later.");
+                        } else {
                             Toast.error("Error", Message);
                         }
                     }
@@ -131,10 +137,10 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, projectEditId 
     };
 
     useEffect(() => {
-        if (onOpen && projectEditId) {
+        if (EditId) {
             getProjectById();
         }
-    }, [projectEditId]);
+    }, [EditId]);
 
     useEffect(() => {
         if (onOpen) {

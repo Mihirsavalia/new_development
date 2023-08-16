@@ -13,10 +13,10 @@ import styles from "@/assets/scss/styles.module.scss";
 interface DrawerProps {
     onOpen: boolean;
     onClose: () => void;
-    locationEditId?: number;
+    EditId?: number;
 }
-const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, locationEditId }) => {
-
+const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
+    const [Id, setId] = useState<string>("");
     const [locationId, setLocationId] = useState<string>("");
     const [idHasError, setIdHasError] = useState<boolean>(false);
     const [idError, setIdError] = useState<boolean>(false);
@@ -34,8 +34,8 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, locationEditI
         try {
             const token = await localStorage.getItem("token");
             const params = {
-                "CompanyId":process.env.CompanyId,
-                "Id": locationEditId
+                "CompanyId": 86,
+                "Id": EditId
 
             }
             const config = {
@@ -52,12 +52,17 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, locationEditI
             if (response.status === 200) {
                 if (ResponseStatus === "Success") {
                     if (ResponseData !== null && typeof ResponseData === 'object') {
-                        const { id, name } = ResponseData;
-                        setLocationId(id);
-                        setName(name);
+                        const { Id, LocationId, Name } = ResponseData;
+                        setId(Id || "");
+                        setLocationId(LocationId || "");
+                        setName(Name || "");
+                        setIdHasError(true);
+                        setNameHasError(true);
                     }
                 } else {
-                    if (Message != null) {
+                    if (Message === null) {
+                        Toast.error("Error", "Please try again later.");
+                    } else {
                         Toast.error("Error", Message);
                     }
                 }
@@ -78,20 +83,20 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, locationEditI
         locationId.trim().length <= 0 && setIdError(true);
         name.trim().length <= 0 && setNameError(true);
 
-        if (idHasError && nameHasError) {
+        if (!(locationId.length <= 0) && !(name.length <= 0)) {
             try {
                 const token = await localStorage.getItem("token");
                 const params = {
-                    "Id": 0,
-                    "LocationId": locationId,
-                    "Description": "f4g4",
-                    "RecordNo": "",
-                    "CompanyId":process.env.CompanyId,
+                    "CompanyId": 86,
+                    "Id": Id || 0,
                     "Name": name,
+                    "RecordNo": "",
+                    "Status": "active",
+                    "FullyQualifiedName": "",
+                    "LocationId": locationId,
                     "ParentId": "",
                     "ParentName": "",
-                    "Status": "active",
-                    "FullyQualifiedName": ""
+                    "TaxId": ""
                 }
                 const config = {
                     headers: {
@@ -106,11 +111,13 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, locationEditI
                 const { ResponseStatus, Message } = response.data;
                 if (response.status === 200) {
                     if (ResponseStatus === "Success") {
-                        Toast.success(`Location ${locationEditId ? "updated" : "added"} successfully.`);
+                        Toast.success(`Location ${EditId ? "updated" : "added"} successfully.`);
                         onClose();
                     } else {
                         onClose();
-                        if (Message != null) {
+                        if (Message === null) {
+                            Toast.error("Error", "Please try again later.");
+                        } else {
                             Toast.error("Error", Message);
                         }
                     }
@@ -131,19 +138,21 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, locationEditI
     };
 
     useEffect(() => {
-        if (onOpen && locationEditId) {
-            getLocationById();
-        }
-    }, [locationEditId]);
-
-    useEffect(() => {
         if (onOpen) {
+            setId("");
             setLocationId("");
             setIdError(false);
             setName("");
             setNameError(false);
         }
     }, [onOpen]);
+
+    useEffect(() => {
+        if (EditId) {
+            getLocationById();
+        }
+    }, [EditId]);
+
 
     return (
         <>
@@ -152,7 +161,7 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, locationEditI
                     className={`fixed top-0 bg-white  right-0 h-full xsm:!w-5/6 sm:!w-2/4 lg:!w-2/6 xl:!w-2/6 2xl:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.rightAnimation}`}
                 >
                     <div className="p-4 flex justify-between items-center border-b border-lightSilver">
-                        <Typography type="label" className="!font-bold !text-lg"> ADD Location</Typography>
+                        <Typography type="label" className="!font-bold !text-lg"> {EditId ? "EDIT" : "ADD"} Location</Typography>
                         <div className="mx-2 cursor-pointer" onClick={handleClose}>
                             <Close variant="medium" />
                         </div>

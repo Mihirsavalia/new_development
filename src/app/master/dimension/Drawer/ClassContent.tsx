@@ -13,12 +13,14 @@ import styles from "@/assets/scss/styles.module.scss";
 interface DrawerProps {
     onOpen: boolean;
     onClose: () => void;
-    classEditId?: number;
+    EditId?: number;
 }
-const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, classEditId }) => {
+const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
 
+    const [Id, setId] = useState<string>("");
     const [classId, setClassId] = useState<string>("");
     const [idHasError, setIdHasError] = useState<boolean>(false);
+
     const [idError, setIdError] = useState<boolean>(false);
 
     const [name, setName] = useState<string>("");
@@ -34,8 +36,8 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, classEditId }) =
         try {
             const token = await localStorage.getItem("token");
             const params = {
-                "CompanyId":process.env.CompanyId,
-                "Id": classEditId
+                "CompanyId": 86,
+                "Id": EditId
             }
             const config = {
                 headers: {
@@ -51,12 +53,17 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, classEditId }) =
             if (response.status === 200) {
                 if (ResponseStatus === "Success") {
                     if (ResponseData !== null && typeof ResponseData === 'object') {
-                        const { id, name } = ResponseData;
-                        setClassId(id);
-                        setName(name);
+                        const { Id, ClassId, Name } = ResponseData;
+                        setId(Id || "");
+                        setClassId(ClassId || "");
+                        setName(Name || "");
+                        setIdHasError(true);
+                        setNameHasError(true);
                     }
                 } else {
-                    if (Message != null) {
+                    if (Message === null) {
+                        Toast.error("Error", "Please try again later.");
+                    } else {
                         Toast.error("Error", Message);
                     }
                 }
@@ -76,16 +83,16 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, classEditId }) =
         e.preventDefault();
         classId.trim().length <= 0 && setIdError(true);
         name.trim().length <= 0 && setNameError(true);
-
-        if (idHasError && nameHasError) {
+        
+        if (!(classId.length <= 0) && !(name.length <= 0)) {
             try {
                 const token = await localStorage.getItem("token");
                 const params = {
-                    "Id": 0,
+                    "Id": Id || 0,
                     "ClassId": classId,
-                    "Description": "Class 1",
+                    "Description": name,
                     "RecordNo": "",
-                    "CompanyId":process.env.CompanyId,
+                    "CompanyId": 86,
                     "Name": name,
                     "ParentId": "",
                     "ParentName": "",
@@ -105,11 +112,13 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, classEditId }) =
                 const { ResponseStatus, Message } = response.data;
                 if (response.status === 200) {
                     if (ResponseStatus === "Success") {
-                        Toast.success(`Class ${classEditId ? "updated" : "added"} successfully.`);
+                        Toast.success(`Class ${EditId ? "updated" : "added"} successfully.`);
                         onClose();
                     } else {
                         onClose();
-                        if (Message != null) {
+                        if (Message === null) {
+                            Toast.error("Error", "Please try again later.");
+                        } else {
                             Toast.error("Error", Message);
                         }
                     }
@@ -122,6 +131,8 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, classEditId }) =
                     }
                 }
             } catch (error) {
+                console.log(error);
+
             }
         }
         else {
@@ -130,19 +141,20 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, classEditId }) =
     };
 
     useEffect(() => {
-        if (onOpen && classEditId) {
-            getClassById();
-        }
-    }, [classEditId]);
-
-    useEffect(() => {
         if (onOpen) {
+            setId("");
             setClassId("");
             setIdError(false);
             setName("");
             setNameError(false);
         }
     }, [onOpen]);
+
+    useEffect(() => {
+        if (EditId) {
+            getClassById();
+        }
+    }, [EditId]);
 
     return (
         <>
@@ -151,7 +163,7 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, classEditId }) =
                     className={`fixed top-0 bg-white  right-0 h-full xsm:!w-5/6 sm:!w-2/4 lg:!w-2/6 xl:!w-2/6 2xl:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.rightAnimation}`}
                 >
                     <div className="p-4 flex justify-between items-center border-b border-lightSilver">
-                        <Typography type="label" className="!font-bold !text-lg"> ADD Class</Typography>
+                        <Typography type="label" className="!font-bold !text-lg">{EditId ? "EDIT" : "ADD"} Class</Typography>
                         <div className="mx-2 cursor-pointer" onClick={handleClose}>
                             <Close variant="medium" />
                         </div>
@@ -211,7 +223,7 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, classEditId }) =
                             </Button>
                         </div>
                     </div>
-                </div >
+                </div>
             )}
         </>
     );

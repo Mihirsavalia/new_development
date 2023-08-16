@@ -13,17 +13,17 @@ import styles from "@/assets/scss/styles.module.scss";
 interface DrawerProps {
     onOpen: boolean;
     onClose: () => void;
-    departmentEditId?: number;
+    EditId?: number;
 }
-const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, departmentEditId }) => {
-
+const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
     const [departmentId, setDepartmentId] = useState<string>("");
+    const [departmentCode, setDepartmentCode] = useState<string>("");
     const [idHasError, setIdHasError] = useState<boolean>(false);
     const [idError, setIdError] = useState<boolean>(false);
 
-    const [name, setName] = useState<string>("");
-    const [nameError, setNameError] = useState<boolean>(false);
-    const [nameHasError, setNameHasError] = useState<boolean>(false);
+    const [title, setTitle] = useState<string>("");
+    const [titleError, setTitleError] = useState<boolean>(false);
+    const [titleHasError, setTitleHasError] = useState<boolean>(false);
 
     const handleClose = () => {
         onClose();
@@ -34,8 +34,8 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, departmentE
         try {
             const token = await localStorage.getItem("token");
             const params = {
-                "CompanyId":process.env.CompanyId,
-                "Id": departmentEditId
+                "CompanyId": 86,
+                "Id": EditId
 
             }
             const config = {
@@ -52,12 +52,17 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, departmentE
             if (response.status === 200) {
                 if (ResponseStatus === "Success") {
                     if (ResponseData !== null && typeof ResponseData === 'object') {
-                        const { id, name } = ResponseData;
-                        setDepartmentId(id);
-                        setName(name);
+                        const { DepartmentId, DepartmentCode, Title } = ResponseData;
+                        setDepartmentId(DepartmentId.toString() || "");
+                        setDepartmentCode(DepartmentCode.toString() || "");
+                        setTitle(Title || "");
+                        setIdHasError(true);
+                        setTitleHasError(true);
                     }
                 } else {
-                    if (Message != null) {
+                    if (Message === null) {
+                        Toast.error("Error", "Please try again later.");
+                    } else {
                         Toast.error("Error", Message);
                     }
                 }
@@ -75,23 +80,19 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, departmentE
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
-        departmentId.trim().length <= 0 && setIdError(true);
-        name.trim().length <= 0 && setNameError(true);
+        departmentCode.trim().length <= 0 && setIdError(true);
+        title.trim().length <= 0 && setTitleError(true);
 
-        if (idHasError && nameHasError) {
+        if (idHasError && titleHasError) {
             try {
                 const token = await localStorage.getItem("token");
                 const params = {
-                    "Id": 0,
-                    "DepartmentId": departmentId,
-                    "Description": "f4g4",
-                    "RecordNo": "",
-                    "CompanyId":process.env.CompanyId,
-                    "Name": name,
-                    "ParentId": "",
-                    "ParentName": "",
-                    "Status": "active",
-                    "FullyQualifiedName": ""
+                    "DepartmentId": 0,
+                    "CompanyId": 86,
+                    "DepartmentCode": departmentCode,
+                    "RecordNo": "12",
+                    "Title": title,
+                    "Status": "active"
                 }
                 const config = {
                     headers: {
@@ -106,11 +107,13 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, departmentE
                 const { ResponseStatus, Message } = response.data;
                 if (response.status === 200) {
                     if (ResponseStatus === "Success") {
-                        Toast.success(`Department ${departmentEditId ? "updated" : "added"} successfully.`);
+                        Toast.success(`Department ${EditId ? "updated" : "added"} successfully.`);
                         onClose();
                     } else {
                         onClose();
-                        if (Message != null) {
+                        if (Message === null) {
+                            Toast.error("Error", "Please try again later.");
+                        } else {
                             Toast.error("Error", Message);
                         }
                     }
@@ -131,19 +134,20 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, departmentE
     };
 
     useEffect(() => {
-        if (onOpen && departmentEditId) {
-            getDepartmentById();
-        }
-    }, [departmentEditId]);
-
-    useEffect(() => {
         if (onOpen) {
             setDepartmentId("");
             setIdError(false);
-            setName("");
-            setNameError(false);
+            setTitle("");
+            setTitleError(false);
+            setDepartmentCode("");
         }
     }, [onOpen]);
+
+    useEffect(() => {
+        if (EditId) {
+            getDepartmentById();
+        }
+    }, [EditId]);
 
     return (
         <>
@@ -152,7 +156,7 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, departmentE
                     className={`fixed top-0 bg-white  right-0 h-full xsm:!w-5/6 sm:!w-2/4 lg:!w-2/6 xl:!w-2/6 2xl:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.rightAnimation}`}
                 >
                     <div className="p-4 flex justify-between items-center border-b border-lightSilver">
-                        <Typography type="label" className="!font-bold !text-lg"> ADD Department</Typography>
+                        <Typography type="label" className="!font-bold !text-lg"> {EditId ? "EDIT" : "ADD"} Department</Typography>
                         <div className="mx-2 cursor-pointer" onClick={handleClose}>
                             <Close variant="medium" />
                         </div>
@@ -165,9 +169,9 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, departmentE
                                 name="id"
                                 placeholder="Please Enter ID Name"
                                 validate
-                                value={departmentId}
+                                value={departmentCode}
                                 hasError={idError}
-                                getValue={(value: any) => setDepartmentId(value)}
+                                getValue={(value: any) => setDepartmentCode(value)}
                                 getError={(e: any) => setIdHasError(e)}
                                 onChange={(e: any) => {
                                     setIdError(true);
@@ -182,12 +186,12 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, departmentE
                                 name="name"
                                 placeholder="Please Enter Department Name"
                                 validate
-                                hasError={nameError}
-                                value={name}
-                                getValue={(value: any) => setName(value)}
-                                getError={(e: any) => setNameHasError(e)}
+                                hasError={titleError}
+                                value={title}
+                                getValue={(value: any) => setTitle(value)}
+                                getError={(e: any) => setTitleHasError(e)}
                                 onChange={(e: any) => {
-                                    setNameError(true);
+                                    setTitleError(true);
                                 }}
                             ></Text>
                         </div>

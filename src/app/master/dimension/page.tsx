@@ -45,7 +45,7 @@ const Dimension: React.FC = () => {
         try {
             const token = await localStorage.getItem("token");
             const params = {
-                "CompanyId": 80,
+                "CompanyId": 86,
             }
             const config = {
                 headers: {
@@ -159,10 +159,6 @@ const Dimension: React.FC = () => {
                 {tab === "location" && <Location onDrawerOpen={isOpenDrawer} onDrawerClose={handleDrawerClose} />}
                 {tab === "department" && <Department onDrawerOpen={isOpenDrawer} onDrawerClose={handleDrawerClose} />}
                 {tab === "project" && <Project onDrawerOpen={isOpenDrawer} onDrawerClose={handleDrawerClose} />}
-                <DrawerOverlay
-                    isOpen={isOpenDrawer}
-                    onClose={handleDrawerClose}
-                />
             </div>
         </Wrapper>
     )

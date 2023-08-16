@@ -43,7 +43,7 @@ const Vendor: React.FC = () => {
     try {
       const token = await localStorage.getItem("token");
       const params = {
-        "CompanyId": 80,
+        "CompanyId": 86,
       }
       const config = {
         headers: {
@@ -177,7 +177,7 @@ const Vendor: React.FC = () => {
           "Status": "active",
           "GlobalFilter": ""
         },
-        "CompanyId": 80,
+        "CompanyId": 86,
         "Index": 1,
         "PageSize": 10
       }
@@ -247,7 +247,7 @@ const Vendor: React.FC = () => {
     try {
       const token = await localStorage.getItem("token");
       const params = {
-        "CompanyId": 80,
+        "CompanyId": 86,
         "Id": 354,
         "RecordNo": "124"
       }

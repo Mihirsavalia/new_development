@@ -294,8 +294,6 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
         }
     }, [onOpen]);
 
-
-
     return (
         <>
             {onOpen && (

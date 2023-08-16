@@ -1,8 +1,20 @@
-import { Button, Close, DataTable, Modal, ModalAction, ModalContent, ModalTitle, Switch, Toast, Typography } from 'next-ts-lib';
-import React, { useEffect, useRef, useState } from 'react';
+import {
+  Button,
+  Close,
+  DataTable,
+  Modal,
+  ModalAction,
+  ModalContent,
+  ModalTitle,
+  Switch,
+  Toast,
+  Typography,
+} from "next-ts-lib";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import MeatballsMenuIcon from "@/assets/Icons/MeatballsMenu";
-import DepartmentContent from '../Drawer/DepartmentContent';
+import DrawerOverlay from "@/app/manage/users/DrawerOverlay";
+import DepartmentContent from "../Drawer/DepartmentContent";
 
 interface departmentList {
   name: string;
@@ -16,11 +28,12 @@ interface DepartmentProps {
 }
 
 const Department: React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose }) => {
-  const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
+  const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
   const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
   const [departmentList, setDepartmentList] = useState<departmentList[]>([]);
-  const [departmentEditId, setDepartmentEditId] = useState<number | null>();
-
+  const [Id, setId] = useState<number | null>();
+  const [RecordNo, setRecordNo] = useState<number | null>();
+  const [refreshTable, setRefreshTable] = useState<boolean>(false);
 
   const columns = [
     {
@@ -44,16 +57,17 @@ const Department: React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose }) 
   const getDepartmentList = async () => {
     try {
       const params = {
-        "FilterObj": {
-          "DepartmentCode": "",
-          "Title": "",
-          "Status": "active",
-          "GlobalFilter": ""
+        FilterObj: {
+          DepartmentCode: "",
+          Title: "",
+          Status: "active",
+          GlobalFilter: "",
         },
-        "CompanyId":76,
-        "Index": 1,
-        "PageSize": 10
-      }
+        CompanyId: 86,
+        Index: 1,
+        PageSize: 100,
+      };
+
       const token = await localStorage.getItem("token");
       const config = {
         headers: {
@@ -61,15 +75,15 @@ const Department: React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose }) 
         },
       };
       const response = await axios.post(
-        `${process.env.base_url}/department/getlist`, params,
+        `${process.env.base_url}/department/getlist`,
+        params,
         config
       );
       const { ResponseStatus, ResponseData, Message } = response.data;
       if (response.status === 200) {
         if (ResponseStatus === "Success") {
-          if (ResponseData !== null && typeof ResponseData === 'object') {
+          if (ResponseData !== null && typeof ResponseData === "object") {
             setDepartmentList(ResponseData.List);
-            Toast.success("Success", "Department list fetched successfully!.");
           }
         } else {
           if (Message === null) {
@@ -78,8 +92,7 @@ const Department: React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose }) 
             Toast.error("Error", Message);
           }
         }
-      }
-      else {
+      } else {
         if (Message === null) {
           Toast.error("Error", "Please try again later.");
         } else {
@@ -89,36 +102,15 @@ const Department: React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose }) 
     } catch (error) {
       console.error(error);
     }
-  }
+  };
   useEffect(() => {
     getDepartmentList();
-  }, []);
+  }, [refreshTable]);
 
   const actionArray = ["Edit", "Remove"];
-  const departmentListData = departmentList?.map((e: any) => new Object({
-    name: e.first_name,
-    status:
-      <div>
-        {e.is_Active ? <Switch checked={true} /> : <Switch checked={false} />}
-      </div>,
-    action: <Actions id={e.id} actions={actionArray} />
-  }))
 
-  const handleKebabChange = (actionName: string, id: number) => {
-    setDepartmentEditId(id);
-    if (actionName === "Edit") {
-      setIsEditOpen(!isEditOpen)
-    }
-    if (actionName === "Remove") {
-      setIsRemoveOpen(!isRemoveOpen)
-    }
-  };
-
-  const modalClose = () => {
-    setIsRemoveOpen(false);
-  };
-
-  const Actions = ({ actions, id }: any) => {
+  // Action
+  const Actions = ({ actions, id, recNo }: any) => {
     const actionsRef = useRef<HTMLDivElement>(null);
     const [open, setOpen] = useState(false);
     const handleOutsideClick = (event: MouseEvent) => {
@@ -139,18 +131,22 @@ const Department: React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose }) 
       <div
         ref={actionsRef}
         className="cursor-pointer flex justify-end"
-        onClick={() => setOpen(!open)}>
+        onClick={() => setOpen(!open)}
+      >
         <MeatballsMenuIcon />
         {open && (
           <React.Fragment>
             <div className="relative z-10 flex justify-center items-center">
-              <div className="absolute top-0 right-0 py-2 border border-lightSilver rounded-md bg-pureWhite shadow-lg ">
+              <div className="absolute top-7 right-1 py-2 border border-lightSilver rounded-md bg-pureWhite shadow-lg ">
                 <ul className="w-40">
                   {actions.map((action: any, index: any) => (
                     <li
                       key={index}
-                      onClick={() => { handleKebabChange(action, id) }}
-                      className="flex w-full h-9 px-3 hover:bg-lightGray !cursor-pointer">
+                      onClick={() => {
+                        handleKebabChange(action, id, recNo);
+                      }}
+                      className="flex w-full h-9 px-3 hover:bg-lightGray !cursor-pointer"
+                    >
                       <div className="flex justify-center items-center ml-2 cursor-pointer">
                         <label className="inline-block text-xs cursor-pointer">
                           {action}
@@ -167,38 +163,90 @@ const Department: React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose }) 
     );
   };
 
-  //Delete Department API 
+  //DataTable Data
+  const departmentListData = departmentList?.map(
+    (e: any) =>
+      new Object({
+        name: e.Title,
+        status: (
+          <div>
+            {e.Status == "active" ? (
+              <Switch checked={true} />
+            ) : (
+              <Switch checked={false} />
+            )}
+          </div>
+        ),
+        action: <Actions id={e.DepartmentId} recNo={e.RecordNo} actions={actionArray} />,
+      })
+  );
+
+  const handleKebabChange = (actionName: string, id: number, RecordNo: number) => {
+    setId(id);
+    if (actionName === "Edit") {
+      setIsOpenDrawer(true);
+    }
+    if (actionName === "Remove") {
+      setRecordNo(RecordNo);
+      setIsRemoveOpen(!isRemoveOpen);
+    }
+  };
+
+  const handleDrawerClose = () => {
+    setIsOpenDrawer(false);
+    setId(null);
+    setRefreshTable(prevValue => !prevValue);
+    onDrawerClose();
+  };
+
+  useEffect(() => {
+    setIsOpenDrawer(onDrawerOpen);
+  }, [onDrawerOpen]);
+
+  useEffect(() => {
+    if (isOpenDrawer) {
+      handleDrawerClose();
+    }
+  }, [onDrawerClose]);
+
+  const modalClose = () => {
+    setIsRemoveOpen(false);
+  };
+
+  //Delete Department API
   const handleDepartmentDelete = async () => {
     try {
       const token = await localStorage.getItem("token");
       const params = {
-        "CompanyId":76,
-        "Id": 354,
-        "RecordNo": "124"
-      }
+        CompanyId: 86,
+        Id: Id,
+        RecordNo: RecordNo,
+      };
       const config = {
         headers: {
           Authorization: `bearer ${token}`,
         },
       };
       const response = await axios.post(
-        `${process.env.base_url}/department/delete `,
+        `${process.env.base_url}/department/delete`,
         params,
         config
       );
       const { ResponseStatus, ResponseData, Message } = response.data;
       if (response.status === 200) {
         if (ResponseStatus === "Success") {
-          if (ResponseData !== null && typeof ResponseData === 'object') {
-            Toast.success("Error", "Department Remove successfully");
+          if (ResponseData !== null && typeof ResponseData === "object") {
+            Toast.success("Success", "Department Remove successfully");
+            getDepartmentList();
           }
         } else {
-          if (Message != null) {
+          if (Message === null) {
+            Toast.error("Error", "Please try again later.");
+          } else {
             Toast.error("Error", Message);
           }
         }
-      }
-      else {
+      } else {
         if (Message === null) {
           Toast.error("Error", "Please try again later.");
         } else {
@@ -208,35 +256,34 @@ const Department: React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose }) 
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   return (
     <div>
       {/* DataTable */}
-      {departmentListData.length > 0 && (
-        <DataTable
-          columns={columns}
-          data={departmentListData}
-          headerInvisible={false}
-          stickyHeader={true}
-          hoverEffect={true}
-        />
-      )}
+      <div className="h-[445px]">
+        {departmentListData.length > 0 && (
+          <DataTable
+            columns={columns}
+            data={departmentListData}
+            headerInvisible={false}
+            stickyHeader={true}
+            hoverEffect={true}
+          />
+        )}
+      </div>
 
-      {/* Modal */}
-      <Modal
-        isOpen={isRemoveOpen}
-        onClose={modalClose}
-        width="363px">
+      {/* Remove Modal */}
+      <Modal isOpen={isRemoveOpen} onClose={modalClose} width="363px">
         <ModalTitle>
           <div className="py-3 px-4 font-bold">Remove</div>
-          <div className="" >
+          <div className="">
             <Close variant="medium" />
           </div>
         </ModalTitle>
         <ModalContent>
           <div className="p-2 my-5">
-            <Typography type='h5' className='!font-normal'>
+            <Typography type="h5" className="!font-normal">
               Are you sure you want to remove the department ?
             </Typography>
           </div>
@@ -245,23 +292,27 @@ const Department: React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose }) 
           <div>
             <Button
               className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
-              variant="btn-outline">
+              variant="btn-outline"
+            >
               NO
             </Button>
           </div>
           <div>
             <Button
               className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
-              variant="btn-error" onClick={handleDepartmentDelete} >
+              variant="btn-error"
+              onClick={handleDepartmentDelete}
+            >
               YES
             </Button>
           </div>
         </ModalAction>
       </Modal>
 
-      <DepartmentContent onOpen={onDrawerOpen} onClose={onDrawerClose} departmentEditId={typeof departmentEditId === 'number' ? departmentEditId : 0} />
+      <DepartmentContent onOpen={isOpenDrawer} onClose={handleDrawerClose} EditId={typeof Id === "number" ? Id : 0} />
+      <DrawerOverlay isOpen={isOpenDrawer} onClose={handleDrawerClose} />
     </div>
-  )
-}
+  );
+};
 
-export default Department
+export default Department;

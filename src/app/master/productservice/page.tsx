@@ -41,7 +41,7 @@ const Product_Service: React.FC = () => {
         try {
             const token = await localStorage.getItem("token");
             const params = {
-                "CompanyId": 76,
+                "CompanyId": 86,
             }
             const config = {
                 headers: {
@@ -57,7 +57,7 @@ const Product_Service: React.FC = () => {
             if (response.status === 200) {
                 if (ResponseStatus === "Success") {
                     if (ResponseData !== null && typeof ResponseData === 'object') {
-                        Toast.success("Error", "Product Sync successfully");
+                        Toast.success("Error", "Product & Service Sync successfully");
                     }
                 } else {
                     if (Message != null) {
@@ -116,6 +116,7 @@ const Product_Service: React.FC = () => {
         }
     };
 
+    // Action
     const Actions = ({ actions, id }: any) => {
         const actionsRef = useRef<HTMLDivElement>(null);
         const [open, setOpen] = useState(false);
@@ -164,7 +165,23 @@ const Product_Service: React.FC = () => {
             </div>
         );
     };
-
+    //DataTable Data
+    // const productListData = productList?.map(
+    //     (e: any) =>
+    //         new Object({
+    //             name: e.Name,
+    //             status: (
+    //                 <div>
+    //                     {e.Status == "active" ? (
+    //                         <Switch checked={true} />
+    //                     ) : (
+    //                         <Switch checked={false} />
+    //                     )}
+    //                 </div>
+    //             ),
+    //             action: <Actions id={e.Id} recNo={e.RecordNo} actions={actionArray} />,
+    //         })
+    // );
     //Product List API
     const getProductList = async () => {
         try {
@@ -177,8 +194,8 @@ const Product_Service: React.FC = () => {
                     "Status": "",
                     "GlobalFilter": ""
                 },
-                "CompanyId": 76,
-                "PageSize": 10,
+                "CompanyId": 86,
+                "PageSize": 100,
                 "Index": 1
             }
             const token = await localStorage.getItem("token");
@@ -220,30 +237,6 @@ const Product_Service: React.FC = () => {
         getProductList();
     }, []);
 
-    const [tableData, setTableData] = useState([
-        {
-            itemId: "V-616",
-            name: "John Doe",
-            type: "service",
-            account: "AP",
-            action: <Actions actions={actionArray} />
-        },
-        {
-            itemId: "V-615",
-            name: "Jane Smith",
-            type: "Category",
-            account: "AP",
-            action: <Actions actions={actionArray} />
-        },
-        {
-            itemId: "V-620",
-            name: "Bob Johnson",
-            type: "service",
-            account: "AP BI",
-            action: <Actions actions={actionArray} />
-        }
-    ]);
-
     return (
         <Wrapper masterSettings={true}>
 
@@ -259,7 +252,7 @@ const Product_Service: React.FC = () => {
                         <Tooltip content={"Search"} position="bottom" className='!z-[2]'>
                             <SearchIcon />
                         </Tooltip>
-                        <Tooltip content={`Sync Product`} position="bottom" className='!z-[2]'>
+                        <Tooltip content={`Sync Product & Service`} position="bottom" className='!z-[2]'>
                             <div onClick={() => setIsSyncModalOpen(true)}>
                                 <SyncIcon />
                             </div>
@@ -287,7 +280,7 @@ const Product_Service: React.FC = () => {
                     <ModalContent>
                         <div className="px-4 py-6">
                             <Typography type='h5' className='!font-normal'>
-                                Are you sure you want to sync product ?
+                                Are you sure you want to sync product & service ?
                             </Typography>
                         </div>
                     </ModalContent>
@@ -310,15 +303,15 @@ const Product_Service: React.FC = () => {
                 </Modal>
 
                 {/* DataTable */}
-                {tableData.length > 0 && (
+                {/* {productListData.length > 0 && (
                     <DataTable
                         columns={columns}
-                        data={tableData}
+                        data={productListData}
                         headerInvisible={false}
                         stickyHeader={true}
                         hoverEffect={true}
                     />
-                )}
+                )} */}
 
                 <ProductContent onOpen={isOpenDrawer} onClose={handleDrawerClose} editId={typeof editId === 'number' ? editId : 0} />
 

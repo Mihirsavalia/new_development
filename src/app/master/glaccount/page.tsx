@@ -41,7 +41,7 @@ const GLAccount: React.FC = () => {
         try {
             const token = await localStorage.getItem("token");
             const params = {
-                "CompanyId": 80,
+                "CompanyId": 86,
             }
             const config = {
                 headers: {
@@ -180,7 +180,7 @@ const GLAccount: React.FC = () => {
                     "Status": "active",
                     "GlobalFilter": ""
                 },
-                "CompanyId": 80,
+                "CompanyId": 86,
                 "Index": 1,
                 "PageSize": 10
             }
