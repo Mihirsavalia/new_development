@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Close, DataTable, Modal, ModalAction, ModalContent, ModalTitle, Switch, Toast, Tooltip, Typography } from 'next-ts-lib';
+import { Button, Close, DataTable, Loader, Modal, ModalAction, ModalContent, ModalTitle, Switch, Toast, Tooltip, Typography } from 'next-ts-lib';
 import React, { useEffect, useRef, useState } from 'react';
 import PlusIcon from '@/assets/Icons/PlusIcon';
 import SearchIcon from '@/assets/Icons/SearchIcon';
@@ -10,6 +10,7 @@ import MeatballsMenuIcon from "@/assets/Icons/MeatballsMenu";
 import axios from 'axios';
 import ProductContent from './Drawer/Product&ServiceContent';
 import Wrapper from '@/components/common/Wrapper';
+import "next-ts-lib/dist/index.css";
 
 interface productList {
     name: string;
@@ -19,25 +20,44 @@ interface productList {
 
 const Product_Service: React.FC = () => {
     const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
-    const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
+
     const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
-    const [editId, setEditId] = useState<number | null>();
+    const [Id, setId] = useState<number | null>();
     const [productList, setProductList] = useState<productList[]>([]);
     const [isSyncModalOpen, setIsSyncModalOpen] = useState<boolean>(false);
+    const [refreshTable, setRefreshTable] = useState<boolean>(false);
 
-    const handleToggleChange = () => {
-        setIsOpenDrawer(true);
-    };
-
-    const handleDrawerClose = () => {
-        setIsOpenDrawer(false);
-    }
-    const modalClose = () => {
-        setIsSyncModalOpen(false);
-    };
+    const columns = [
+        {
+            header: "ITEM ID",
+            accessor: "itemId",
+            sortable: true,
+        },
+        {
+            header: "NAME",
+            accessor: "name",
+            sortable: true,
+        },
+        {
+            header: "TYPE",
+            accessor: "type",
+            sortable: false,
+        },
+        // {
+        //     header: "ACCOUNT",
+        //     accessor: "account",
+        //     sortable: false,
+        // },
+        {
+            header: "",
+            accessor: "action",
+            sortable: false,
+        },
+    ];
 
     //Sync API
     const handleSync = async () => {
+        modalClose();
         try {
             const token = await localStorage.getItem("token");
             const params = {
@@ -57,10 +77,12 @@ const Product_Service: React.FC = () => {
             if (response.status === 200) {
                 if (ResponseStatus === "Success") {
                     if (ResponseData !== null && typeof ResponseData === 'object') {
-                        Toast.success("Error", "Product & Service Sync successfully");
+                        Toast.success("Success", "Product & Service Sync successfully");
                     }
                 } else {
-                    if (Message != null) {
+                    if (Message === null) {
+                        Toast.error("Error", "Please try again later.");
+                    } else {
                         Toast.error("Error", Message);
                     }
                 }
@@ -77,111 +99,6 @@ const Product_Service: React.FC = () => {
         }
     }
 
-    const columns = [
-        {
-            header: "ITEM ID",
-            accessor: "itemId",
-            sortable: true,
-        },
-        {
-            header: "NAME",
-            accessor: "name",
-            sortable: true,
-        },
-        {
-            header: "TYPE",
-            accessor: "type",
-            sortable: false,
-        },
-        {
-            header: "ACCOUNT",
-            accessor: "account",
-            sortable: false,
-        },
-        {
-            header: "",
-            accessor: "action",
-            sortable: false,
-        },
-    ];
-    const actionArray = ["Edit", "Remove"];
-
-    const handleKebabChange = (actionName: string, id: number) => {
-        setEditId(id);
-        if (actionName === "Edit") {
-            setIsEditOpen(!isEditOpen)
-        }
-        if (actionName === "Remove") {
-            setIsRemoveOpen(!isRemoveOpen)
-        }
-    };
-
-    // Action
-    const Actions = ({ actions, id }: any) => {
-        const actionsRef = useRef<HTMLDivElement>(null);
-        const [open, setOpen] = useState(false);
-        const handleOutsideClick = (event: MouseEvent) => {
-            if (
-                actionsRef.current &&
-                !actionsRef.current.contains(event.target as Node)
-            ) {
-                setOpen(false);
-            }
-        };
-        useEffect(() => {
-            window.addEventListener("click", handleOutsideClick);
-            return () => {
-                window.removeEventListener("click", handleOutsideClick);
-            };
-        }, []);
-        return (
-            <div
-                ref={actionsRef}
-                className="cursor-pointer flex justify-end"
-                onClick={() => setOpen(!open)}>
-                <MeatballsMenuIcon />
-                {open && (
-                    <React.Fragment>
-                        <div className="relative z-10 flex justify-center items-center">
-                            <div className="absolute top-0 right-0 py-2 border border-lightSilver rounded-md bg-pureWhite shadow-lg ">
-                                <ul className="w-40">
-                                    {actions.map((action: any, index: any) => (
-                                        <li
-                                            key={index}
-                                            onClick={() => { handleKebabChange(action, id) }}
-                                            className="flex w-full h-9 px-3 hover:bg-lightGray !cursor-pointer">
-                                            <div className="flex justify-center items-center ml-2 cursor-pointer">
-                                                <label className="inline-block text-xs cursor-pointer">
-                                                    {action}
-                                                </label>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
-                    </React.Fragment>
-                )}
-            </div>
-        );
-    };
-    //DataTable Data
-    // const productListData = productList?.map(
-    //     (e: any) =>
-    //         new Object({
-    //             name: e.Name,
-    //             status: (
-    //                 <div>
-    //                     {e.Status == "active" ? (
-    //                         <Switch checked={true} />
-    //                     ) : (
-    //                         <Switch checked={false} />
-    //                     )}
-    //                 </div>
-    //             ),
-    //             action: <Actions id={e.Id} recNo={e.RecordNo} actions={actionArray} />,
-    //         })
-    // );
     //Product List API
     const getProductList = async () => {
         try {
@@ -212,7 +129,7 @@ const Product_Service: React.FC = () => {
             if (response.status === 200) {
                 if (ResponseStatus === "Success") {
                     if (ResponseData !== null && typeof ResponseData === 'object') {
-                        setProductList(ResponseData);
+                        setProductList(ResponseData.AllItems);
                     }
                 } else {
                     if (Message === null) {
@@ -235,13 +152,155 @@ const Product_Service: React.FC = () => {
     }
     useEffect(() => {
         getProductList();
-    }, []);
+    }, [refreshTable]);
+
+    const actionArray = ["Edit", "Remove"];
+
+    // Action
+    const Actions = ({ actions, id }: any) => {
+        const actionsRef = useRef<HTMLDivElement>(null);
+        const [open, setOpen] = useState(false);
+        const handleOutsideClick = (event: MouseEvent) => {
+            if (
+                actionsRef.current &&
+                !actionsRef.current.contains(event.target as Node)
+            ) {
+                setOpen(false);
+            }
+        };
+        useEffect(() => {
+            window.addEventListener("click", handleOutsideClick);
+            return () => {
+                window.removeEventListener("click", handleOutsideClick);
+            };
+        }, []);
+        return (
+            <div className="relative w-full flex justify-end">
+                <div
+                    ref={actionsRef}
+                    className="cursor-pointer w-10 flex justify-center items-center"
+                    onClick={() => setOpen(!open)}
+                >
+                    <MeatballsMenuIcon />
+                    {open && (
+                        <React.Fragment>
+                            <div className="absolute z-10 top-7 right-1 flex justify-center items-center">
+                                <div className="py-2 border border-lightSilver rounded-md bg-pureWhite shadow-lg ">
+                                    <ul className="w-40">
+                                        {actions.map((action: any, index: any) => (
+                                            <li
+                                                key={index}
+                                                onClick={() => {
+                                                    handleKebabChange(action, id);
+                                                }}
+                                                className="flex w-full h-9 px-3 hover:bg-lightGray !cursor-pointer"
+                                            >
+                                                <div className="flex justify-center items-center ml-2 cursor-pointer">
+                                                    <label className="inline-block text-xs cursor-pointer">
+                                                        {action}
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        </React.Fragment>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
+    //DataTable Data
+    const productListData = productList?.map(
+        (e: any) =>
+            new Object({
+                itemId: e.ItemId,
+                name: e.Name,
+                type: e.ItemType,
+                account: e.account,
+                action: <Actions id={e.ItemId} actions={actionArray} />,
+            })
+    );
+
+    const handleToggleChange = () => {
+        setIsOpenDrawer(true);
+    };
+
+    const handleDrawerClose = () => {
+        setIsOpenDrawer(false);
+        setId(null);
+        setRefreshTable(prevValue => !prevValue);
+    };
+
+    const modalClose = () => {
+        setIsSyncModalOpen(false);
+        setIsRemoveOpen(false);
+    };
+
+    const handleKebabChange = (
+        actionName: string,
+        id: number,
+    ) => {
+        setId(id);
+        if (actionName === "Edit") {
+            setIsOpenDrawer(true);
+        }
+        if (actionName === "Remove") {
+            setIsRemoveOpen(!isRemoveOpen);
+        }
+    };
+
+    //Delete Product API
+    const handleProductDelete = async () => {
+        modalClose();
+        try {
+            const token = await localStorage.getItem("token");
+            const params = {
+                CompanyId: 86,
+                Id: Id,
+            };
+            const config = {
+                headers: {
+                    Authorization: `bearer ${token}`,
+                },
+            };
+            const response = await axios.post(
+                `${process.env.base_url}/class/delete `,
+                params,
+                config
+            );
+            const { ResponseStatus, ResponseData, Message } = response.data;
+            if (response.status === 200) {
+                if (ResponseStatus === "Success") {
+                    if (ResponseData !== null && typeof ResponseData === "object") {
+                        Toast.success("Success", "Product Remove successfully");
+                        getProductList();
+                    }
+                } else {
+                    if (Message === null) {
+                        Toast.error("Error", "Please try again later.");
+                    } else {
+                        Toast.error("Error", Message);
+                    }
+                }
+            } else {
+                if (Message === null) {
+                    Toast.error("Error", "Please try again later.");
+                } else {
+                    Toast.error("Error", Message);
+                }
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     return (
         <Wrapper masterSettings={true}>
-
             <div>
-                <div className="bg-whiteSmoke flex justify-between items-center">
+                <div className="bg-whiteSmoke h-[66px] flex justify-between items-center">
                     <div className="flex items-center py-[10px] px-3">
                         <Typography type="h5" className="!font-bold flex justify-center items-center text-center">
                             Product & Service
@@ -252,7 +311,7 @@ const Product_Service: React.FC = () => {
                         <Tooltip content={"Search"} position="bottom" className='!z-[2]'>
                             <SearchIcon />
                         </Tooltip>
-                        <Tooltip content={`Sync Product & Service`} position="bottom" className='!z-[2]'>
+                        <Tooltip content={`Sync Product & Service`} position="bottom" className='!z-[2] !p-0 !m-0'>
                             <div onClick={() => setIsSyncModalOpen(true)}>
                                 <SyncIcon />
                             </div>
@@ -270,10 +329,10 @@ const Product_Service: React.FC = () => {
                 <Modal
                     isOpen={isSyncModalOpen}
                     onClose={modalClose}
-                    width="363px">
+                    width="376px">
                     <ModalTitle>
                         <div className="py-3 px-4 font-bold">Sync</div>
-                        <div className="" >
+                        <div onClick={modalClose}>
                             <Close variant="medium" />
                         </div>
                     </ModalTitle>
@@ -288,7 +347,7 @@ const Product_Service: React.FC = () => {
                         <div>
                             <Button
                                 className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
-                                variant="btn-outline">
+                                variant="btn-outline" onClick={modalClose}>
                                 NO
                             </Button>
                         </div>
@@ -301,20 +360,55 @@ const Product_Service: React.FC = () => {
                         </div>
                     </ModalAction>
                 </Modal>
+                {productList.length <= 0 ? <div className="h-[445px] w-full  flex items-center justify-center"><Loader size="md" helperText /></div> :
+                    <div className="h-[445px]">
+                        {productListData.length > 0 && (
+                            <DataTable
+                                columns={columns}
+                                data={productListData}
+                                sticky
+                                hoverEffect={true}
+                            />
+                        )}
+                    </div>}
 
-                {/* DataTable */}
-                {/* {productListData.length > 0 && (
-                    <DataTable
-                        columns={columns}
-                        data={productListData}
-                        headerInvisible={false}
-                        stickyHeader={true}
-                        hoverEffect={true}
-                    />
-                )} */}
+                {/* Remove Modal */}
+                <Modal isOpen={isRemoveOpen} onClose={modalClose} width="376px">
+                    <ModalTitle>
+                        <div className="py-3 px-4 font-bold">Remove</div>
+                        <div onClick={modalClose}>
+                            <Close variant="medium" />
+                        </div>
+                    </ModalTitle>
+                    <ModalContent>
+                        <div className="p-2 my-5">
+                            <Typography type="h5" className="!font-normal">
+                                Are you sure you want to remove the product ?
+                            </Typography>
+                        </div>
+                    </ModalContent>
+                    <ModalAction>
+                        <div>
+                            <Button
+                                className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
+                                variant="btn-outline" onClick={modalClose}
+                            >
+                                NO
+                            </Button>
+                        </div>
+                        <div>
+                            <Button
+                                className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
+                                variant="btn-error"
+                                onClick={handleProductDelete}
+                            >
+                                YES
+                            </Button>
+                        </div>
+                    </ModalAction>
+                </Modal>
 
-                <ProductContent onOpen={isOpenDrawer} onClose={handleDrawerClose} editId={typeof editId === 'number' ? editId : 0} />
-
+                <ProductContent onOpen={isOpenDrawer} onClose={handleDrawerClose} EditId={typeof Id === 'number' ? Id : 0} />
                 <DrawerOverlay
                     isOpen={isOpenDrawer}
                     onClose={handleDrawerClose}

@@ -76,7 +76,9 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                         setDueDay(due_day)
                     }
                 } else {
-                    if (Message != null) {
+                    if (Message === null) {
+                        Toast.error("Error", "Please try again later.");
+                    } else {
                         Toast.error("Error", Message);
                     }
                 }
@@ -214,7 +216,7 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                 const { ResponseStatus, Message } = response.data;
                 if (response.status === 200) {
                     if (ResponseStatus === "Success") {
-                        Toast.success(`APTerm ${editId ? "updated" : "added"} successfully.`);
+                        Toast.success(`AP Term ${editId ? "updated" : "added"} successfully.`);
                         onClose();
                     } else {
                         onClose();
@@ -280,7 +282,7 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                     className={`fixed top-0 bg-white  right-0 h-full xsm:!w-5/6 sm:!w-2/4 lg:!w-2/6 xl:!w-2/6 2xl:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.rightAnimation}`}
                 >
                     <div className="p-4 flex justify-between items-center border-b border-lightSilver">
-                        <Typography type="label" className="!font-bold !text-lg"> ADD Item</Typography>
+                        <Typography type="label" className="!font-bold !text-lg"> Add AP Term</Typography>
                         <div className="mx-2 cursor-pointer" onClick={handleClose}>
                             <Close variant="medium" />
                         </div>

@@ -78,6 +78,14 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
         }
     }
 
+    const handleIdChange = (value: any) => {
+        const pattern = /^[a-zA-Z0-9]+$/;
+        if (pattern.test(value)) {
+            setIdError(false);
+            setLocationId(value);
+        }
+    };
+
     const handleSubmit = async (e: any) => {
         e.preventDefault();
         locationId.trim().length <= 0 && setIdError(true);
@@ -108,10 +116,15 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
                     config
                 );
 
-                const { ResponseStatus, Message } = response.data;
+                const { ResponseStatus, ResponseData, Message } = response.data;
                 if (response.status === 200) {
                     if (ResponseStatus === "Success") {
-                        Toast.success(`Location ${EditId ? "updated" : "added"} successfully.`);
+                        if (ResponseData.ResponseStatus === "Failure") {
+                            Toast.error("Error", ResponseData.Message);
+                        }
+                        else {
+                            Toast.success(`Location ${EditId ? "updated" : "added"} successfully.`);
+                        }
                         onClose();
                     } else {
                         onClose();
@@ -161,7 +174,7 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
                     className={`fixed top-0 bg-white  right-0 h-full xsm:!w-5/6 sm:!w-2/4 lg:!w-2/6 xl:!w-2/6 2xl:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.rightAnimation}`}
                 >
                     <div className="p-4 flex justify-between items-center border-b border-lightSilver">
-                        <Typography type="label" className="!font-bold !text-lg"> {EditId ? "EDIT" : "ADD"} Location</Typography>
+                        <Typography type="label" className="!font-bold !text-lg"> {EditId ? "Edit" : "Add"} Location</Typography>
                         <div className="mx-2 cursor-pointer" onClick={handleClose}>
                             <Close variant="medium" />
                         </div>
@@ -176,7 +189,7 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
                                 validate
                                 value={locationId}
                                 hasError={idError}
-                                getValue={(value: any) => setLocationId(value)}
+                                getValue={(value: any) => handleIdChange(value)}
                                 getError={(e: any) => setIdHasError(e)}
                                 onChange={(e: any) => {
                                     setIdError(true);
@@ -191,6 +204,7 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
                                 name="name"
                                 placeholder="Please Enter Location Name"
                                 validate
+                                maxLength={100}
                                 hasError={nameError}
                                 value={name}
                                 getValue={(value: any) => setName(value)}

@@ -76,14 +76,23 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                 }
             }
         } catch (error) {
+            console.log(error);
         }
     }
+
+    const handleIdChange = (value: any) => {
+        const pattern = /^[a-zA-Z0-9]+$/;
+        if (pattern.test(value)) {
+            setIdError(false);
+            setClassId(value);
+        }
+    };
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
         classId.trim().length <= 0 && setIdError(true);
         name.trim().length <= 0 && setNameError(true);
-        
+
         if (!(classId.length <= 0) && !(name.length <= 0)) {
             try {
                 const token = await localStorage.getItem("token");
@@ -109,10 +118,15 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                     config
                 );
 
-                const { ResponseStatus, Message } = response.data;
+                const { ResponseStatus, ResponseData, Message } = response.data;
                 if (response.status === 200) {
                     if (ResponseStatus === "Success") {
-                        Toast.success(`Class ${EditId ? "updated" : "added"} successfully.`);
+                        if (ResponseData.ResponseStatus === "Failure") {
+                            Toast.error("Error", ResponseData.Message);
+                        }
+                        else {
+                            Toast.success(`Class ${EditId ? "updated" : "added"} successfully.`);
+                        }
                         onClose();
                     } else {
                         onClose();
@@ -163,7 +177,7 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                     className={`fixed top-0 bg-white  right-0 h-full xsm:!w-5/6 sm:!w-2/4 lg:!w-2/6 xl:!w-2/6 2xl:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.rightAnimation}`}
                 >
                     <div className="p-4 flex justify-between items-center border-b border-lightSilver">
-                        <Typography type="label" className="!font-bold !text-lg">{EditId ? "EDIT" : "ADD"} Class</Typography>
+                        <Typography type="label" className="!font-bold !text-lg">{EditId ? "Edit" : "Add"} Class</Typography>
                         <div className="mx-2 cursor-pointer" onClick={handleClose}>
                             <Close variant="medium" />
                         </div>
@@ -178,7 +192,7 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                                 validate
                                 value={classId}
                                 hasError={idError}
-                                getValue={(value: any) => setClassId(value)}
+                                getValue={(value: any) => handleIdChange(value)}
                                 getError={(e: any) => setIdHasError(e)}
                                 onChange={(e: any) => {
                                     setIdError(true);
@@ -193,6 +207,7 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                                 name="name"
                                 placeholder="Please Enter Class Name"
                                 validate
+                                maxLength={100}
                                 hasError={nameError}
                                 value={name}
                                 getValue={(value: any) => setName(value)}

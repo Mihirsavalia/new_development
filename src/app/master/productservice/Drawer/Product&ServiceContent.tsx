@@ -10,13 +10,14 @@ import "next-ts-lib/dist/index.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "@/assets/scss/styles.module.scss";
+import GLAccount from "../../currency/page";
 
 interface DrawerProps {
     onOpen: boolean;
     onClose: () => void;
-    editId?: number;
+    EditId?: number;
 }
-const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
+const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
 
     const [productId, setProductId] = useState<string>("");
     const [idHasError, setIdHasError] = useState<boolean>(false);
@@ -30,8 +31,8 @@ const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
     const [typeError, setTypeError] = useState<boolean>(false);
     const [typeHasError, setTypeHasError] = useState<boolean>(false);
 
-    const [account, setAccount] = useState([]);
-    const [accountId, setAccountId] = useState<number>();
+    const [account, setAccount] = useState<any[]>([]);
+    const [accountId, setAccountId] = useState<number>(0);
     const [accountError, setAccountError] = useState<boolean>(false);
     const [accountHasError, setAccountHasError] = useState<boolean>(false);
 
@@ -39,13 +40,58 @@ const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
         onClose();
     };
 
+    //GET GLAccount API
+    const getGLAccount = async () => {
+        try {
+            const token = await localStorage.getItem("token");
+            const params = {
+                "CompanyId": 86
+            }
+            const config = {
+                headers: {
+                    Authorization: `bearer ${token}`,
+                },
+            };
+            const response = await axios.post(
+                `${process.env.base_url}/account/getdropdown`,
+                params,
+                config
+            );
+            const { ResponseStatus, ResponseData, Message } = response.data;
+            if (response.status === 200) {
+                if (ResponseStatus === "Success") {
+                    if (ResponseData !== null && typeof ResponseData === 'object') {
+                        const newAccountValues = ResponseData.map((label: any) => label.Label);
+                        // setAccount(prevAccount => [...prevAccount, ...newAccountValues]);
+                        setAccount(ResponseData);
+                    }
+                } else {
+                    if (Message === null) {
+                        Toast.error("Error", "Please try again later.");
+                    } else {
+                        Toast.error("Error", Message);
+                    }
+                }
+            }
+            else {
+                if (Message === null) {
+                    Toast.error("Error", "Please try again later.");
+                } else {
+                    Toast.error("Error", Message);
+                }
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     //Product Data API
     const getProductById = async () => {
         try {
             const token = await localStorage.getItem("token");
             const params = {
-                "CompanyId":process.env.CompanyId,
-                "Id": editId
+                "CompanyId": 86,
+                "Id": EditId
             }
             const config = {
                 headers: {
@@ -67,7 +113,9 @@ const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                         setType(type)
                     }
                 } else {
-                    if (Message != null) {
+                    if (Message === null) {
+                        Toast.error("Error", "Please try again later.");
+                    } else {
                         Toast.error("Error", Message);
                     }
                 }
@@ -83,12 +131,13 @@ const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
             console.log(error);
         }
     }
-    //GL Account List API
+
+    //Account List API
     const getAccountList = async () => {
         try {
             const token = await localStorage.getItem("token");
             const params = {
-                "CompanyId":process.env.CompanyId,
+                "CompanyId": process.env.CompanyId,
             }
             const config = {
                 headers: {
@@ -127,6 +176,7 @@ const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
         getAccountList();
     }, []);
 
+    //Save API
     const handleSubmit = async (e: any) => {
         e.preventDefault();
         productId.trim().length <= 0 && setIdError(true);
@@ -134,20 +184,27 @@ const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
         type.trim().length <= 0 && setTypeError(true);
         account.length <= 0 && setAccountError(true);
 
-        if (idHasError && nameHasError && typeHasError && (account.length<=0)) {
+        if (!(productId.trim().length <= 0) && !(name.trim().length <= 0) && !(type.trim().length <= 0) && !(account.length <= 0)) {
             try {
                 const token = await localStorage.getItem("token");
                 const params = {
-                    "Id": 0,
-                    "ProductId": productId,
-                    "Description": "f4g4",
-                    "RecordNo": "",
-                    "CompanyId":76,
-                    "Name": name,
-                    "ParentId": "",
-                    "ParentName": "",
-                    "Status": "active",
-                    "FullyQualifiedName": ""
+                    ItemId: productId || 0,
+                    RecordNo: "",
+                    CompanyId: 86,
+                    Name: name,
+                    IntacctItemId: "testpo1",
+                    ItemType: type,
+                    SKU: null,
+                    Description: null,
+                    InventoryAccount: null,
+                    IntacctVendorID: null,
+                    SalePrice: null,
+                    CostPrice: null,
+                    AsOfDate: null,
+                    CreatedBy: null,
+                    CreatedOn: null,
+                    UpdatedBy: null,
+                    UpdatedOn: null
                 }
                 const config = {
                     headers: {
@@ -162,11 +219,13 @@ const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                 const { ResponseStatus, Message } = response.data;
                 if (response.status === 200) {
                     if (ResponseStatus === "Success") {
-                        Toast.success(`Product ${editId ? "updated" : "added"} successfully.`);
+                        Toast.success(`Product ${EditId ? "updated" : "added"} successfully.`);
                         onClose();
                     } else {
                         onClose();
-                        if (Message != null) {
+                        if (Message === null) {
+                            Toast.error("Error", "Please try again later.");
+                        } else {
                             Toast.error("Error", Message);
                         }
                     }
@@ -187,14 +246,16 @@ const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
         }
     };
 
+
     useEffect(() => {
-        if (onOpen && editId) {
+        if (onOpen && EditId) {
             getProductById();
         }
-    }, [editId]);
+    }, [EditId]);
 
     useEffect(() => {
         if (onOpen) {
+            getGLAccount();
             setProductId("");
             setIdError(false);
             setIdHasError(false);
@@ -217,7 +278,7 @@ const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                     className={`fixed top-0 bg-white  right-0 h-full xsm:!w-5/6 sm:!w-2/4 lg:!w-2/6 xl:!w-2/6 2xl:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.rightAnimation}`}
                 >
                     <div className="p-4 flex justify-between items-center border-b border-lightSilver">
-                        <Typography type="label" className="!font-bold !text-lg"> ADD Item</Typography>
+                        <Typography type="label" className="!font-bold !text-lg"> {EditId ? "Edit" : "Add"} Item</Typography>
                         <div className="mx-2 cursor-pointer" onClick={handleClose}>
                             <Close variant="medium" />
                         </div>
@@ -230,6 +291,7 @@ const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                                 name="id"
                                 placeholder="Please Enter Item ID"
                                 validate
+                                maxLength={50}
                                 value={productId}
                                 hasError={idError}
                                 getValue={(value: any) => setProductId(value)}
@@ -247,6 +309,7 @@ const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                                 name="name"
                                 placeholder="Please Enter Item Name"
                                 validate
+                                maxLength={100}
                                 hasError={nameError}
                                 value={name}
                                 getValue={(value: any) => setName(value)}

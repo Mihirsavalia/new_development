@@ -49,10 +49,10 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
     const [imagePreview, setImagePreview] = useState<string>("");
     const [userData, setUserData] = useState<userData[]>([]);
     const [country, setCountry] = useState([]);
-    const [countryId, setCountryId] = useState<number>();
+    const [countryId, setCountryId] = useState<number>(0);
     const [countryError, setCountryError] = useState<boolean>(false);
     const [state, setState] = useState([]);
-    const [stateId, setStateId] = useState<number>();
+    const [stateId, setStateId] = useState<number>(0);
     const [stateError, setStateError] = useState<boolean>(false);
 
     // const [selectedFile, setSelectedFile] = useState(null);
@@ -304,7 +304,7 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                     <div className="p-4 flex justify-between items-center border-b border-lightSilver">
                         <Typography type="label" className="!font-bold !text-lg">
                             {" "}
-                            {editId ? "EDIT" : "ADD"} USER
+                            {editId ? "Edit" : "Add"} USER
                         </Typography>
                         <div
                             className="mx-2 cursor-pointer"

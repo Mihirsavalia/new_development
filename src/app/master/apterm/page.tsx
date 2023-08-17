@@ -40,6 +40,7 @@ const Vendor: React.FC = () => {
 
   //Sync API
   const handleSync = async () => {
+    modalClose();
     try {
       const token = await localStorage.getItem("token");
       const params = {
@@ -299,7 +300,7 @@ const Vendor: React.FC = () => {
             <Tooltip content={"Search"} position="bottom" className='!z-[2]'>
               <SearchIcon />
             </Tooltip>
-            <Tooltip content={`Sync GL APTerm`} position="bottom" className='!z-[2]'>
+            <Tooltip content={`Sync AP Term`} position="bottom" className='!z-[2]'>
               <div onClick={() => setIsSyncModalOpen(true)}>
                 <SyncIcon />
               </div>
@@ -317,10 +318,10 @@ const Vendor: React.FC = () => {
         <Modal
           isOpen={isSyncModalOpen}
           onClose={modalClose}
-          width="363px">
+          width="376px">
           <ModalTitle>
             <div className="py-3 px-4 font-bold">Sync</div>
-            <div className="" >
+            <div onClick={modalClose}>
               <Close variant="medium" />
             </div>
           </ModalTitle>
@@ -335,7 +336,7 @@ const Vendor: React.FC = () => {
             <div>
               <Button
                 className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
-                variant="btn-outline">
+                variant="btn-outline" onClick={modalClose}>
                 NO
               </Button>
             </div>
@@ -353,7 +354,7 @@ const Vendor: React.FC = () => {
         <Modal
           isOpen={isRemoveOpen}
           onClose={modalClose}
-          width="363px">
+          width="376px">
           <ModalTitle>
             <div className="py-3 px-4 font-bold">Remove</div>
             <div className="" >
@@ -363,7 +364,7 @@ const Vendor: React.FC = () => {
           <ModalContent>
             <div className="px-4 py-6">
               <Typography type='h5' className='!font-normal'>
-                Are you sure you want to remove the apTerm ?
+                Are you sure you want to remove the AP Term ?
               </Typography>
             </div>
           </ModalContent>
@@ -390,8 +391,7 @@ const Vendor: React.FC = () => {
           <DataTable
             columns={columns}
             data={tableData}
-            headerInvisible={false}
-            stickyHeader={true}
+            sticky
             hoverEffect={true}
           />
         )}

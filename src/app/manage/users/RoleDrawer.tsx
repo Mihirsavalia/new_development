@@ -299,8 +299,8 @@ const RoleDrawer: React.FC<DrawerProps> = ({ onClose }) => {
                     <DataTable
                         columns={columns}
                         data={data}
-                        headerInvisible={false}
-                        stickyHeader={true}
+                     
+                        sticky
                         hoverEffect={true}
                     />
                 </div>

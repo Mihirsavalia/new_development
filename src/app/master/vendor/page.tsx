@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Close, DataTable, Modal, ModalAction, ModalContent, ModalTitle, Switch, Toast, Tooltip, Typography } from 'next-ts-lib';
+import { Button, Close, DataTable, Loader, Modal, ModalAction, ModalContent, ModalTitle, Switch, Toast, Tooltip, Typography } from 'next-ts-lib';
 import React, { useEffect, useRef, useState } from 'react';
 import PlusIcon from '@/assets/Icons/PlusIcon';
 import SearchIcon from '@/assets/Icons/SearchIcon';
@@ -37,10 +37,11 @@ const Vendor: React.FC = () => {
 
     //Sync API
     const handleSync = async () => {
+        modalClose();
         try {
             const token = await localStorage.getItem("token");
             const params = {
-                "CompanyId":76,
+                "CompanyId": 86,
             }
             const config = {
                 headers: {
@@ -48,7 +49,7 @@ const Vendor: React.FC = () => {
                 },
             };
             const response = await axios.post(
-                `${process.env.base_url}/account/sync`,
+                `${process.env.base_url}/vendor/sync`,
                 params,
                 config
             );
@@ -56,7 +57,7 @@ const Vendor: React.FC = () => {
             if (response.status === 200) {
                 if (ResponseStatus === "Success") {
                     if (ResponseData !== null && typeof ResponseData === 'object') {
-                        Toast.success("Success", "Account Sync successfully");
+                        Toast.success("Success", "Vendor Sync successfully");
                     }
                 } else {
                     if (Message != null) {
@@ -115,6 +116,7 @@ const Vendor: React.FC = () => {
         }
     };
 
+    //Action
     const Actions = ({ actions, id }: any) => {
         const actionsRef = useRef<HTMLDivElement>(null);
         const [open, setOpen] = useState(false);
@@ -133,33 +135,39 @@ const Vendor: React.FC = () => {
             };
         }, []);
         return (
-            <div
-                ref={actionsRef}
-                className="cursor-pointer flex justify-end"
-                onClick={() => setOpen(!open)}>
-                <MeatballsMenuIcon />
-                {open && (
-                    <React.Fragment>
-                        <div className="relative z-10 flex justify-center items-center">
-                            <div className="absolute top-0 right-0 py-2 border border-lightSilver rounded-md bg-pureWhite shadow-lg ">
-                                <ul className="w-40">
-                                    {actions.map((action: any, index: any) => (
-                                        <li
-                                            key={index}
-                                            onClick={() => { handleKebabChange(action, id) }}
-                                            className="flex w-full h-9 px-3 hover:bg-lightGray !cursor-pointer">
-                                            <div className="flex justify-center items-center ml-2 cursor-pointer">
-                                                <label className="inline-block text-xs cursor-pointer">
-                                                    {action}
-                                                </label>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
+            <div className="relative w-full flex justify-end">
+                <div
+                    ref={actionsRef}
+                    className="cursor-pointer w-10 flex justify-center items-center"
+                    onClick={() => setOpen(!open)}
+                >
+                    <MeatballsMenuIcon />
+                    {open && (
+                        <React.Fragment>
+                            <div className="absolute z-10 top-7 right-1 flex justify-center items-center">
+                                <div className="py-2 border border-lightSilver rounded-md bg-pureWhite shadow-lg ">
+                                    <ul className="w-40">
+                                        {actions.map((action: any, index: any) => (
+                                            <li
+                                                key={index}
+                                                onClick={() => {
+                                                    handleKebabChange(action, id);
+                                                }}
+                                                className="flex w-full h-9 px-3 hover:bg-lightGray !cursor-pointer"
+                                            >
+                                                <div className="flex justify-center items-center ml-2 cursor-pointer">
+                                                    <label className="inline-block text-xs cursor-pointer">
+                                                        {action}
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
                             </div>
-                        </div>
-                    </React.Fragment>
-                )}
+                        </React.Fragment>
+                    )}
+                </div>
             </div>
         );
     };
@@ -170,8 +178,8 @@ const Vendor: React.FC = () => {
             const params = {
                 "FilterObj": {
                     "AccountNo": "",
-                    "Name": "GL1",
-                    "FullyQualifiedName": "AP GL",
+                    "Name": "",
+                    "FullyQualifiedName": "",
                     "AccountType": "",
                     "ClosingType": "",
                     "NormalBalance": "",
@@ -179,9 +187,9 @@ const Vendor: React.FC = () => {
                     "Status": "active",
                     "GlobalFilter": ""
                 },
-                "CompanyId":76,
+                "CompanyId": 86,
                 "Index": 1,
-                "PageSize": 10
+                "PageSize": 100
             }
             const token = await localStorage.getItem("token");
             const config = {
@@ -246,87 +254,90 @@ const Vendor: React.FC = () => {
         }
     ]);
 
-    return (
+    return (<>
         <Wrapper masterSettings={true}>
-        <div>
-            <div className="bg-whiteSmoke flex justify-between items-center">
-                <div className="flex items-center py-[10px] px-3">
-                    <Typography type="h5" className="!font-bold flex justify-center items-center text-center">
-                        Vendor
-                    </Typography>
-
-                </div>
-                <div className="flex items-center px-[10px]">
-                    <Tooltip content={"Search"} position="bottom" className='!z-[2]'>
-                        <SearchIcon />
-                    </Tooltip>
-                    <Tooltip content={`Sync GL Account`} position="bottom" className='!z-[2]'>
-                        <div onClick={() => setIsSyncModalOpen(true)}>
-                            <SyncIcon />
-                        </div>
-                    </Tooltip>
-                    <Button
-                        className="rounded-full !px-6 "
-                        variant="btn-primary"
-                        onClick={handleToggleChange}>
-                        <Typography type="h6" className="!font-bold flex justify-center items-center text-center"><span className="mr-1"> <PlusIcon /></span> CREATE NEW</Typography>
-                    </Button>
-                </div>
-            </div>
-
-            {/* Sync Modal */}
-            <Modal
-                isOpen={isSyncModalOpen}
-                onClose={modalClose}
-                width="363px">
-                <ModalTitle>
-                    <div className="py-3 px-4 font-bold">Sync</div>
-                    <div className="" >
-                        <Close variant="medium" />
-                    </div>
-                </ModalTitle>
-                <ModalContent>
-                    <div className="px-4 py-6">
-                        <Typography type='h5' className='!font-normal'>
-                            Are you sure you want to sync GL Account ?
+            <div>
+                <div className="bg-whiteSmoke h-[66px] flex justify-between items-center">
+                    <div className="flex items-center py-[10px] px-3">
+                        <Typography type="h5" className="!font-bold flex justify-center items-center text-center">
+                            Vendor
                         </Typography>
-                    </div>
-                </ModalContent>
-                <ModalAction>
-                    <div>
-                        <Button
-                            className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
-                            variant="btn-outline">
-                            NO
-                        </Button>
-                    </div>
-                    <div>
-                        <Button
-                            className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
-                            variant="btn-primary" onClick={handleSync}>
-                            YES
-                        </Button>
-                    </div>
-                </ModalAction>
-            </Modal>
 
-            {/* DataTable */}
-            {tableData.length > 0 && (
-                <DataTable
-                    columns={columns}
-                    data={tableData}
-                    headerInvisible={false}
-                    stickyHeader={true}
-                    hoverEffect={true}
+                    </div>
+                    <div className="flex items-center px-[10px]">
+                        <Tooltip content={"Search"} position="bottom" className='!z-[2]'>
+                            <SearchIcon />
+                        </Tooltip>
+                        <Tooltip content={`Sync Vendor`} position="bottom" className='!z-[2] !p-0 !m-0'>
+                            <div onClick={() => setIsSyncModalOpen(true)}>
+                                <SyncIcon />
+                            </div>
+                        </Tooltip>
+                        <Button
+                            className="rounded-full !px-6 "
+                            variant="btn-primary"
+                            onClick={handleToggleChange}>
+                            <Typography type="h6" className="!font-bold flex justify-center items-center text-center"><span className="mr-1"> <PlusIcon /></span> CREATE NEW</Typography>
+                        </Button>
+                    </div>
+                </div>
+
+                {/* Sync Modal */}
+                <Modal
+                    isOpen={isSyncModalOpen}
+                    onClose={modalClose}
+                    width="376px">
+                    <ModalTitle>
+                        <div className="py-3 px-4 font-bold">Sync</div>
+                        <div onClick={modalClose}>
+                            <Close variant="medium" />
+                        </div>
+                    </ModalTitle>
+                    <ModalContent>
+                        <div className="px-4 py-6">
+                            <Typography type='h5' className='!font-normal'>
+                                Are you sure you want to sync Vendor ?
+                            </Typography>
+                        </div>
+                    </ModalContent>
+                    <ModalAction>
+                        <div>
+                            <Button
+                                className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
+                                variant="btn-outline" onClick={modalClose}>
+                                NO
+                            </Button>
+                        </div>
+                        <div>
+                            <Button
+                                className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
+                                variant="btn-primary" onClick={handleSync}>
+                                YES
+                            </Button>
+                        </div>
+                    </ModalAction>
+                </Modal>
+
+                {/* DataTable */}
+                {tableData.length <= 0 ? <div className="h-[445px] w-full  flex items-center justify-center"><Loader size="md" helperText /></div> :
+                    <div className="h-[445px]">
+                        {tableData.length > 0 && (
+                            <DataTable
+                                columns={columns}
+                                data={tableData}
+
+                                sticky
+                                hoverEffect={true}
+                            />
+                        )}
+                    </div>}
+                <DrawerOverlay
+                    isOpen={isOpenDrawer}
+                    onClose={handleDrawerClose}
                 />
-            )}
-
-            <DrawerOverlay
-                isOpen={isOpenDrawer}
-                onClose={handleDrawerClose}
-            />
-        </div>
+            </div>
         </Wrapper>
+    </>
     )
 }
 

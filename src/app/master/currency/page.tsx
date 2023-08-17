@@ -279,7 +279,7 @@ const GLAccount: React.FC = () => {
             <Modal
                 isOpen={isSyncModalOpen}
                 onClose={modalClose}
-                width="363px">
+                width="376px">
                 <ModalTitle>
                     <div className="py-3 px-4 font-bold">Sync</div>
                     <div className="" >
@@ -316,8 +316,8 @@ const GLAccount: React.FC = () => {
                 <DataTable
                     columns={columns}
                     data={tableData}
-                    headerInvisible={false}
-                    stickyHeader={true}
+                 
+                    sticky
                     hoverEffect={true}
                 />
             )}

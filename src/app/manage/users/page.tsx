@@ -267,8 +267,8 @@ const page: React.FC = () => {
                   <DataTable
                     columns={columns}
                     data={updatedUserData}
-                    headerInvisible={false}
-                    stickyHeader={true}
+                 
+                    sticky
                     hoverEffect={true}
                   />
                 )}

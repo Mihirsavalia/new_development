@@ -15,95 +15,89 @@ interface DrawerProps {
     onClose: () => void;
     EditId?: number;
 }
-const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
+const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
+    // const [Id, setId] = useState<string>("");
+    // const [idHasError, setIdHasError] = useState<boolean>(false);
+    // const [idError, setIdError] = useState<boolean>(false);
 
-    const [Id, setId] = useState<string>("");
-    const [projectId, setProjectId] = useState<string>("");
-    const [idHasError, setIdHasError] = useState<boolean>(false);
-    const [idError, setIdError] = useState<boolean>(false);
-
-    const [name, setName] = useState<string>("");
-    const [nameError, setNameError] = useState<boolean>(false);
-    const [nameHasError, setNameHasError] = useState<boolean>(false);
+    const [description, setDescription] = useState<string>("");
+    const [descriptionError, setDescriptionError] = useState<boolean>(false);
+    const [descriptionHasError, setDescriptionHasError] = useState<boolean>(false);
 
     const handleClose = () => {
         onClose();
     };
 
-    //Project Data API
-    const getProjectById = async () => {
-        try {
-            const token = await localStorage.getItem("token");
-            const params = {
-                "CompanyId": 86,
-                "Id": EditId
+    //Description Get Data API
+    // const getDescriptionById = async () => {
+    //     try {
+    //         const token = await localStorage.getItem("token");
+    //         const params = {
+    //             "CompanyId": 86,
+    //             "Id": EditId
 
-            }
-            const config = {
-                headers: {
-                    Authorization: `bearer ${token}`,
-                },
-            };
-            const response = await axios.post(
-                `${process.env.base_url}/project/getbyid `,
-                params,
-                config
-            );
-            const { ResponseStatus, ResponseData, Message } = response.data;
-            if (response.status === 200) {
-                if (ResponseStatus === "Success") {
-                    if (ResponseData !== null && typeof ResponseData === 'object') {
-                        const { Id, ProjectId, Name } = ResponseData;
-                        setId(Id || "");
-                        setProjectId(ProjectId || "");
-                        setName(Name || "");
-                        setIdHasError(true);
-                        setNameHasError(true);
-                    }
-                } else {
-                    if (Message === null) {
-                        Toast.error("Error", "Please try again later.");
-                    } else {
-                        Toast.error("Error", Message);
-                    }
-                }
-            }
-            else {
-                if (Message === null) {
-                    Toast.error("Error", "Please try again later.");
-                } else {
-                    Toast.error("Error", Message);
-                }
-            }
-        } catch (error) {
-        }
-    }
+    //         }
+    //         const config = {
+    //             headers: {
+    //                 Authorization: `bearer ${token}`,
+    //             },
+    //         };
+    //         const response = await axios.post(
+    //             `${process.env.base_url}/description/getbyid `,
+    //             params,
+    //             config
+    //         );
+    //         const { ResponseStatus, ResponseData, Message } = response.data;
+    //         if (response.status === 200) {
+    //             if (ResponseStatus === "Success") {
+    //                 if (ResponseData !== null && typeof ResponseData === 'object') {
+    //                     const { Id, LocationId, Name } = ResponseData;
+    //                     // setId(Id || "");
+    //                     // setId(LocationId || "");
+    //                     setDescription(Name || "");
+    //                     // setIdHasError(true);
+    //                     setDescriptionHasError(true);
+    //                 }
+    //             } else {
+    //                 if (Message === null) {
+    //                     Toast.error("Error", "Please try again later.");
+    //                 } else {
+    //                     Toast.error("Error", Message);
+    //                 }
+    //             }
+    //         }
+    //         else {
+    //             if (Message === null) {
+    //                 Toast.error("Error", "Please try again later.");
+    //             } else {
+    //                 Toast.error("Error", Message);
+    //             }
+    //         }
+    //     } catch (error) {
+    //     }
+    // }
 
-    const handleIdChange = (value: any) => {
-        const pattern = /^[a-zA-Z0-9]+$/;
-        if (pattern.test(value)) {
-            setIdError(false);
-            setProjectId(value);
-        }
-    };
+    // const handleIdChange = (value: any) => {
+    //     const pattern = /^[a-zA-Z0-9]+$/;
+    //     if (pattern.test(value)) {
+    //         setIdError(false);
+    //         setId(value);
+    //     }
+    // };
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
-        projectId.trim().length <= 0 && setIdError(true);
-        name.trim().length <= 0 && setNameError(true);
+        // Id.trim().length <= 0 && setIdError(true);
+        description.trim().length <= 0 && setDescriptionError(true);
 
-        if (!(projectId.length <= 0) && !(name.length <= 0)) {
+        if (!(description.trim().length <= 0)) {
             try {
                 const token = await localStorage.getItem("token");
                 const params = {
-                    "Id": Id || 0,
-                    "ProjectId": projectId,
-                    "RecordNo": "",
-                    "CompanyId": 86,
-                    "Name": name,
-                    "Description": "f4g4",
-                    "Category": "Capitalized",
-                    "Status": "active",
+                    Id: 0,
+                    CompanyId: 86,
+                    APFieldId: 47,
+                    Description: description
                 }
                 const config = {
                     headers: {
@@ -111,7 +105,7 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                     },
                 };
                 const response = await axios.post(
-                    `${process.env.base_url}/project/save`, params,
+                    `${process.env.base_url}/description/save`, params,
                     config
                 );
 
@@ -122,7 +116,7 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                             Toast.error("Error", ResponseData.Message);
                         }
                         else {
-                            Toast.success(`Project ${EditId ? "updated" : "added"} successfully.`);
+                            Toast.success(`Description ${EditId ? "updated" : "added"} successfully.`);
                         }
                         onClose();
                     } else {
@@ -150,19 +144,20 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
     };
 
     useEffect(() => {
-        if (EditId) {
-            getProjectById();
-        }
-    }, [EditId]);
-
-    useEffect(() => {
         if (onOpen) {
-            setProjectId("");
-            setIdError(false);
-            setName("");
-            setNameError(false);
+            // setId("");
+            // setIdError(false);
+            setDescription("");
+            setDescriptionError(false);
         }
     }, [onOpen]);
+
+    // useEffect(() => {
+    //     if (EditId) {
+    //         getDescriptionById();
+    //     }
+    // }, [EditId]);
+
 
     return (
         <>
@@ -171,20 +166,20 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                     className={`fixed top-0 bg-white  right-0 h-full xsm:!w-5/6 sm:!w-2/4 lg:!w-2/6 xl:!w-2/6 2xl:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.rightAnimation}`}
                 >
                     <div className="p-4 flex justify-between items-center border-b border-lightSilver">
-                        <Typography type="label" className="!font-bold !text-lg"> Add Project</Typography>
+                        <Typography type="label" className="!font-bold !text-lg"> {EditId ? "Edit" : "Add"} Description</Typography>
                         <div className="mx-2 cursor-pointer" onClick={handleClose}>
                             <Close variant="medium" />
                         </div>
                     </div>
                     <div className="flex-1 mx-5 mt-2 mb-12 ">
-                        <div className="flex-1 mt-3">
+                        {/* <div className="flex-1 mt-3">
                             <Text
                                 label="ID"
                                 id="id"
                                 name="id"
-                                placeholder="Please Enter ID Name"
+                                placeholder="Please Enter ID"
                                 validate
-                                value={projectId}
+                                value={Id}
                                 hasError={idError}
                                 getValue={(value: any) => handleIdChange(value)}
                                 getError={(e: any) => setIdHasError(e)}
@@ -193,21 +188,21 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                                 }}
                             >
                             </Text>
-                        </div>
+                        </div> */}
                         <div className="flex-1 mt-3">
                             <Text
-                                label="Name"
-                                id="name"
-                                name="name"
-                                placeholder="Please Enter Project Name"
+                                label="Description"
+                                id="description"
+                                name="description"
+                                placeholder="Please Enter Description"
                                 validate
-                                maxLength={100}
-                                hasError={nameError}
-                                value={name}
-                                getValue={(value: any) => setName(value)}
-                                getError={(e: any) => setNameHasError(e)}
+                                maxLength={200}
+                                hasError={descriptionError}
+                                value={description}
+                                getValue={(value: any) => setDescription(value)}
+                                getError={(e: any) => setDescriptionHasError(e)}
                                 onChange={(e: any) => {
-                                    setNameError(true);
+                                    setDescriptionError(true);
                                 }}
                             ></Text>
                         </div>
@@ -238,4 +233,4 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
     );
 }
 
-export default ProjectContent
+export default LocationContent

@@ -13,9 +13,9 @@ import styles from "@/assets/scss/styles.module.scss";
 interface DrawerProps {
     onOpen: boolean;
     onClose: () => void;
-    editId?: number;
+    EditId?: number;
 }
-const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
+const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
 
     const [accountId, setAccountId] = useState<string>("");
     const [idHasError, setIdHasError] = useState<boolean>(false);
@@ -29,19 +29,17 @@ const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
     const [typeError, setTypeError] = useState<boolean>(false);
     const [typeHasError, setTypeHasError] = useState<boolean>(false);
 
-
-
     const handleClose = () => {
         onClose();
     };
 
-    //Account Data API
+    //Account Get Data API
     const getAccountById = async () => {
         try {
             const token = await localStorage.getItem("token");
             const params = {
-                "CompanyId":process.env.CompanyId,
-                "Id": editId
+                "CompanyId": 86,
+                "Id": EditId
             }
             const config = {
                 headers: {
@@ -49,7 +47,7 @@ const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                 },
             };
             const response = await axios.post(
-                `${process.env.base_url}/account/getbyid `,
+                `${process.env.base_url}/account/getbyid`,
                 params,
                 config
             );
@@ -57,13 +55,15 @@ const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
             if (response.status === 200) {
                 if (ResponseStatus === "Success") {
                     if (ResponseData !== null && typeof ResponseData === 'object') {
-                        const { id, name, type } = ResponseData;
-                        setAccountId(id);
-                        setName(name);
-                        setType(type)
+                        const { GLAccountId, Name, AccountType } = ResponseData;
+                        setAccountId(GLAccountId);
+                        setName(Name);
+                        setType(AccountType)
                     }
                 } else {
-                    if (Message != null) {
+                    if (Message === null) {
+                        Toast.error("Error", "Please try again later.");
+                    } else {
                         Toast.error("Error", Message);
                     }
                 }
@@ -79,6 +79,11 @@ const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
             console.log(error);
         }
     }
+    useEffect(() => {
+        if (onOpen && EditId) {
+            getAccountById();
+        }
+    }, [EditId]);
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
@@ -94,7 +99,7 @@ const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                     "AccountId": accountId,
                     "Description": "f4g4",
                     "RecordNo": "",
-                    "CompanyId":process.env.CompanyId,
+                    "CompanyId": process.env.CompanyId,
                     "Name": name,
                     "ParentId": "",
                     "ParentName": "",
@@ -114,7 +119,7 @@ const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                 const { ResponseStatus, Message } = response.data;
                 if (response.status === 200) {
                     if (ResponseStatus === "Success") {
-                        Toast.success(`Account ${editId ? "updated" : "added"} successfully.`);
+                        Toast.success(`Account ${EditId ? "updated" : "added"} successfully.`);
                         onClose();
                     } else {
                         onClose();
@@ -139,11 +144,7 @@ const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
         }
     };
 
-    useEffect(() => {
-        if (onOpen && editId) {
-            getAccountById();
-        }
-    }, [editId]);
+
 
     useEffect(() => {
         if (onOpen) {
@@ -166,7 +167,7 @@ const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                     className={`fixed top-0 bg-white  right-0 h-full xsm:!w-5/6 sm:!w-2/4 lg:!w-2/6 xl:!w-2/6 2xl:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.rightAnimation}`}
                 >
                     <div className="p-4 flex justify-between items-center border-b border-lightSilver">
-                        <Typography type="label" className="!font-bold !text-lg"> ADD Account</Typography>
+                        <Typography type="label" className="!font-bold !text-lg"> Add Account</Typography>
                         <div className="mx-2 cursor-pointer" onClick={handleClose}>
                             <Close variant="medium" />
                         </div>
@@ -223,7 +224,7 @@ const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                         </div>
                     </div>
                     <span className="flex absolute bottom-16 w-full right-0 border-t border-lightSilver"></span>
-                    <div className={`flex fixed  bottom-0 right-0 justify-end items-center`}>
+                    <div className={`flex fixed bg-white  bottom-0 right-0 justify-end items-center`}>
                         <div className="py-3 px-5">
                             <Button
                                 onClick={onClose}

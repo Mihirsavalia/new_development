@@ -1,5 +1,5 @@
 "use client";
-import { Tooltip, Typography } from "next-ts-lib";
+import { Tooltip, Typography, Loader } from "next-ts-lib";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -249,7 +249,7 @@ const Sidebar = ({ setOpen, setSettingSidebar, toggleDrawer }: SidebarProps): JS
   }, 250);
 
   const handleSettingChange = () => {
-router.push('/manage/users')
+    router.push('/manage/users')
   }
 
   return (
