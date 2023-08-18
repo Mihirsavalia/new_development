@@ -1,18 +1,19 @@
 "use client";
 
-import { Button, Close, DataTable, Loader, Modal, ModalAction, ModalContent, ModalTitle, Switch, Toast, Tooltip, Typography } from 'next-ts-lib';
-import React, { useEffect, useRef, useState } from 'react';
-import axios from 'axios';
-
+import DrawerOverlay from '@/app/manage/users/DrawerOverlay';
+import ImportIcon from "@/assets/Icons/ImportIcon";
+import MeatballsMenuIcon from "@/assets/Icons/MeatballsMenu";
 import PlusIcon from '@/assets/Icons/PlusIcon';
 import SearchIcon from '@/assets/Icons/SearchIcon';
 import SyncIcon from "@/assets/Icons/SyncIcon";
-import MeatballsMenuIcon from "@/assets/Icons/MeatballsMenu";
-import ImportIcon from "@/assets/Icons/ImportIcon";
-
-import GLAccountContent from './Drawer/GLAccountContent';
 import Wrapper from '@/components/common/Wrapper';
-import DrawerOverlay from '@/app/manage/users/DrawerOverlay';
+import { callAPI } from '@/utils/API/callAPI';
+import { hasNoToken } from "@/utils/commonFunction";
+import { Button, Close, DataTable, Loader, Modal, ModalAction, ModalContent, ModalTitle, Toast, Text, Tooltip, Typography } from 'next-ts-lib';
+import "next-ts-lib/dist/index.css";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useRef, useState } from 'react';
+import GLAccountContent from './Drawer/GLAccountDrawer';
 
 interface accountList {
     name: string;
@@ -21,6 +22,12 @@ interface accountList {
 }
 
 const GLAccount: React.FC = () => {
+    const router = useRouter();
+
+    useEffect(() => {
+        hasNoToken(router);
+    }, [router]);
+
     const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
 
     const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
@@ -28,6 +35,9 @@ const GLAccount: React.FC = () => {
     const [accountList, setAccountList] = useState<accountList[]>([]);
     const [isSyncModalOpen, setIsSyncModalOpen] = useState<boolean>(false);
     const [refreshTable, setRefreshTable] = useState<boolean>(false);
+    const [isSearch, setIsSearch] = useState<boolean>(false);
+    const [searchValue, setSearchValue] = useState<string>("");
+    const [searchHasError, setSearchHasError] = useState<boolean>(false);
 
     const columns = [
         {
@@ -55,107 +65,64 @@ const GLAccount: React.FC = () => {
     //Sync API
     const handleSync = async () => {
         modalClose();
-        try {
-            const token = await localStorage.getItem("token");
-            const params = {
-                CompanyId: 86,
-            }
-            const config = {
-                headers: {
-                    Authorization: `bearer ${token}`,
-                },
-            };
-            const response = await axios.post(
-                `${process.env.base_url}/account/sync`,
-                params,
-                config
-            );
-            const { ResponseStatus, ResponseData, Message } = response.data;
-            if (response.status === 200) {
-                if (ResponseStatus === "Success") {
-                    if (ResponseData !== null && typeof ResponseData === 'object') {
-                        Toast.success("Success", "Account Sync successfully");
-                    }
-                } else {
-                    if (Message === null) {
-                        Toast.error("Error", "Please try again later.");
-                    } else {
-                        Toast.error("Error", Message);
-                    }
-                }
-            }
-            else {
-                if (Message === null) {
-                    Toast.error("Error", "Please try again later.");
-                } else {
-                    Toast.error("Error", Message);
-                }
-            }
-        } catch (error) {
-            console.error(error);
+        const params = {
+            CompanyId: 86,
         }
-    }
+        const url = `${process.env.base_url}/account/sync`;
+        const successCallback = () => {
+            Toast.success("Success", "Account Sync successfully");
+        };
+        callAPI(url, params, successCallback);
+    };
 
     //GL Account List API
     const getAccountList = async () => {
-        try {
-            const params = {
-                FilterObj: {
-                    AccountNo: "",
-                    Name: "",
-                    FullyQualifiedName: "",
-                    AccountType: "",
-                    ClosingType: "",
-                    NormalBalance: "",
-                    CurrentBalance: "",
-                    Status: "",
-                    GlobalFilter: ""
-                },
-                CompanyId: 86,
-                Index: 1,
-                PageSize: 1000
-            }
-            const token = await localStorage.getItem("token");
-            const config = {
-                headers: {
-                    Authorization: `bearer ${token}`,
-                },
-            };
-            const response = await axios.post(
-                `${process.env.base_url}/account/getlist`, params,
-                config
-            );
-            const { ResponseStatus, ResponseData, Message } = response.data;
-            if (response.status === 200) {
-                if (ResponseStatus === "Success") {
-                    if (ResponseData !== null && typeof ResponseData === 'object') {
-                        setAccountList(ResponseData.List);
-                    }
-                } else {
-                    if (Message === null) {
-                        Toast.error("Error", "Please try again later.");
-                    } else {
-                        Toast.error("Error", Message);
-                    }
-                }
-            }
-            else {
-                if (Message === null) {
-                    Toast.error("Error", "Please try again later.");
-                } else {
-                    Toast.error("Error", Message);
-                }
-            }
-        } catch (error) {
-            console.error(error);
+        const params = {
+            FilterObj: {
+                AccountNo: "",
+                Name: "",
+                FullyQualifiedName: "",
+                AccountType: "",
+                ClosingType: "",
+                NormalBalance: "",
+                CurrentBalance: "",
+                Status: "",
+                GlobalFilter: ""
+            },
+            CompanyId: 86,
+            Index: 1,
+            PageSize: 1000
         }
-    }
+        const url = `${process.env.base_url}/account/getlist`;
+        const successCallback = (ResponseData: any) => {
+            if (ResponseData !== null && typeof ResponseData === 'object') {
+                setAccountList(ResponseData.List);
+            }
+        };
+        callAPI(url, params, successCallback);
+    };
     useEffect(() => {
         getAccountList();
     }, [refreshTable]);
 
-    const actionArray = ["Edit", "Remove"];
+    //Delete Account API
+    const handleAccountDelete = async () => {
+        modalClose();
+        const params = {
+            CompanyId: 86,
+            Id: Id,
+        };
+        const url = `${process.env.base_url}/account/delete`;
+        const successCallback = (ResponseData: any) => {
+            if (ResponseData !== null && typeof ResponseData === 'object') {
+                // Toast.success("Success", "Account Remove successfully");
+                getAccountList();
+            }
+        };
+        callAPI(url, params, successCallback);
+    };
 
+    const actionArray = ["Edit", "Remove"];
     // Action
     const Actions = ({ actions, id }: any) => {
         const actionsRef = useRef<HTMLDivElement>(null);
@@ -212,6 +179,19 @@ const GLAccount: React.FC = () => {
         );
     };
 
+    const handleKebabChange = (
+        actionName: string,
+        id: number,
+    ) => {
+        setId(id);
+        if (actionName === "Edit") {
+            setIsOpenDrawer(true);
+        }
+        if (actionName === "Remove") {
+            setIsRemoveOpen(!isRemoveOpen);
+        }
+    };
+
     //DataTable Data
     const accountListData = accountList?.map(
         (e: any) =>
@@ -239,62 +219,13 @@ const GLAccount: React.FC = () => {
         setIsRemoveOpen(false);
     };
 
-    const handleKebabChange = (
-        actionName: string,
-        id: number,
-    ) => {
-        setId(id);
-        if (actionName === "Edit") {
-            setIsOpenDrawer(true);
-        }
-        if (actionName === "Remove") {
-            setIsRemoveOpen(!isRemoveOpen);
-        }
+    const handleSearchValue = (value: string) => {
+        setIsSearch(true);
+        setSearchValue(value);
     };
-
-    //Delete Account API
-    const handleAccountDelete = async () => {
-        modalClose();
-        try {
-            const token = await localStorage.getItem("token");
-            const params = {
-                CompanyId: 86,
-                Id: Id,
-            };
-            const config = {
-                headers: {
-                    Authorization: `bearer ${token}`,
-                },
-            };
-            const response = await axios.post(
-                `${process.env.base_url}/account/delete `,
-                params,
-                config
-            );
-            const { ResponseStatus, ResponseData, Message } = response.data;
-            if (response.status === 200) {
-                if (ResponseStatus === "Success") {
-                    if (ResponseData !== null && typeof ResponseData === "object") {
-                        // Toast.success("Success", "Account Remove successfully");
-                        getAccountList();
-                    }
-                } else {
-                    if (Message === null) {
-                        Toast.error("Error", "Please try again later.");
-                    } else {
-                        Toast.error("Error", Message);
-                    }
-                }
-            } else {
-                if (Message === null) {
-                    Toast.error("Error", "Please try again later.");
-                } else {
-                    Toast.error("Error", Message);
-                }
-            }
-        } catch (error) {
-            console.error(error);
-        }
+    const handleSearchClose = () => {
+        setIsSearch(false);
+        setSearchValue("");
     };
 
     return (
@@ -308,9 +239,36 @@ const GLAccount: React.FC = () => {
 
                     </div>
                     <div className="flex items-center px-[10px]">
-                        <Tooltip content={"Search"} position="bottom" className='!z-[2]'>
-                            <SearchIcon />
-                        </Tooltip>
+                        {isSearch
+                            ? <div className="flex relative items-center">
+                                <Text
+                                    id="searching"
+                                    name="searching"
+                                    value={searchValue}
+                                    placeholder="Search"
+                                    className='pl-8 border-0 rounded-full'
+                                    getValue={(value: any) => handleSearchValue(value)}
+                                    getError={(e: any) => setSearchHasError(e)}
+                                ></Text>
+                                <div className="flex absolute left-2 cursor-pointer">
+                                    <SearchIcon />
+                                </div>
+                                {isSearch && (
+                                    <div
+                                        className="flex absolute -top-2 -right-2 cursor-pointer"
+                                        onClick={handleSearchClose}
+                                    >
+                                        <Tooltip position="bottom" content="close" className='!z-[2]'>
+                                            <Close variant="small" />
+                                        </Tooltip>
+                                    </div>
+                                )}
+                            </div>
+                            : <Tooltip content={"Search"} position="bottom" className='!z-[2]'>
+                                <div onClick={() => { setIsSearch(true) }}>
+                                    <SearchIcon />
+                                </div>
+                            </Tooltip>}
                         <Tooltip content={`Import`} position="bottom" className='!z-[2] !p-0 !ml-3'>
                             <ImportIcon />
                         </Tooltip>

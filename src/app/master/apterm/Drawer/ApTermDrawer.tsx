@@ -10,13 +10,14 @@ import "next-ts-lib/dist/index.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "@/assets/scss/styles.module.scss";
+import { callAPI } from "@/utils/API/callAPI";
 
 interface DrawerProps {
     onOpen: boolean;
     onClose: () => void;
-    editId?: number;
+    EditId?: number;
 }
-const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
+const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
 
     const [name, setName] = useState<string>("");
     const [nameError, setNameError] = useState<boolean>(false);
@@ -31,7 +32,7 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
     const [dueDayHasError, setDueDayHasError] = useState<boolean>(false);
 
     const [dueForm, setDueForm] = useState([]);
-    const [dueFormId, setDueFormId] = useState<number>();
+    const [dueFormId, setDueFormId] = useState<number>(0);
     const [dueFormError, setDueFormError] = useState<boolean>(false);
     const [dueFormHasError, setDueFormHasError] = useState<boolean>(false);
 
@@ -40,7 +41,7 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
     const [discountHasError, setDiscountHasError] = useState<boolean>(false);
 
     const [account, setAccount] = useState([]);
-    const [accountId, setAccountId] = useState<number>();
+    const [accountId, setAccountId] = useState<number>(0);
     const [accountError, setAccountError] = useState<boolean>(false);
     const [accountHasError, setAccountHasError] = useState<boolean>(false);
 
@@ -50,134 +51,52 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
 
     //APTerm Data API
     const getAPTermById = async () => {
-        try {
-            const token = await localStorage.getItem("token");
-            const params = {
-                "CompanyId": process.env.CompanyId,
-                "Id": editId
+        const params = {
+            CompanyId: 86,
+            Id: EditId
+        };
+        const url = `${process.env.base_url}/apTerm/getbyid`;
+        const successCallback = (ResponseData: any) => {
+            if (ResponseData !== null && typeof ResponseData === 'object') {
+                const { name, description, due_day } = ResponseData;
+                setDescription(description);
+                setName(name);
+                setDueDay(due_day)
             }
-            const config = {
-                headers: {
-                    Authorization: `bearer ${token}`,
-                },
-            };
-            const response = await axios.post(
-                `${process.env.base_url}/apTerm/getbyid `,
-                params,
-                config
-            );
-            const { ResponseStatus, ResponseData, Message } = response.data;
-            if (response.status === 200) {
-                if (ResponseStatus === "Success") {
-                    if (ResponseData !== null && typeof ResponseData === 'object') {
-                        const { name, description, due_day } = ResponseData;
-                        setDescription(description);
-                        setName(name);
-                        setDueDay(due_day)
-                    }
-                } else {
-                    if (Message === null) {
-                        Toast.error("Error", "Please try again later.");
-                    } else {
-                        Toast.error("Error", Message);
-                    }
-                }
-            }
-            else {
-                if (Message === null) {
-                    Toast.error("Error", "Please try again later.");
-                } else {
-                    Toast.error("Error", Message);
-                }
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
-    //GL DueForm List API
-    const getDueFormList = async () => {
-        try {
-            const token = await localStorage.getItem("token");
-            const params = {
-                "CompanyId": process.env.CompanyId,
-            }
-            const config = {
-                headers: {
-                    Authorization: `bearer ${token}`,
-                },
-            };
-            const response = await axios.post(
-                `${process.env.base_url}/account/getlist`,
-                params,
-                config
-            );
-            const { ResponseStatus, ResponseData, Message } = response.data;
-            if (response.status === 200) {
-                if (ResponseStatus === "Success") {
-                    if (ResponseData !== null && typeof ResponseData === 'object') {
-                        setDueForm(ResponseData);
-                    }
-                } else {
-                    if (Message != null) {
-                        Toast.error("Error", Message);
-                    }
-                }
-            }
-            else {
-                if (Message === null) {
-                    Toast.error("Error", "Please try again later.");
-                } else {
-                    Toast.error("Error", Message);
-                }
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
-    useEffect(() => {
-        getDueFormList();
-    }, []);
+        };
+        callAPI(url, params, successCallback);
+    };
+
+    //DueForm List API
+    // const getDueFormList = async () => {
+    //     const params = {
+    //         CompanyId: 86
+    //     };
+    //     const url = `${process.env.base_url}/account/getlist`;
+    //     const successCallback = (ResponseData: any) => {
+    //         if (ResponseData !== null && typeof ResponseData === 'object') {
+    //             setDueForm(ResponseData);
+    //         }
+    //     };
+    //     callAPI(url, params, successCallback);
+    // };
+    // useEffect(() => {
+    //     getDueFormList();
+    // }, []);
 
     //Default Account List API
-    const getAccountList = async () => {
-        try {
-            const token = await localStorage.getItem("token");
-            const params = {
-                "CompanyId": 81,
-            }
-            const config = {
-                headers: {
-                    Authorization: `bearer ${token}`,
-                },
-            };
-            const response = await axios.post(
-                `${process.env.base_url}/account/getlist`,
-                params,
-                config
-            );
-            const { ResponseStatus, ResponseData, Message } = response.data;
-            if (response.status === 200) {
-                if (ResponseStatus === "Success") {
-                    if (ResponseData !== null && typeof ResponseData === 'object') {
-                        setAccount(ResponseData);
-                    }
-                } else {
-                    if (Message != null) {
-                        Toast.error("Error", Message);
-                    }
-                }
-            }
-            else {
-                if (Message === null) {
-                    Toast.error("Error", "Please try again later.");
-                } else {
-                    Toast.error("Error", Message);
-                }
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
+    // const getAccountList = async () => {
+    //     const params = {
+    //         CompanyId: 86
+    //     };
+    //     const url = `${process.env.base_url}/account/getlist`;
+    //     const successCallback = (ResponseData: any) => {
+    //         if (ResponseData !== null && typeof ResponseData === 'object') {
+    //             setAccount(ResponseData);
+    //         }
+    //     };
+    //     callAPI(url, params, successCallback);
+    // };
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
@@ -189,63 +108,32 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
         account.length <= 0 && setAccountError(true);
 
         if (nameHasError && descriptionHasError && dueDayHasError && dueFormHasError && discountHasError && accountHasError) {
-            try {
-                const token = await localStorage.getItem("token");
-                const params = {
-                    "Id": 0,
-                    "APTermId": editId,
-                    "Description": "f4g4",
-                    "RecordNo": "",
-                    "CompanyId": 86,
-                    "Name": name,
-                    "ParentId": "",
-                    "ParentName": "",
-                    "Status": "active",
-                    "FullyQualifiedName": ""
-                }
-                const config = {
-                    headers: {
-                        Authorization: `bearer ${token}`,
-                    },
-                };
-                const response = await axios.post(
-                    `${process.env.base_url}/apTerm/save`, params,
-                    config
-                );
-
-                const { ResponseStatus, Message } = response.data;
-                if (response.status === 200) {
-                    if (ResponseStatus === "Success") {
-                        Toast.success(`AP Term ${editId ? "updated" : "added"} successfully.`);
-                        onClose();
-                    } else {
-                        onClose();
-                        if (Message != null) {
-                            Toast.error("Error", Message);
-                        }
-                    }
-                }
-                else {
-                    if (Message === null) {
-                        Toast.error("Error", "Please try again later.");
-                    } else {
-                        Toast.error("Error", Message);
-                    }
-                }
-            } catch (error) {
-                console.log(error);
-            }
-        }
-        else {
-            Toast.error("Error", "Please fill required field!");
+            const params = {
+                Id: 0,
+                APTermId: EditId,
+                Description: "",
+                RecordNo: "",
+                CompanyId: 86,
+                Name: name,
+                ParentId: "",
+                ParentName: "",
+                Status: "active",
+                FullyQualifiedName: ""
+            };
+            const url = `${process.env.base_url}/apTerm/save`;
+            const successCallback = () => {
+                Toast.success(`AP Term ${EditId ? "updated" : "added"} successfully.`);
+                onClose();
+            };
+            callAPI(url, params, successCallback);
         }
     };
 
     useEffect(() => {
-        if (onOpen && editId) {
+        if (onOpen && EditId) {
             getAPTermById();
         }
-    }, [editId]);
+    }, [EditId]);
 
     useEffect(() => {
         if (onOpen) {
@@ -300,9 +188,6 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                                 value={name}
                                 getValue={(value: any) => setName(value)}
                                 getError={(e: any) => setNameHasError(e)}
-                                onChange={(e: any) => {
-                                    setNameError(true);
-                                }}
                             ></Text>
                         </div>
                         <div className="flex-1 mt-4">
@@ -316,11 +201,7 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                                 hasError={descriptionError}
                                 getValue={(value: any) => setDescription(value)}
                                 getError={(e: any) => setDescriptionHasError(e)}
-                                onChange={(e: any) => {
-                                    setDescriptionError(true);
-                                }}
-                            >
-                            </Text>
+                            ></Text>
                         </div>
                         <div className="flex-1 mt-4">
                             <Text
@@ -333,9 +214,6 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                                 value={dueDay}
                                 getValue={(value: any) => setDueDay(value)}
                                 getError={(e: any) => setDueDayHasError(e)}
-                                onChange={(e: any) => {
-                                    setDueDayError(true);
-                                }}
                             ></Text>
                         </div>
                         <div className="flex-1 mt-4">
@@ -361,9 +239,6 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                                 value={discount}
                                 getValue={(value: any) => setDiscount(value)}
                                 getError={(e: any) => setDiscountHasError(e)}
-                                onChange={(e: any) => {
-                                    setDiscountError(true);
-                                }}
                             ></Text>
                         </div>
                         <div className="flex-1 mt-4">

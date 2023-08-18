@@ -1,14 +1,8 @@
-import {
-    Button,
-    Close,
-    Text,
-    Toast,
-    Typography
-} from "next-ts-lib";
+import styles from "@/assets/scss/styles.module.scss";
+import { callAPI } from "@/utils/API/callAPI";
+import { Button, Close, Text, Toast, Typography } from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
 import { useEffect, useState } from "react";
-import axios from "axios";
-import styles from "@/assets/scss/styles.module.scss";
 
 interface DrawerProps {
     onOpen: boolean;
@@ -16,7 +10,8 @@ interface DrawerProps {
     EditId?: number;
 }
 const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
-
+    
+    const AccountingTool = 1;
     const [Id, setId] = useState<string>("");
     const [projectId, setProjectId] = useState<string>("");
     const [idHasError, setIdHasError] = useState<boolean>(false);
@@ -25,67 +20,46 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
     const [name, setName] = useState<string>("");
     const [nameError, setNameError] = useState<boolean>(false);
     const [nameHasError, setNameHasError] = useState<boolean>(false);
+    const [clicked, setClicked] = useState(false);
 
     const handleClose = () => {
         onClose();
     };
 
-    //Project Data API
+    //Project Get Data API
     const getProjectById = async () => {
-        try {
-            const token = await localStorage.getItem("token");
-            const params = {
-                "CompanyId": 86,
-                "Id": EditId
-
-            }
-            const config = {
-                headers: {
-                    Authorization: `bearer ${token}`,
-                },
-            };
-            const response = await axios.post(
-                `${process.env.base_url}/project/getbyid `,
-                params,
-                config
-            );
-            const { ResponseStatus, ResponseData, Message } = response.data;
-            if (response.status === 200) {
-                if (ResponseStatus === "Success") {
-                    if (ResponseData !== null && typeof ResponseData === 'object') {
-                        const { Id, ProjectId, Name } = ResponseData;
-                        setId(Id || "");
-                        setProjectId(ProjectId || "");
-                        setName(Name || "");
-                        setIdHasError(true);
-                        setNameHasError(true);
-                    }
-                } else {
-                    if (Message === null) {
-                        Toast.error("Error", "Please try again later.");
-                    } else {
-                        Toast.error("Error", Message);
-                    }
-                }
-            }
-            else {
-                if (Message === null) {
-                    Toast.error("Error", "Please try again later.");
-                } else {
-                    Toast.error("Error", Message);
-                }
-            }
-        } catch (error) {
+        const params = {
+            CompanyId: 86,
+            Id: EditId
         }
-    }
+        const url = `${process.env.base_url}/project/getbyid`;
+        const successCallback = (ResponseData: any) => {
+            if (ResponseData !== null && typeof ResponseData === 'object') {
+                const { Id, ProjectId, Name } = ResponseData;
+                setId(Id || "");
+                setProjectId(ProjectId || "");
+                setName(Name || "");
+                setIdHasError(true);
+                setNameHasError(true);
+            }
+        };
+        callAPI(url, params, successCallback);
+    };
 
     const handleIdChange = (value: any) => {
-        const pattern = /^[a-zA-Z0-9]+$/;
+        const pattern = /^[a-zA-Z0-9]*$/;
         if (pattern.test(value)) {
             setIdError(false);
             setProjectId(value);
         }
     };
+
+    const generatedId = () => {
+        const length = 6;
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let result = Array.from({ length }, () => characters[Math.floor(Math.random() * characters.length)]).join('');
+        return result;
+    }
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
@@ -93,59 +67,28 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
         name.trim().length <= 0 && setNameError(true);
 
         if (!(projectId.length <= 0) && !(name.length <= 0)) {
-            try {
-                const token = await localStorage.getItem("token");
-                const params = {
-                    "Id": Id || 0,
-                    "ProjectId": projectId,
-                    "RecordNo": "",
-                    "CompanyId": 86,
-                    "Name": name,
-                    "Description": "f4g4",
-                    "Category": "Capitalized",
-                    "Status": "active",
-                }
-                const config = {
-                    headers: {
-                        Authorization: `bearer ${token}`,
-                    },
-                };
-                const response = await axios.post(
-                    `${process.env.base_url}/project/save`, params,
-                    config
-                );
-
-                const { ResponseStatus, ResponseData, Message } = response.data;
-                if (response.status === 200) {
-                    if (ResponseStatus === "Success") {
-                        if (ResponseData.ResponseStatus === "Failure") {
-                            Toast.error("Error", ResponseData.Message);
-                        }
-                        else {
-                            Toast.success(`Project ${EditId ? "updated" : "added"} successfully.`);
-                        }
-                        onClose();
-                    } else {
-                        onClose();
-                        if (Message === null) {
-                            Toast.error("Error", "Please try again later.");
-                        } else {
-                            Toast.error("Error", Message);
-                        }
-                    }
+            setClicked(true);
+            const params = {
+                Id: Id || 0,
+                ProjectId: projectId,
+                RecordNo: "",
+                CompanyId: 86,
+                Name: name,
+                Description: "f4g4",
+                Category: "Capitalized",
+                Status: "active"
+            }
+            const url = `${process.env.base_url}/project/save`;
+            const successCallback = (ResponseData: any) => {
+                if (ResponseData.ResponseStatus === "Failure") {
+                    Toast.error("Error", ResponseData.Message);
                 }
                 else {
-                    if (Message === null) {
-                        Toast.error("Error", "Please try again later.");
-                    } else {
-                        Toast.error("Error", Message);
-                    }
+                    Toast.success(`Project ${EditId ? "updated" : "added"} successfully.`);
                 }
-            } catch (error) {
-            }
-        }
-        else {
-            Toast.error("Error", "Please fill required field!");
+                onClose();
+            };
+            callAPI(url, params, successCallback);
         }
     };
 
@@ -161,6 +104,10 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
             setIdError(false);
             setName("");
             setNameError(false);
+            setClicked(false);
+        }
+        if (AccountingTool === 1) {
+            setProjectId(generatedId())
         }
     }, [onOpen]);
 
@@ -171,7 +118,7 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                     className={`fixed top-0 bg-white  right-0 h-full xsm:!w-5/6 sm:!w-2/4 lg:!w-2/6 xl:!w-2/6 2xl:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.rightAnimation}`}
                 >
                     <div className="p-4 flex justify-between items-center border-b border-lightSilver">
-                        <Typography type="label" className="!font-bold !text-lg"> Add Project</Typography>
+                        <Typography type="label" className="!font-bold !text-lg"> {EditId ? "Edit" : "Add"} Project</Typography>
                         <div className="mx-2 cursor-pointer" onClick={handleClose}>
                             <Close variant="medium" />
                         </div>
@@ -188,9 +135,6 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                                 hasError={idError}
                                 getValue={(value: any) => handleIdChange(value)}
                                 getError={(e: any) => setIdHasError(e)}
-                                onChange={(e: any) => {
-                                    setIdError(true);
-                                }}
                             >
                             </Text>
                         </div>
@@ -206,9 +150,6 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                                 value={name}
                                 getValue={(value: any) => setName(value)}
                                 getError={(e: any) => setNameHasError(e)}
-                                onChange={(e: any) => {
-                                    setNameError(true);
-                                }}
                             ></Text>
                         </div>
                     </div>
@@ -225,7 +166,7 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                             <Button
                                 type="submit"
                                 onClick={handleSubmit}
-                                className={`rounded-full font-medium w-28 xsm:!px-1`}
+                                className={`rounded-full font-medium w-28 xsm:!px-1  ${clicked && "opacity-50 pointer-events-none"}`}
                                 variant="btn-primary"
                             >
                                 <Typography type="h6" className="!font-bold"> SAVE</Typography>

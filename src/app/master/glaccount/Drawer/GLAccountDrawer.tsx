@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import styles from "@/assets/scss/styles.module.scss";
+import { callAPI } from '@/utils/API/callAPI';
 import axios from "axios";
 import {
     Button,
@@ -8,7 +9,7 @@ import {
     Typography
 } from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
-import styles from "@/assets/scss/styles.module.scss";
+import { useEffect, useState } from "react";
 
 interface DrawerProps {
     onOpen: boolean;
@@ -35,50 +36,21 @@ const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
 
     //Account Get Data API
     const getAccountById = async () => {
-        try {
-            const token = await localStorage.getItem("token");
-            const params = {
-                "CompanyId": 86,
-                "Id": EditId
-            }
-            const config = {
-                headers: {
-                    Authorization: `bearer ${token}`,
-                },
-            };
-            const response = await axios.post(
-                `${process.env.base_url}/account/getbyid`,
-                params,
-                config
-            );
-            const { ResponseStatus, ResponseData, Message } = response.data;
-            if (response.status === 200) {
-                if (ResponseStatus === "Success") {
-                    if (ResponseData !== null && typeof ResponseData === 'object') {
-                        const { GLAccountId, Name, AccountType } = ResponseData;
-                        setAccountId(GLAccountId);
-                        setName(Name);
-                        setType(AccountType)
-                    }
-                } else {
-                    if (Message === null) {
-                        Toast.error("Error", "Please try again later.");
-                    } else {
-                        Toast.error("Error", Message);
-                    }
-                }
-            }
-            else {
-                if (Message === null) {
-                    Toast.error("Error", "Please try again later.");
-                } else {
-                    Toast.error("Error", Message);
-                }
-            }
-        } catch (error) {
-            console.log(error);
+        const params = {
+            CompanyId: 86,
+            Id: EditId
         }
-    }
+        const url = `${process.env.base_url}/account/getdropdown`;
+        const successCallback = (ResponseData: any) => {
+            if (ResponseData !== null && typeof ResponseData === 'object') {
+                const { GLAccountId, Name, AccountType } = ResponseData;
+                setAccountId(GLAccountId);
+                setName(Name);
+                setType(AccountType)
+            }
+        };
+        callAPI(url, params, successCallback);
+    };
     useEffect(() => {
         if (onOpen && EditId) {
             getAccountById();
@@ -92,59 +64,26 @@ const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
         type.trim().length <= 0 && setTypeError(true);
 
         if (idHasError && nameHasError && typeHasError) {
-            try {
-                const token = await localStorage.getItem("token");
-                const params = {
-                    "Id": 0,
-                    "AccountId": accountId,
-                    "Description": "f4g4",
-                    "RecordNo": "",
-                    "CompanyId": process.env.CompanyId,
-                    "Name": name,
-                    "ParentId": "",
-                    "ParentName": "",
-                    "Status": "active",
-                    "FullyQualifiedName": ""
-                }
-                const config = {
-                    headers: {
-                        Authorization: `bearer ${token}`,
-                    },
-                };
-                const response = await axios.post(
-                    `${process.env.base_url}/account/save`, params,
-                    config
-                );
-
-                const { ResponseStatus, Message } = response.data;
-                if (response.status === 200) {
-                    if (ResponseStatus === "Success") {
-                        Toast.success(`Account ${EditId ? "updated" : "added"} successfully.`);
-                        onClose();
-                    } else {
-                        onClose();
-                        if (Message != null) {
-                            Toast.error("Error", Message);
-                        }
-                    }
-                }
-                else {
-                    if (Message === null) {
-                        Toast.error("Error", "Please try again later.");
-                    } else {
-                        Toast.error("Error", Message);
-                    }
-                }
-            } catch (error) {
-                console.log(error);
+            const params = {
+                Id: 0,
+                AccountId: accountId,
+                Description: "f4g4",
+                RecordNo: "",
+                CompanyId: process.env.CompanyId,
+                Name: name,
+                ParentId: "",
+                ParentName: "",
+                Status: "active",
+                FullyQualifiedName: ""
             }
-        }
-        else {
-            Toast.error("Error", "Please fill required field!");
+            const url = `${process.env.base_url}/account/getdropdown`;
+            const successCallback = (ResponseData: any) => {
+                Toast.success(`Account ${EditId ? "updated" : "added"} successfully.`);
+                onClose();
+            };
+            callAPI(url, params, successCallback);
         }
     };
-
-
 
     useEffect(() => {
         if (onOpen) {
@@ -184,11 +123,7 @@ const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                                 hasError={idError}
                                 getValue={(value: any) => setAccountId(value)}
                                 getError={(e: any) => setIdHasError(e)}
-                                onChange={(e: any) => {
-                                    setIdError(true);
-                                }}
-                            >
-                            </Text>
+                            ></Text>
                         </div>
                         <div className="flex-1 mt-3">
                             <Text
@@ -201,9 +136,6 @@ const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                                 value={name}
                                 getValue={(value: any) => setName(value)}
                                 getError={(e: any) => setNameHasError(e)}
-                                onChange={(e: any) => {
-                                    setNameError(true);
-                                }}
                             ></Text>
                         </div>
                         <div className="flex-1 mt-3">
@@ -217,9 +149,6 @@ const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                                 value={type}
                                 getValue={(value: any) => setType(value)}
                                 getError={(e: any) => setTypeHasError(e)}
-                                onChange={(e: any) => {
-                                    setTypeError(true);
-                                }}
                             ></Text>
                         </div>
                     </div>

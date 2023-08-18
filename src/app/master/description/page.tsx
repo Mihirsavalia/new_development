@@ -1,31 +1,38 @@
 "use client";
 
-import { Button, Close, DataTable, Loader, Modal, ModalAction, ModalContent, ModalTitle, Switch, Toast, Tooltip, Typography } from 'next-ts-lib';
-import React, { useEffect, useRef, useState } from 'react';
-import PlusIcon from '@/assets/Icons/PlusIcon';
-import SearchIcon from '@/assets/Icons/SearchIcon';
 import DrawerOverlay from '@/app/manage/users/DrawerOverlay';
 import MeatballsMenuIcon from "@/assets/Icons/MeatballsMenu";
-import axios from 'axios';
-import DescriptionContent from './Drawer/DescriptionContent';
+import PlusIcon from '@/assets/Icons/PlusIcon';
+import SearchIcon from '@/assets/Icons/SearchIcon';
 import Wrapper from '@/components/common/Wrapper';
+import { callAPI } from '@/utils/API/callAPI';
+import { hasNoToken } from "@/utils/commonFunction";
+import { Button, Close, DataTable, Loader, Modal, ModalAction, ModalContent, ModalTitle, Toast, Text, Tooltip, Typography } from 'next-ts-lib';
+import { useRouter } from "next/navigation";
+import React, { useEffect, useRef, useState } from 'react';
+import DescriptionContent from './Drawer/DescriptionDrawer';
 
 interface descriptionList {
     name: string;
     status: any;
     action: any;
 }
-interface DescriptionProps {
-    onDrawerOpen: boolean;
-    onDrawerClose: () => void;
-}
 
-const Description: React.FC<DescriptionProps> = ({ onDrawerOpen, onDrawerClose }) => {
+const Description: React.FC = () => {
+    const router = useRouter();
+
+    useEffect(() => {
+        hasNoToken(router);
+    }, [router]);
+
     const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
     const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
     const [Id, setId] = useState<number | null>();
     const [descriptionList, setDescriptionList] = useState<descriptionList[]>([]);
     const [refreshTable, setRefreshTable] = useState<boolean>(false);
+    const [isSearch, setIsSearch] = useState<boolean>(false);
+    const [searchValue, setSearchValue] = useState<string>("");
+    const [searchHasError, setSearchHasError] = useState<boolean>(false);
 
     const columns = [
         {
@@ -47,52 +54,40 @@ const Description: React.FC<DescriptionProps> = ({ onDrawerOpen, onDrawerClose }
 
     //Description List API
     const getDescriptionList = async () => {
-        try {
-            const params = {
-                "CompanyId": 86,
-                "APFieldId": 47,
-                "Description": "",
-                "Index": 1,
-                "PageSize": 1000
+        const params = {
+            CompanyId: 86,
+            APFieldId: 47,
+            Description: "",
+            Index: 1,
+            PageSize: 1000
+        };
+        const url = `${process.env.base_url}/description/getlist`;
+        const successCallback = (ResponseData: any) => {
+            if (ResponseData !== null && typeof ResponseData === 'object') {
+                setDescriptionList(ResponseData.APDescriptions);
             }
-            const token = await localStorage.getItem("token");
-            const config = {
-                headers: {
-                    Authorization: `bearer ${token}`,
-                },
-            };
-            const response = await axios.post(
-                `${process.env.base_url}/description/getlist`, params,
-                config
-            );
-            const { ResponseStatus, ResponseData, Message } = response.data;
-            if (response.status === 200) {
-                if (ResponseStatus === "Success") {
-                    if (ResponseData !== null && typeof ResponseData === 'object') {
-                        setDescriptionList(ResponseData.APDescriptions);
-                    }
-                } else {
-                    if (Message === null) {
-                        Toast.error("Error", "Please try again later.");
-                    } else {
-                        Toast.error("Error", Message);
-                    }
-                }
-            }
-            else {
-                if (Message === null) {
-                    Toast.error("Error", "Please try again later.");
-                } else {
-                    Toast.error("Error", Message);
-                }
-            }
-        } catch (error) {
-            console.error(error);
-        }
-    }
+        };
+        callAPI(url, params, successCallback);
+    };
     useEffect(() => {
         getDescriptionList();
     }, [refreshTable]);
+
+    //Delete Description API
+    const handleDescriptionDelete = async () => {
+        modalClose();
+        const params = {
+            Id: Id,
+            CompanyId: 86,
+            APFieldId: 47
+        };
+        const url = `${process.env.base_url}/description/delete`;
+        const successCallback = () => {
+            Toast.success("Success", "Description Remove successfully");
+            getDescriptionList();
+        };
+        callAPI(url, params, successCallback);
+    };
 
     const actionArray = ["Edit", "Remove"];
 
@@ -184,54 +179,14 @@ const Description: React.FC<DescriptionProps> = ({ onDrawerOpen, onDrawerClose }
     const modalClose = () => {
         setIsRemoveOpen(false);
     };
-
-    //Delete Description API
-    const handleDescriptionDelete = async () => {
-        modalClose();
-        try {
-            const token = await localStorage.getItem("token");
-            const params = {
-                Id: Id,
-                CompanyId: 86,
-                APFieldId: 47
-            };
-            const config = {
-                headers: {
-                    Authorization: `bearer ${token}`,
-                },
-            };
-            const response = await axios.post(
-                `${process.env.base_url}/description/delete`,
-                params,
-                config
-            );
-            console.log("🚀 ~ file: page.tsx:209 ~ handleDescriptionDelete ~ response:", response)
-            const { ResponseStatus, ResponseData, Message } = response.data;
-            if (response.status === 200) {
-                if (ResponseStatus === "Success") {
-                    if (ResponseData !== null && typeof ResponseData === "object") {
-                        getDescriptionList();
-                        Toast.success("Success", "Description Remove successfully");
-                    }
-                } else {
-                    if (Message === null) {
-                        Toast.error("Error", "Please try again later.");
-                    } else {
-                        Toast.error("Error", Message);
-                    }
-                }
-            } else {
-                if (Message === null) {
-                    Toast.error("Error", "Please try again later.");
-                } else {
-                    Toast.error("Error", Message);
-                }
-            }
-        } catch (error) {
-            console.error(error);
-        }
+    const handleSearchValue = (value: string) => {
+        setIsSearch(true);
+        setSearchValue(value);
     };
-
+    const handleSearchClose = () => {
+        setIsSearch(false);
+        setSearchValue("");
+    };
     return (
         <Wrapper masterSettings={true}>
             <div>
@@ -242,9 +197,36 @@ const Description: React.FC<DescriptionProps> = ({ onDrawerOpen, onDrawerClose }
                         </Typography>
                     </div>
                     <div className="flex items-center px-[10px]">
-                        <Tooltip content={"Search"} position="bottom" className='!z-[2]'>
-                            <SearchIcon />
-                        </Tooltip>
+                        {isSearch
+                            ? <div className="flex relative items-center">
+                                <Text
+                                    id="searching"
+                                    name="searching"
+                                    value={searchValue}
+                                    placeholder="Search"
+                                    className='pl-8 border-0 rounded-full'
+                                    getValue={(value: any) => handleSearchValue(value)}
+                                    getError={(e: any) => setSearchHasError(e)}
+                                ></Text>
+                                <div className="flex absolute left-2 cursor-pointer">
+                                    <SearchIcon />
+                                </div>
+                                {isSearch && (
+                                    <div
+                                        className="flex absolute -top-2 -right-2 cursor-pointer"
+                                        onClick={handleSearchClose}
+                                    >
+                                        <Tooltip position="bottom" content="close" className='!z-[2]'>
+                                            <Close variant="small" />
+                                        </Tooltip>
+                                    </div>
+                                )}
+                            </div>
+                            : <Tooltip content={"Search"} position="bottom" className='!z-[2]'>
+                                <div onClick={() => { setIsSearch(true) }}>
+                                    <SearchIcon />
+                                </div>
+                            </Tooltip>}
                         <Button
                             className="rounded-full ml-2 !px-6 "
                             variant="btn-primary"

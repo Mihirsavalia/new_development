@@ -1,16 +1,18 @@
 "use client"
-import { Button, Close, Loader, Modal, ModalAction, ModalContent, ModalTitle, Toast, Tooltip, Typography } from 'next-ts-lib';
-import React, { useState } from 'react';
 import PlusIcon from '@/assets/Icons/PlusIcon';
 import SearchIcon from '@/assets/Icons/SearchIcon';
 import SyncIcon from "@/assets/Icons/SyncIcon";
-import Class from './content/Class';
-import Department from './content/Department';
-import Location from './content/Location';
-import Project from './content/Project';
-import DrawerOverlay from '@/app/manage/users/DrawerOverlay';
-import axios from 'axios';
 import Wrapper from '@/components/common/Wrapper';
+import { callAPI } from '@/utils/API/callAPI';
+import { hasNoToken } from "@/utils/commonFunction";
+import { Button, Close, Modal, ModalAction, ModalContent, ModalTitle, Text, Toast, Tooltip, Typography } from 'next-ts-lib';
+import "next-ts-lib/dist/index.css";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from 'react';
+import Class from './Content/ClassContent';
+import Department from './Content/DepartmentContent';
+import Location from './Content/LocationContent';
+import Project from './Content/ProjectContent';
 
 const tabs = [
     { id: "class", label: "CLASS" },
@@ -20,10 +22,33 @@ const tabs = [
 ];
 
 const Dimension: React.FC = () => {
+    const router = useRouter();
+
+    useEffect(() => {
+        hasNoToken(router);
+    }, [router]);
+
     const [selectedTabIndex, setSelectedTabIndex] = useState<number>(0);
     const [tab, setTab] = useState<string>("class");
     const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
     const [isSyncModalOpen, setIsSyncModalOpen] = useState<boolean>(false);
+
+    const [isSearch, setIsSearch] = useState<boolean>(false);
+    const [searchValue, setSearchValue] = useState<string>("");
+    const [searchHasError, setSearchHasError] = useState<boolean>(false);
+
+    //Sync API
+    const handleSync = async () => {
+        modalClose();
+        const params = {
+            CompanyId: 86
+        }
+        const url = `${process.env.base_url}/${tab}/sync`;
+        const successCallback = () => {
+            Toast.success("Success", `${tab} sync successfully`);
+        };
+        callAPI(url, params, successCallback);
+    };
 
     const handleToggleChange = (tab: any) => {
         setIsOpenDrawer(true);
@@ -39,48 +64,14 @@ const Dimension: React.FC = () => {
         setSelectedTabIndex(index);
         setIsOpenDrawer(false);
     }
-
-    //Sync API
-    const handleSync = async () => {
-        modalClose();
-        try {
-            const token = await localStorage.getItem("token");
-            const params = {
-                "CompanyId": 86,
-            }
-            const config = {
-                headers: {
-                    Authorization: `bearer ${token}`,
-                },
-            };
-            const response = await axios.post(
-                `${process.env.base_url}/${tab}/sync`,
-                params,
-                config
-            );
-            const { ResponseStatus, ResponseData, Message } = response.data;
-            if (response.status === 200) {
-                if (ResponseStatus === "Success") {
-                    Toast.success("Success", `${tab} sync successfully`);
-                } else {
-                    if (Message === null) {
-                        Toast.error("Error", "Please try again later.");
-                    } else {
-                        Toast.error("Error", Message);
-                    }
-                }
-            }
-            else {
-                if (Message === null) {
-                    Toast.error("Error", "Please try again later.");
-                } else {
-                    Toast.error("Error", Message);
-                }
-            }
-        } catch (error) {
-            console.error(error);
-        }
-    }
+    const handleSearchValue = (value: string) => {
+        setIsSearch(true);
+        setSearchValue(value);
+    };
+    const handleSearchClose = () => {
+        setIsSearch(false);
+        setSearchValue("");
+    };
 
     return (
         <Wrapper masterSettings={true}>
@@ -101,9 +92,37 @@ const Dimension: React.FC = () => {
 
                 </div>
                 <div className="flex items-center px-[10px]">
-                    <Tooltip content={"Search"} position="bottom" className='!z-[2]'>
-                        <SearchIcon />
-                    </Tooltip>
+                    {isSearch
+                        ? <div className="flex relative items-center">
+                            <Text
+                                id="searching"
+                                name="searching"
+                                value={searchValue}
+                                placeholder="Search"
+                                className='pl-8 border-0 rounded-full'
+                                getValue={(value: any) => handleSearchValue(value)}
+                                getError={(e: any) => setSearchHasError(e)}
+                            ></Text>
+                            <div className="flex absolute left-2 cursor-pointer">
+                                <SearchIcon />
+                            </div>
+                            {isSearch && (
+                                <div
+                                    className="flex absolute -top-2 -right-2 cursor-pointer"
+                                    onClick={handleSearchClose}
+                                >
+                                    <Tooltip position="bottom" content="close" className='!z-[2]'>
+                                        <Close variant="small" />
+                                    </Tooltip>
+                                </div>
+                            )}
+                        </div>
+                        : <Tooltip content={"Search"} position="bottom" className='!z-[2]'>
+                            <div onClick={() => { setIsSearch(true) }}>
+                                <SearchIcon />
+                            </div>
+                        </Tooltip>}
+
                     <Tooltip content={`Sync ${tab}`} position="bottom" className='!z-[2] !p-0 !m-0'>
                         <div onClick={() => setIsSyncModalOpen(true)}>
                             <SyncIcon />

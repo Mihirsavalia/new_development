@@ -1,34 +1,31 @@
-import { useEffect, useState } from "react";
-
-// Lib components
 import {
+  Avatar,
   Button,
   Close,
+  Email,
   Select,
-  Avatar,
   Tel,
   Text,
   Toast,
-  Email,
 } from "next-ts-lib";
-
-// icons
+import React, { useEffect, useState } from "react";
 import EditIcon from "@/assets/Icons/EditIcon";
 import axios from "axios";
 import router from "next/router";
-
-const EntityTypeList = [
-  { label: "Profit Organization", value: 1 },
-  { label: "Non-profit Organization", value: 2 },
-];
 
 interface DrawerProps {
   onOpen: boolean;
   onClose: () => void;
   hasEditId: any;
-  CompanyData?: any[] |null;
+  CompanyData?: any[] | null;
   accountingTool: number | null | undefined;
+  getCompanyList: any;
 }
+
+const EntityTypeList = [
+  { label: "Profit Organization", value: 1 },
+  { label: "Non-profit Organization", value: 2 },
+];
 
 const Drawer: React.FC<DrawerProps> = ({
   onOpen,
@@ -36,25 +33,25 @@ const Drawer: React.FC<DrawerProps> = ({
   hasEditId,
   CompanyData,
   accountingTool,
+  getCompanyList,
 }: any) => {
-
-  const [Id, setId] = useState("");
+  const [Id, setId] = useState(0);
   const [companyName, setCompanyName] = useState("");
   const [companyNameError, setCompanyNameError] = useState(false);
   const [companyNameHasError, setCompanyNameHasError] = useState(false);
-  const [entityType, setEntityType] = useState(-1);
+  const [entityType, setEntityType] = useState(0);
   const [entityTypeError, setEntityTypeError] = useState(false);
   const [entityTypeHasError, setEntityTypeHasError] = useState(false);
   const [address, setAddress] = useState("");
   const [addressError, setAddressError] = useState(false);
   const [addressHasError, setAddressHasError] = useState(false);
-  const [country, setCountry] = useState(-1);
+  const [country, setCountry] = useState(0);
   const [countryError, setCountryError] = useState(false);
   const [countryHasError, setCountryHasError] = useState(false);
-  const [state, setState] = useState(-1);
+  const [state, setState] = useState(0);
   const [stateError, setStateError] = useState(false);
   const [stateHasError, setStateHasError] = useState(false);
-  const [city, setCity] = useState(-1);
+  const [city, setCity] = useState(0);
   const [cityError, setCityError] = useState(false);
   const [cityHasError, setCityHasError] = useState(false);
   const [zipCode, setZipCode] = useState("");
@@ -78,64 +75,97 @@ const Drawer: React.FC<DrawerProps> = ({
 
   useEffect(() => {
     if (CompanyData) {
-      setCompanyName(CompanyData?.Name);
-      setAccountToolCompanyId(CompanyData?.AccToolCompanyId);
-      setEntityType(CompanyData?.EntityType);
-      setAddress(CompanyData?.Address);
-      setCountry(CompanyData?.CountryId);
-      setState(CompanyData?.StateId);
-      setCity(CompanyData?.CityId);
-      setZipCode(CompanyData?.ZipCode);
-      setPhone(CompanyData?.Phone);
-      setEmail(CompanyData?.Email);
-      setDeletedFile(CompanyData?.DeletedFile);
+      console.log(CompanyData);
+      setCompanyName(CompanyData.Name);
+      CompanyData.Name !== undefined &&
+        CompanyData.Name !== null &&
+        CompanyData.Name.length > 0 &&
+        setCompanyNameHasError(true);
+      setAccountToolCompanyId(CompanyData.AccToolCompanyId);
+      setEntityType(CompanyData.EntityType);
+      CompanyData.EntityType > 0 && setEntityTypeHasError(true);
+      setAddress(CompanyData.Address);
+      CompanyData.Address !== undefined &&
+        CompanyData.Address !== null &&
+        CompanyData.Address.length > 0 &&
+        setAddressHasError(true);
+      setCountry(CompanyData.CountryId);
+      CompanyData.CountryId > 0 && setCompanyNameHasError(true);
+      setState(CompanyData.StateId);
+      CompanyData.StateId > 0 && setStateHasError(true);
+      setCity(CompanyData.CityId);
+      CompanyData.CityId > 0 && setCityHasError(true);
+      setZipCode(CompanyData.ZipCode);
+      CompanyData.ZipCode !== undefined &&
+        CompanyData.ZipCode !== null &&
+        CompanyData.ZipCode.length > 0 &&
+        setZipCodeHasError(true);
+      setPhone(CompanyData.Phone);
+      CompanyData.Phone !== undefined &&
+        CompanyData.Phone !== null &&
+        CompanyData.Phone.length > 0 &&
+        setPhoneHasError(true);
+      setEmail(CompanyData.Email);
+      CompanyData.Email !== undefined &&
+        CompanyData.Email !== null &&
+        CompanyData.Email.length > 0 &&
+        setEmailHasError(true);
+      // setDeletedFile(CompanyData.DeletedFile);
     }
-
   }, [CompanyData]);
 
   // Get By Company ID
-  useEffect(() => {
-    const getCompanyListById = async () => {
-      try {
-        const accessToken = localStorage.getItem("token");
-        const headers = {
-          Authorization: accessToken,
-        };
+  const getCompanyListById = async () => {
+    try {
+      const accessToken = await localStorage.getItem("token");
+      const headers = {
+        Authorization: accessToken,
+      };
 
-        const response = await axios.get(
-          `${process.env.base_url}/company/getbyid?companyId=${hasEditId}`,
-          { headers: headers }
-        );
+      const response = await axios.get(
+        `${process.env.base_url}/company/getbyid?companyId=${hasEditId}`,
+        { headers: headers }
+      );
 
-        if (response.status === 200) {
-          const responseData = response.data.ResponseData;
-          setId(responseData?.Id || 0);
-          setCompanyName(responseData?.Name);
-          setAccountToolCompanyId(responseData?.AccToolCompanyId);
-          setEntityType(responseData?.EntityType);
-          setAddress(responseData?.Address);
-          setCountry(responseData?.CountryId);
-          setState(responseData?.StateId);
-          setCity(responseData?.CityId);
-          setZipCode(responseData?.ZipCode);
-          setPhone(responseData?.Phone);
-          setEmail(responseData?.Email);
-          setDeletedFile(responseData?.DeletedFile);
-          setImagePreview(responseData?.CompanyImage);
-          CountryDropDown();
-          StateDropDown(responseData?.CountryId);
-          CityDropDown(responseData?.StateId);
-        }
-      } catch (error: any) {
-        if (error?.response.status === 401 || 404) {
-          router.push("/signin");
-        }
-        console.log(error);
+      if (response.status === 200) {
+        const responseData = response.data.ResponseData;
+        console.log(responseData);
+        setId(responseData.Id);
+        setCompanyName(responseData.Name);
+        responseData.Name.length > 0 && setCompanyNameHasError(true);
+        setAccountToolCompanyId(responseData.AccToolCompanyId);
+        setEntityType(responseData.EntityType);
+        responseData.EntityType > 0 && setEntityTypeHasError(true);
+        setAddress(responseData.Address);
+        responseData.Address.length > 0 && setAddressHasError(true);
+        setCountry(responseData.CountryId);
+        responseData.CountryId > 0 && setCountryHasError(true);
+        setState(responseData.StateId);
+        responseData.StateId > 0 && setStateHasError(true);
+        setCity(responseData.CityId);
+        responseData.CityId > 0 && setCityHasError(true);
+        setZipCode(responseData.ZipCode);
+        responseData.ZipCode.length > 0 && setZipCodeHasError(true);
+        setPhone(responseData.Phone);
+        responseData.Phone.length > 0 && setPhoneHasError(true);
+        setEmail(responseData.Email);
+        responseData.Email.length > 0 && setEmailHasError(true);
+        // setDeletedFile(responseData?.DeletedFile);
+        // setImagePreview(responseData?.CompanyImage);
+        CountryDropDown();
+        StateDropDown(responseData.CountryId);
+        CityDropDown(responseData.StateId);
       }
-    };
-    if (hasEditId) {
-      getCompanyListById();
+    } catch (error: any) {
+      if (error.response.status === 401 || 404) {
+        router.push("/signin");
+      }
+      console.error(error);
     }
+  };
+
+  useEffect(() => {
+    hasEditId && getCompanyListById();
   }, [hasEditId]);
 
   // Country DropDownMenuItem
@@ -147,16 +177,20 @@ const Drawer: React.FC<DrawerProps> = ({
       };
 
       const response = await axios.get(
-        `${process.env.base_url}/country/list`,
+        `${process.env.api_profile}/country/list`,
         { headers: headers }
       );
 
       if (response.status === 200) {
-        const responseData = await response.data.ResponseData;
-        setCountryDropDownData(responseData);
+        let responseData = await response.data.ResponseData;
+        if (!responseData) {
+          responseData = null;
+        } else {
+          setCountryDropDownData(response.data.ResponseData);
+        }
       }
     } catch (error: any) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -169,16 +203,20 @@ const Drawer: React.FC<DrawerProps> = ({
       };
 
       const response = await axios.get(
-        `${process.env.base_url}/state/list?countryId=${country}`,
+        `${process.env.api_profile}/state/list?countryId=${country}`,
         { headers: headers }
       );
 
       if (response.status === 200) {
-        const responseData = await response.data.ResponseData;
-        setStateDropDownData(responseData);
+        let responseData = await response.data.ResponseData;
+        if (!responseData) {
+          responseData = null;
+        } else {
+          setStateDropDownData(response.data.ResponseData);
+        }
       }
     } catch (error: any) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -191,16 +229,20 @@ const Drawer: React.FC<DrawerProps> = ({
       };
 
       const response = await axios.get(
-        `${process.env.base_url}/city/list?stateId=${state}`,
+        `${process.env.api_profile}/city/list?stateId=${state}`,
         { headers: headers }
       );
 
       if (response.status === 200) {
-        const responseData = await response.data.ResponseData;
-        setCityDropDownData(responseData);
+        let responseData = await response.data.ResponseData;
+        if (!responseData) {
+          responseData = null;
+        } else {
+          setCityDropDownData(response.data.ResponseData);
+        }
       }
     } catch (error: any) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -210,54 +252,47 @@ const Drawer: React.FC<DrawerProps> = ({
     CityDropDown(1);
   }, []);
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
-    e.preventDefault();
-
-    (companyName?.trim().length <= 0 || companyName === undefined) &&
-      setCompanyNameError(true);
-    (entityType <= -1 || entityType === undefined || entityType === 0) &&
-      setEntityTypeError(true);
-    (address?.trim().length <= 0 || address === undefined) &&
-      setAddressError(true);
-    (country <= -1 || country === undefined || country === 0) &&
-      setCountryError(true);
-    (state <= -1 || state === undefined || state === 0) && setStateError(true);
-    (city <= -1 || city === undefined || city === 0) && setCityError(true);
-    (zipCode?.trim().length <= 0 || zipCode === undefined) &&
-      setZipCodeError(true);
-    (phone?.trim().length <= 0 || phone === undefined) && setPhoneError(true);
-    (email?.trim().length <= 0 || email === undefined) && setEmailError(true);
-    (deletedFile?.trim().length <= 0 || deletedFile === undefined) &&
-      setDeletedFileError(true);
-
-    if (
-      companyNameHasError &&
-      entityTypeHasError &&
-      addressHasError &&
-      countryHasError &&
-      stateHasError &&
-      cityHasError &&
-      zipCodeHasError &&
-      phoneHasError &&
-      emailHasError &&
-      deletedFileHasError
-    ) {
-      saveCompany();
-    } else if (hasEditId) {
-      saveCompany();
-    }
+  const clearData = () => {
+    setCompanyName("");
+    setCompanyNameError(false);
+    setCompanyNameHasError(false);
+    setEntityType(0);
+    setEntityTypeError(false);
+    setEntityTypeHasError(false);
+    setAddress("");
+    setAddressError(false);
+    setAddressHasError(false);
+    setCountry(0);
+    setCountryError(false);
+    setCountryHasError(false);
+    setState(0);
+    setStateError(false);
+    setStateHasError(false);
+    setCity(0);
+    setCityError(false);
+    setCityHasError(false);
+    setZipCode("");
+    setZipCodeError(false);
+    setZipCodeHasError(false);
+    setPhone("");
+    setPhoneError(false);
+    setPhoneHasError(false);
+    setEmail("");
+    setEmailError(false);
+    setEmailHasError(false);
+    onClose();
   };
 
   const saveCompany = async () => {
     try {
-      const accessToken = localStorage.getItem("token");
+      const accessToken = await localStorage.getItem("token");
       const headers = {
         Authorization: accessToken,
       };
       const response = await axios.post(
         `${process.env.base_url}/company/save`,
         {
-          Id: Id || 0,
+          Id: Id > 0 ? Id : 0,
           Name: companyName,
           EntityType: entityType,
           Address: address,
@@ -269,7 +304,7 @@ const Drawer: React.FC<DrawerProps> = ({
           Email: email,
           AccountingTool: accountingTool,
           AccToolCompanyId: accountToolCompanyId,
-          CompanyImage: binaryImage,
+          // CompanyImage: binaryImage,
           // IntacctUserId: null,
           // IntacctPassword: null,
           // IntacctCompanyId: null,
@@ -280,33 +315,64 @@ const Drawer: React.FC<DrawerProps> = ({
 
       if (response.status === 200) {
         if (response.data.ResponseStatus === "Success") {
-          if (Id) {
-            Toast.success("Company updated successfully");
-          } else {
-            Toast.success("Company saved successfully");
-          }
-          onClose();
-          window.location.reload();
+          Toast.success(`Company ${Id ? "updated" : "created"} successfully`);
+          clearData();
+          getCompanyList();
         } else {
           onClose();
           const data = response.data.Message;
           if (data === null) {
-            Toast.error("Error", "Please try again later.");
+            Toast.error("Please try again later.");
           } else {
-            Toast.error("Error", data);
+            Toast.error(data);
           }
         }
       } else {
         onClose();
         const data = response.data.Message;
         if (data === null) {
-          Toast.error("Error", "Failed Please try again.");
+          Toast.error("Failed Please try again.");
         } else {
-          Toast.error("Error", data);
+          Toast.error(data);
         }
       }
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const handleSubmit = (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+
+    (companyName.trim().length <= 0 || companyName === undefined) &&
+      setCompanyNameError(true);
+    (entityType <= 0 || entityType === undefined || entityType === 0) &&
+      setEntityTypeError(true);
+    (address?.trim().length <= 0 || address === undefined) &&
+      setAddressError(true);
+    (country <= 0 || country === undefined || country === 0) &&
+      setCountryError(true);
+    (state <= 0 || state === undefined || state === 0) && setStateError(true);
+    (city <= 0 || city === undefined || city === 0) && setCityError(true);
+    (zipCode.trim().length <= 0 || zipCode === undefined) &&
+      setZipCodeError(true);
+    (phone === null || phone === undefined || phone.length <= 0) &&
+      setPhoneError(true);
+    (email === null || email.length <= 0 || email === undefined) &&
+      setEmailError(true);
+
+    if (
+      companyNameHasError &&
+      entityTypeHasError &&
+      addressHasError &&
+      countryHasError &&
+      stateHasError &&
+      cityHasError &&
+      zipCodeHasError &&
+      phoneHasError &&
+      emailHasError
+    ) {
+      saveCompany();
     }
   };
 
@@ -347,77 +413,22 @@ const Drawer: React.FC<DrawerProps> = ({
     fileInput && fileInput.click();
   };
 
-  const onUploadImage = (e: any) => {
-    if (e.target?.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onload = async function (e) {
-        const result = e.target?.result;
-        if (result && typeof result === "string") {
-          setImagePreview(result);
-
-          const base64Data = result.split(",")[1];
-
-          // Convert base64 to binary
-          const binaryData = atob(base64Data);
-          SetBinaryImage(binaryData);
-          const byteArray = new Uint8Array(binaryData.length);
-          for (let i = 0; i < binaryData.length; i++) {
-            byteArray[i] = binaryData.charCodeAt(i);
-          }
-
-          const formData = new FormData();
-          const blob = new Blob([byteArray], { type: file.type });
-
-          formData.append("image", blob, file.name);
-
-          try {
-            const accessToken = localStorage.getItem("token");
-            const headers = {
-              Authorization: accessToken,
-            };
-
-            const response = await axios.post(
-              `${process.env.base_url}/company/upload/image`,
-              {
-                companyId: Id || 0,
-                file: blob.type,
-                fileName: file.name,
-              },
-              {
-                headers: headers,
-              }
-            );
-
-            if (response.status === 200) {
-              console.log("Image uploaded successfully");
-            } else {
-              console.error("Image upload failed");
-            }
-          } catch (error) {
-            console.error("Error uploading image:", error);
-          }
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
   if (!onOpen) return null;
 
   return (
     <>
       {/*  Drawer */}
       <div
-        className={`fixed right-0 top-0 h-full overflow-y-auto lg:w-5/12 text-black transform bg-white z-[999] ${
-          onOpen ? "translate-x-0" : "translate-x-full"
-        } transition-transform duration-500 ease-in-out`}
+        className={`fixed top-0 h-full overflow-y-auto lg:w-5/12 text-black transform bg-white z-30 ${
+          onOpen ? "right-0" : "right-full"
+        } transition-transform duration-2000 linear`}
       >
         <div className="flex justify-between py-[13px] border-b-[1px] border-[#D8D8D8] ">
           <div className="text-black text-[18px] mx-6 font-bold">
             {hasEditId ? "Edit " : "Add "}
             Company
           </div>
-          <div onClick={onClose} className="mx-3">
+          <div onClick={clearData} className="mx-3">
             <Close variant="medium" />
           </div>
         </div>
@@ -430,7 +441,7 @@ const Drawer: React.FC<DrawerProps> = ({
                 imageUrl={imagePreview}
               />
               <div
-                className="absolute bottom-0 left-11 cursor-pointer bg-[#EEF4F8] rounded p-0.5"
+                className="absolute bottom-0 left-11 bg-[#EEF4F8] rounded p-0.5"
                 onClick={handleEditIconClick}
               >
                 <EditIcon />
@@ -440,7 +451,8 @@ const Drawer: React.FC<DrawerProps> = ({
                 id="imageUpload"
                 accept=".png, .jpg, .jpeg"
                 className="hidden"
-                onChange={onUploadImage}
+                // onChange={onUploadImage}
+                disabled
               />
             </div>
             <div className=" text-black text-[16px] font-bold mt-7">
@@ -499,6 +511,10 @@ const Drawer: React.FC<DrawerProps> = ({
                   getValue={(value) => {
                     setCountry(value);
                     StateDropDown(value);
+                    setState(0);
+                    setStateHasError(false);
+                    setCity(0);
+                    setCityHasError(false);
                   }}
                   getError={(err) => setCountryHasError(err)}
                   hasError={countryError}
@@ -515,6 +531,8 @@ const Drawer: React.FC<DrawerProps> = ({
                   getValue={(value) => {
                     setState(value);
                     CityDropDown(value);
+                    setCity(0);
+                    setCityHasError(false);
                   }}
                   getError={(err) => setStateHasError(err)}
                   hasError={stateError}
@@ -541,12 +559,14 @@ const Drawer: React.FC<DrawerProps> = ({
                 <Text
                   label="Zip/Postal Code"
                   value={zipCode}
-                  maxLength={7}
+                  noSpecialChar
+                  noText
+                  maxChar={7}
                   getValue={(e) => setZipCode(e)}
                   getError={(err) => setZipCodeHasError(err)}
                   hasError={zipCodeError}
                   validate
-                  className="!pt-0"
+                  className="!pt-0 [appearance:number] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
               </div>
             </div>
@@ -577,31 +597,29 @@ const Drawer: React.FC<DrawerProps> = ({
                 />
               </div>
             </div>
-            <div className=" text-black text-[16px] font-bold mt-7">
-              Other Details
+            {/* <div className=" text-black text-[16px] font-bold mt-7">
+            Other Details
+          </div> */}
+            {/* <div className="grid lg:grid-cols-2 md:grid-cols-1 mt-1">
+            <div className="lg:w-56 md:w-full">
+              <Text
+                value={deletedFile}
+                label="Delete File in Days"
+                className="!pt-0"
+                maxLength={3}
+                id="delete"
+                getValue={(e) => setDeletedFile(e)}
+                getError={(err) => setDeletedFileHasError(err)}
+              ></Text>
             </div>
-            <div className="grid lg:grid-cols-2 md:grid-cols-1 mt-1">
-              <div className="lg:w-56 md:w-full">
-                <Text
-                  value={deletedFile}
-                  label="Delete File in Days"
-                  className="!pt-0"
-                  maxLength={3}
-                  id="delete"
-                  validate
-                  getValue={(e) => setDeletedFile(e)}
-                  getError={(err) => setDeletedFileHasError(err)}
-                  hasError={deletedFileError}
-                ></Text>
-              </div>
-            </div>
+          </div> */}
           </div>
           <div className="w-full flex justify-end mt-8 border-t-[1px] py-3.5 px-2 border-[#D8D8D8] bottom-0">
             <div>
               <Button
                 className="rounded-full btn-sm font-semibold mx-2 !w-24 !h-[36px]"
                 variant="btn-outline-primary"
-                onClick={onClose}
+                onClick={clearData}
               >
                 CANCEL
               </Button>

@@ -1,14 +1,8 @@
-import {
-    Button,
-    Close,
-    Text,
-    Toast,
-    Typography
-} from "next-ts-lib";
+import styles from "@/assets/scss/styles.module.scss";
+import { callAPI } from "@/utils/API/callAPI";
+import { Button, Close, Text, Toast, Typography } from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
 import { useEffect, useState } from "react";
-import axios from "axios";
-import styles from "@/assets/scss/styles.module.scss";
 
 interface DrawerProps {
     onOpen: boolean;
@@ -28,118 +22,29 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
         onClose();
     };
 
-    //Description Get Data API
-    // const getDescriptionById = async () => {
-    //     try {
-    //         const token = await localStorage.getItem("token");
-    //         const params = {
-    //             "CompanyId": 86,
-    //             "Id": EditId
-
-    //         }
-    //         const config = {
-    //             headers: {
-    //                 Authorization: `bearer ${token}`,
-    //             },
-    //         };
-    //         const response = await axios.post(
-    //             `${process.env.base_url}/description/getbyid `,
-    //             params,
-    //             config
-    //         );
-    //         const { ResponseStatus, ResponseData, Message } = response.data;
-    //         if (response.status === 200) {
-    //             if (ResponseStatus === "Success") {
-    //                 if (ResponseData !== null && typeof ResponseData === 'object') {
-    //                     const { Id, LocationId, Name } = ResponseData;
-    //                     // setId(Id || "");
-    //                     // setId(LocationId || "");
-    //                     setDescription(Name || "");
-    //                     // setIdHasError(true);
-    //                     setDescriptionHasError(true);
-    //                 }
-    //             } else {
-    //                 if (Message === null) {
-    //                     Toast.error("Error", "Please try again later.");
-    //                 } else {
-    //                     Toast.error("Error", Message);
-    //                 }
-    //             }
-    //         }
-    //         else {
-    //             if (Message === null) {
-    //                 Toast.error("Error", "Please try again later.");
-    //             } else {
-    //                 Toast.error("Error", Message);
-    //             }
-    //         }
-    //     } catch (error) {
-    //     }
-    // }
-
-    // const handleIdChange = (value: any) => {
-    //     const pattern = /^[a-zA-Z0-9]+$/;
-    //     if (pattern.test(value)) {
-    //         setIdError(false);
-    //         setId(value);
-    //     }
-    // };
-
     const handleSubmit = async (e: any) => {
         e.preventDefault();
         // Id.trim().length <= 0 && setIdError(true);
         description.trim().length <= 0 && setDescriptionError(true);
 
         if (!(description.trim().length <= 0)) {
-            try {
-                const token = await localStorage.getItem("token");
-                const params = {
-                    Id: 0,
-                    CompanyId: 86,
-                    APFieldId: 47,
-                    Description: description
-                }
-                const config = {
-                    headers: {
-                        Authorization: `bearer ${token}`,
-                    },
-                };
-                const response = await axios.post(
-                    `${process.env.base_url}/description/save`, params,
-                    config
-                );
-
-                const { ResponseStatus, ResponseData, Message } = response.data;
-                if (response.status === 200) {
-                    if (ResponseStatus === "Success") {
-                        if (ResponseData.ResponseStatus === "Failure") {
-                            Toast.error("Error", ResponseData.Message);
-                        }
-                        else {
-                            Toast.success(`Description ${EditId ? "updated" : "added"} successfully.`);
-                        }
-                        onClose();
-                    } else {
-                        onClose();
-                        if (Message === null) {
-                            Toast.error("Error", "Please try again later.");
-                        } else {
-                            Toast.error("Error", Message);
-                        }
-                    }
+            const params = {
+                Id: 0,
+                CompanyId: 86,
+                APFieldId: 47,
+                Description: description
+            }
+            const url = `${process.env.base_url}/description/save`;
+            const successCallback = (ResponseData: any) => {
+                if (ResponseData.ResponseStatus === "Failure") {
+                    Toast.error("Error", ResponseData.Message);
                 }
                 else {
-                    if (Message === null) {
-                        Toast.error("Error", "Please try again later.");
-                    } else {
-                        Toast.error("Error", Message);
-                    }
+                    Toast.success(`Description ${EditId ? "updated" : "added"} successfully.`);
                 }
-            } catch (error) {
-            }
-        }
-        else {
-            Toast.error("Error", "Please fill required field!");
+                onClose();
+            };
+            callAPI(url, params, successCallback);
         }
     };
 
@@ -201,9 +106,6 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
                                 value={description}
                                 getValue={(value: any) => setDescription(value)}
                                 getError={(e: any) => setDescriptionHasError(e)}
-                                onChange={(e: any) => {
-                                    setDescriptionError(true);
-                                }}
                             ></Text>
                         </div>
                     </div>

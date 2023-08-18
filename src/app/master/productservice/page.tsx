@@ -1,16 +1,19 @@
 "use client";
 
-import { Button, Close, DataTable, Loader, Modal, ModalAction, ModalContent, ModalTitle, Switch, Toast, Tooltip, Typography } from 'next-ts-lib';
-import React, { useEffect, useRef, useState } from 'react';
+import DrawerOverlay from '@/app/manage/users/DrawerOverlay';
+import MeatballsMenuIcon from "@/assets/Icons/MeatballsMenu";
 import PlusIcon from '@/assets/Icons/PlusIcon';
 import SearchIcon from '@/assets/Icons/SearchIcon';
 import SyncIcon from "@/assets/Icons/SyncIcon";
-import DrawerOverlay from '@/app/manage/users/DrawerOverlay';
-import MeatballsMenuIcon from "@/assets/Icons/MeatballsMenu";
-import axios from 'axios';
-import ProductContent from './Drawer/Product&ServiceContent';
 import Wrapper from '@/components/common/Wrapper';
+import { hasNoToken } from "@/utils/commonFunction";
+import axios from 'axios';
+import { Button, Close, DataTable, Loader, Modal, ModalAction, ModalContent, ModalTitle, Toast, Text, Tooltip, Typography } from 'next-ts-lib';
 import "next-ts-lib/dist/index.css";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useRef, useState } from 'react';
+import ProductContent from './Drawer/Product&ServiceDrawer';
+import { callAPI } from '@/utils/API/callAPI';
 
 interface productList {
     name: string;
@@ -19,13 +22,21 @@ interface productList {
 }
 
 const Product_Service: React.FC = () => {
-    const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
+    const router = useRouter();
 
+    useEffect(() => {
+        hasNoToken(router);
+    }, [router]);
+
+    const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
     const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
     const [Id, setId] = useState<number | null>();
     const [productList, setProductList] = useState<productList[]>([]);
     const [isSyncModalOpen, setIsSyncModalOpen] = useState<boolean>(false);
     const [refreshTable, setRefreshTable] = useState<boolean>(false);
+    const [isSearch, setIsSearch] = useState<boolean>(false);
+    const [searchValue, setSearchValue] = useState<string>("");
+    const [searchHasError, setSearchHasError] = useState<boolean>(false);
 
     const columns = [
         {
@@ -58,101 +69,55 @@ const Product_Service: React.FC = () => {
     //Sync API
     const handleSync = async () => {
         modalClose();
-        try {
-            const token = await localStorage.getItem("token");
-            const params = {
-                "CompanyId": 86,
-            }
-            const config = {
-                headers: {
-                    Authorization: `bearer ${token}`,
-                },
-            };
-            const response = await axios.post(
-                `${process.env.base_url}/productandservice/sync`,
-                params,
-                config
-            );
-            const { ResponseStatus, ResponseData, Message } = response.data;
-            if (response.status === 200) {
-                if (ResponseStatus === "Success") {
-                    if (ResponseData !== null && typeof ResponseData === 'object') {
-                        Toast.success("Success", "Product & Service Sync successfully");
-                    }
-                } else {
-                    if (Message === null) {
-                        Toast.error("Error", "Please try again later.");
-                    } else {
-                        Toast.error("Error", Message);
-                    }
-                }
-            }
-            else {
-                if (Message === null) {
-                    Toast.error("Error", "Please try again later.");
-                } else {
-                    Toast.error("Error", Message);
-                }
-            }
-        } catch (error) {
-            console.error(error);
+        const params = {
+            CompanyId: 86,
         }
-    }
+        const url = `${process.env.base_url}/productandservice/sync`;
+        const successCallback = () => {
+            Toast.success("Success", "Product & Service Sync successfully");
+        };
+        callAPI(url, params, successCallback);
+    };
 
     //Product List API
     const getProductList = async () => {
-        try {
-            const params = {
-                "ProductSerObject": {
-                    "Name": "",
-                    "Type": "",
-                    "Description": "",
-                    "UnitPrice": "",
-                    "Status": "",
-                    "GlobalFilter": ""
-                },
-                "CompanyId": 86,
-                "PageSize": 100,
-                "Index": 1
-            }
-            const token = await localStorage.getItem("token");
-            const config = {
-                headers: {
-                    Authorization: `bearer ${token}`,
-                },
-            };
-            const response = await axios.post(
-                `${process.env.base_url}/productandservice/getlist`, params,
-                config
-            );
-            const { ResponseStatus, ResponseData, Message } = response.data;
-            if (response.status === 200) {
-                if (ResponseStatus === "Success") {
-                    if (ResponseData !== null && typeof ResponseData === 'object') {
-                        setProductList(ResponseData.AllItems);
-                    }
-                } else {
-                    if (Message === null) {
-                        Toast.error("Error", "Please try again later.");
-                    } else {
-                        Toast.error("Error", Message);
-                    }
-                }
-            }
-            else {
-                if (Message === null) {
-                    Toast.error("Error", "Please try again later.");
-                } else {
-                    Toast.error("Error", Message);
-                }
-            }
-        } catch (error) {
-            console.error(error);
+        const params = {
+            ProductSerObject: {
+                Name: "",
+                Type: "",
+                Description: "",
+                UnitPrice: "",
+                Status: "",
+                GlobalFilter: ""
+            },
+            CompanyId: 86,
+            PageSize: 100,
+            Index: 1
         }
-    }
+        const url = `${process.env.base_url}/productandservice/getlist`;
+        const successCallback = (ResponseData: any) => {
+            setProductList(ResponseData.AllItems);
+        };
+        callAPI(url, params, successCallback);
+    };
     useEffect(() => {
         getProductList();
     }, [refreshTable]);
+
+    //Delete Product API
+    const handleProductDelete = async () => {
+        modalClose();
+        const params = {
+            CompanyId: 86,
+            Id: Id,
+        };
+        const url = `${process.env.base_url}/productandservice/delete`;
+        const successCallback = () => {
+            Toast.success("Success", "Product Remove successfully");
+            getProductList();
+        };
+        callAPI(url, params, successCallback);
+    };
 
     const actionArray = ["Edit", "Remove"];
 
@@ -252,49 +217,13 @@ const Product_Service: React.FC = () => {
         }
     };
 
-    //Delete Product API
-    const handleProductDelete = async () => {
-        modalClose();
-        try {
-            const token = await localStorage.getItem("token");
-            const params = {
-                CompanyId: 86,
-                Id: Id,
-            };
-            const config = {
-                headers: {
-                    Authorization: `bearer ${token}`,
-                },
-            };
-            const response = await axios.post(
-                `${process.env.base_url}/class/delete `,
-                params,
-                config
-            );
-            const { ResponseStatus, ResponseData, Message } = response.data;
-            if (response.status === 200) {
-                if (ResponseStatus === "Success") {
-                    if (ResponseData !== null && typeof ResponseData === "object") {
-                        Toast.success("Success", "Product Remove successfully");
-                        getProductList();
-                    }
-                } else {
-                    if (Message === null) {
-                        Toast.error("Error", "Please try again later.");
-                    } else {
-                        Toast.error("Error", Message);
-                    }
-                }
-            } else {
-                if (Message === null) {
-                    Toast.error("Error", "Please try again later.");
-                } else {
-                    Toast.error("Error", Message);
-                }
-            }
-        } catch (error) {
-            console.error(error);
-        }
+    const handleSearchValue = (value: string) => {
+        setIsSearch(true);
+        setSearchValue(value);
+    };
+    const handleSearchClose = () => {
+        setIsSearch(false);
+        setSearchValue("");
     };
 
     return (
@@ -308,9 +237,36 @@ const Product_Service: React.FC = () => {
 
                     </div>
                     <div className="flex items-center px-[10px]">
-                        <Tooltip content={"Search"} position="bottom" className='!z-[2]'>
-                            <SearchIcon />
-                        </Tooltip>
+                        {isSearch
+                            ? <div className="flex relative items-center">
+                                <Text
+                                    id="searching"
+                                    name="searching"
+                                    value={searchValue}
+                                    placeholder="Search"
+                                    className='pl-8 border-0 rounded-full'
+                                    getValue={(value: any) => handleSearchValue(value)}
+                                    getError={(e: any) => setSearchHasError(e)}
+                                ></Text>
+                                <div className="flex absolute left-2 cursor-pointer">
+                                    <SearchIcon />
+                                </div>
+                                {isSearch && (
+                                    <div
+                                        className="flex absolute -top-2 -right-2 cursor-pointer"
+                                        onClick={handleSearchClose}
+                                    >
+                                        <Tooltip position="bottom" content="close" className='!z-[2]'>
+                                            <Close variant="small" />
+                                        </Tooltip>
+                                    </div>
+                                )}
+                            </div>
+                            : <Tooltip content={"Search"} position="bottom" className='!z-[2]'>
+                                <div onClick={() => { setIsSearch(true) }}>
+                                    <SearchIcon />
+                                </div>
+                            </Tooltip>}
                         <Tooltip content={`Sync Product & Service`} position="bottom" className='!z-[2] !p-0 !m-0'>
                             <div onClick={() => setIsSyncModalOpen(true)}>
                                 <SyncIcon />

@@ -1,14 +1,8 @@
-import {
-    Button,
-    Close,
-    Text,
-    Toast,
-    Typography
-} from "next-ts-lib";
+import styles from "@/assets/scss/styles.module.scss";
+import { callAPI } from "@/utils/API/callAPI";
+import { Button, Close, Text, Toast, Typography } from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
 import { useEffect, useState } from "react";
-import axios from "axios";
-import styles from "@/assets/scss/styles.module.scss";
 
 interface DrawerProps {
     onOpen: boolean;
@@ -16,6 +10,8 @@ interface DrawerProps {
     EditId?: number;
 }
 const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
+    
+    const AccountingTool = 1;
     const [Id, setId] = useState<string>("");
     const [locationId, setLocationId] = useState<string>("");
     const [idHasError, setIdHasError] = useState<boolean>(false);
@@ -24,67 +20,46 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
     const [name, setName] = useState<string>("");
     const [nameError, setNameError] = useState<boolean>(false);
     const [nameHasError, setNameHasError] = useState<boolean>(false);
+    const [clicked, setClicked] = useState(false);
 
     const handleClose = () => {
         onClose();
     };
 
-    //Location Data API
+    //Location Get Data API
     const getLocationById = async () => {
-        try {
-            const token = await localStorage.getItem("token");
-            const params = {
-                "CompanyId": 86,
-                "Id": EditId
-
-            }
-            const config = {
-                headers: {
-                    Authorization: `bearer ${token}`,
-                },
-            };
-            const response = await axios.post(
-                `${process.env.base_url}/location/getbyid `,
-                params,
-                config
-            );
-            const { ResponseStatus, ResponseData, Message } = response.data;
-            if (response.status === 200) {
-                if (ResponseStatus === "Success") {
-                    if (ResponseData !== null && typeof ResponseData === 'object') {
-                        const { Id, LocationId, Name } = ResponseData;
-                        setId(Id || "");
-                        setLocationId(LocationId || "");
-                        setName(Name || "");
-                        setIdHasError(true);
-                        setNameHasError(true);
-                    }
-                } else {
-                    if (Message === null) {
-                        Toast.error("Error", "Please try again later.");
-                    } else {
-                        Toast.error("Error", Message);
-                    }
-                }
-            }
-            else {
-                if (Message === null) {
-                    Toast.error("Error", "Please try again later.");
-                } else {
-                    Toast.error("Error", Message);
-                }
-            }
-        } catch (error) {
+        const params = {
+            CompanyId: 86,
+            Id: EditId
         }
-    }
+        const url = `${process.env.base_url}/location/getbyid`;
+        const successCallback = (ResponseData: any) => {
+            if (ResponseData !== null && typeof ResponseData === 'object') {
+                const { Id, LocationId, Name } = ResponseData;
+                setId(Id || "");
+                setLocationId(LocationId || "");
+                setName(Name || "");
+                setIdHasError(true);
+                setNameHasError(true);
+            }
+        };
+        callAPI(url, params, successCallback);
+    };
 
     const handleIdChange = (value: any) => {
-        const pattern = /^[a-zA-Z0-9]+$/;
+        const pattern = /^[a-zA-Z0-9]*$/;
         if (pattern.test(value)) {
             setIdError(false);
             setLocationId(value);
         }
     };
+
+    const generatedId = () => {
+        const length = 6;
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let result = Array.from({ length }, () => characters[Math.floor(Math.random() * characters.length)]).join('');
+        return result;
+    }
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
@@ -92,61 +67,30 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
         name.trim().length <= 0 && setNameError(true);
 
         if (!(locationId.length <= 0) && !(name.length <= 0)) {
-            try {
-                const token = await localStorage.getItem("token");
-                const params = {
-                    "CompanyId": 86,
-                    "Id": Id || 0,
-                    "Name": name,
-                    "RecordNo": "",
-                    "Status": "active",
-                    "FullyQualifiedName": "",
-                    "LocationId": locationId,
-                    "ParentId": "",
-                    "ParentName": "",
-                    "TaxId": ""
-                }
-                const config = {
-                    headers: {
-                        Authorization: `bearer ${token}`,
-                    },
-                };
-                const response = await axios.post(
-                    `${process.env.base_url}/location/save`, params,
-                    config
-                );
-
-                const { ResponseStatus, ResponseData, Message } = response.data;
-                if (response.status === 200) {
-                    if (ResponseStatus === "Success") {
-                        if (ResponseData.ResponseStatus === "Failure") {
-                            Toast.error("Error", ResponseData.Message);
-                        }
-                        else {
-                            Toast.success(`Location ${EditId ? "updated" : "added"} successfully.`);
-                        }
-                        onClose();
-                    } else {
-                        onClose();
-                        if (Message === null) {
-                            Toast.error("Error", "Please try again later.");
-                        } else {
-                            Toast.error("Error", Message);
-                        }
-                    }
+            setClicked(true);
+            const params = {
+                CompanyId: 86,
+                Id: Id || 0,
+                Name: name,
+                RecordNo: "",
+                Status: "active",
+                FullyQualifiedName: "",
+                LocationId: locationId,
+                ParentId: "",
+                ParentName: "",
+                TaxId: ""
+            }
+            const url = `${process.env.base_url}/location/save`;
+            const successCallback = (ResponseData: any) => {
+                if (ResponseData.ResponseStatus === "Failure") {
+                    Toast.error("Error", ResponseData.Message);
                 }
                 else {
-                    if (Message === null) {
-                        Toast.error("Error", "Please try again later.");
-                    } else {
-                        Toast.error("Error", Message);
-                    }
+                    Toast.success(`Location ${EditId ? "updated" : "added"} successfully.`);
                 }
-            } catch (error) {
-            }
-        }
-        else {
-            Toast.error("Error", "Please fill required field!");
+                onClose();
+            };
+            callAPI(url, params, successCallback);
         }
     };
 
@@ -157,6 +101,10 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
             setIdError(false);
             setName("");
             setNameError(false);
+            setClicked(false);
+        }
+        if (AccountingTool === 1) {
+            setLocationId(generatedId())
         }
     }, [onOpen]);
 
@@ -165,7 +113,6 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
             getLocationById();
         }
     }, [EditId]);
-
 
     return (
         <>
@@ -191,9 +138,6 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
                                 hasError={idError}
                                 getValue={(value: any) => handleIdChange(value)}
                                 getError={(e: any) => setIdHasError(e)}
-                                onChange={(e: any) => {
-                                    setIdError(true);
-                                }}
                             >
                             </Text>
                         </div>
@@ -209,9 +153,6 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
                                 value={name}
                                 getValue={(value: any) => setName(value)}
                                 getError={(e: any) => setNameHasError(e)}
-                                onChange={(e: any) => {
-                                    setNameError(true);
-                                }}
                             ></Text>
                         </div>
                     </div>
@@ -228,7 +169,7 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
                             <Button
                                 type="submit"
                                 onClick={handleSubmit}
-                                className={`rounded-full font-medium w-28 xsm:!px-1`}
+                                className={`rounded-full font-medium w-28 xsm:!px-1  ${clicked && "opacity-50 pointer-events-none"}`}
                                 variant="btn-primary"
                             >
                                 <Typography type="h6" className="!font-bold"> SAVE</Typography>

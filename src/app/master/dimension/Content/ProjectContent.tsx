@@ -1,46 +1,33 @@
-import {
-    Button,
-    Close,
-    DataTable,
-    Loader,
-    Modal,
-    ModalAction,
-    ModalContent,
-    ModalTitle,
-    Switch,
-    Toast,
-    Typography,
-} from "next-ts-lib";
-import React, { useEffect, useRef, useState } from "react";
-import axios from "axios";
-import MeatballsMenuIcon from "@/assets/Icons/MeatballsMenu";
 import DrawerOverlay from "@/app/manage/users/DrawerOverlay";
-import LocationContent from "../Drawer/LocationContent";
+import MeatballsMenuIcon from "@/assets/Icons/MeatballsMenu";
+import { callAPI } from "@/utils/API/callAPI";
+import { Button, Close, DataTable, Loader, Modal, ModalAction, ModalContent, ModalTitle, Switch, Toast, Typography } from 'next-ts-lib';
+import React, { useEffect, useRef, useState } from "react";
+import ProjectContent from "../Drawer/ProjectDrawer";
 
-interface locationList {
-    locationId: number;
+interface projectList {
     name: string;
     status: any;
     action: any;
 }
 
-interface LocationProps {
+interface ProjectProps {
     onDrawerOpen: boolean;
     onDrawerClose: () => void;
 }
 
-const Location: React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => {
+const Project: React.FC<ProjectProps> = ({ onDrawerOpen, onDrawerClose }) => {
     const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
     const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
-    const [locationList, setLocationList] = useState<locationList[]>([]);
+    const [projectList, setProjectList] = useState<projectList[]>([]);
     const [Id, setId] = useState<any>();
     const [RecordNo, setRecordNo] = useState<number | null>();
     const [refreshTable, setRefreshTable] = useState<boolean>(false);
 
     const columns = [
         {
-            header: "LOCATION ID",
-            accessor: "locationId",
+            header: "PROJECT ID",
+            accessor: "id",
             sortable: true,
         },
         {
@@ -60,60 +47,48 @@ const Location: React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => {
         },
     ];
 
-    //Location List API
-    const getLocationList = async () => {
-        try {
-            const params = {
-                FilterObj: {
-                    LocationId: "",
-                    Name: "",
-                    FullyQualifiedName: "",
-                    Status: "active",
-                    GlobalFilter: "",
-                },
-                CompanyId: 86,
-                Index: 1,
-                PageSize: 1000,
-            };
-
-            const token = await localStorage.getItem("token");
-            const config = {
-                headers: {
-                    Authorization: `bearer ${token}`,
-                },
-            };
-            const response = await axios.post(
-                `${process.env.base_url}/location/getlist`,
-                params,
-                config
-            );
-            const { ResponseStatus, ResponseData, Message } = response.data;
-            if (response.status === 200) {
-                if (ResponseStatus === "Success") {
-                    if (ResponseData !== null && typeof ResponseData === "object") {
-                        setLocationList(ResponseData.List);
-                    }
-                } else {
-                    if (Message === null) {
-                        Toast.error("Error", "Please try again later.");
-                    } else {
-                        Toast.error("Error", Message);
-                    }
-                }
-            } else {
-                if (Message === null) {
-                    Toast.error("Error", "Please try again later.");
-                } else {
-                    Toast.error("Error", Message);
-                }
+    //Project List API
+    const getProjectList = async () => {
+        const params = {
+            FilterObj: {
+                ProjectId: "",
+                Name: "",
+                Category: "",
+                Status: "active",
+                GlobalFilter: "",
+            },
+            CompanyId: 86,
+            Index: 1,
+            PageSize: 1000,
+        };
+        const url = `${process.env.base_url}/project/getlist`;
+        const successCallback = (ResponseData: any) => {
+            if (ResponseData !== null && typeof ResponseData === "object") {
+                setProjectList(ResponseData.List);
             }
-        } catch (error) {
-            console.error(error);
-        }
+        };
+        callAPI(url, params, successCallback);
     };
     useEffect(() => {
-        getLocationList();
+        getProjectList();
     }, [refreshTable]);
+
+
+    //Delete Project API
+    const handleProjectDelete = async () => {
+        modalClose();
+        const params = {
+            CompanyId: 86,
+            Id: Id,
+            RecordNo: RecordNo,
+        };
+        const url = `${process.env.base_url}/project/delete`;
+        const successCallback = () => {
+            Toast.success("Success", "Project Remove successfully");
+            getProjectList();
+        };
+        callAPI(url, params, successCallback);
+    };
 
     const actionArray = ["Edit", "Remove"];
 
@@ -173,10 +148,10 @@ const Location: React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => {
         );
     };
     //DataTable Data
-    const locationListData = locationList?.map(
+    const projectListData = projectList?.map(
         (e: any) =>
             new Object({
-                locationId: e.LocationId,
+                id: e.ProjectId,
                 name: e.Name,
                 status: (
                     <div>
@@ -227,63 +202,16 @@ const Location: React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => {
         setIsRemoveOpen(false);
     };
 
-    //Delete Location API
-    const handleLocationDelete = async () => {
-        modalClose();
-        try {
-            const token = await localStorage.getItem("token");
-            const params = {
-                CompanyId: 86,
-                Id: Id,
-                RecordNo: RecordNo,
-            };
-            const config = {
-                headers: {
-                    Authorization: `bearer ${token}`,
-                },
-            };
-            const response = await axios.post(
-                `${process.env.base_url}/location/delete`,
-                params,
-                config
-            );
-            const { ResponseStatus, ResponseData, Message } = response.data;
-            if (response.status === 200) {
-                if (ResponseStatus === "Success") {
-                    if (ResponseData !== null && typeof ResponseData === "object") {
-                        Toast.success("Success", "Location Remove successfully");
-                        getLocationList();
-                    }
-                } else {
-                    if (Message === null) {
-                        Toast.error("Error", "Please try again later.");
-                    } else {
-                        Toast.error("Error", Message);
-                    }
-                }
-            } else {
-                if (Message === null) {
-                    Toast.error("Error", "Please try again later.");
-                } else {
-                    Toast.error("Error", Message);
-                }
-            }
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
     return (
         <>
-            {locationList.length <= 0 ? <div className="h-[445px] w-full flex items-center justify-center"><Loader size="md" helperText /></div> :
+            {projectList.length <= 0 ? <div className="h-[445px] w-full flex items-center justify-center"><Loader size="md" helperText /></div> :
                 <div>
                     {/* DataTable */}
                     <div className="h-[445px]">
-                        {locationListData.length > 0 && (
+                        {projectListData.length > 0 && (
                             <DataTable
                                 columns={columns}
-                                data={locationListData}
-
+                                data={projectListData}
                                 sticky
                                 hoverEffect={true}
                             />
@@ -301,7 +229,7 @@ const Location: React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => {
                         <ModalContent>
                             <div className="p-2 my-5">
                                 <Typography type="h5" className="!font-normal">
-                                    Are you sure you want to remove the location ?
+                                    Are you sure you want to remove the project ?
                                 </Typography>
                             </div>
                         </ModalContent>
@@ -319,7 +247,7 @@ const Location: React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => {
                                 <Button
                                     className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
                                     variant="btn-error"
-                                    onClick={handleLocationDelete}
+                                    onClick={handleProjectDelete}
                                 >
                                     YES
                                 </Button>
@@ -327,10 +255,10 @@ const Location: React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => {
                         </ModalAction>
                     </Modal>
 
-                    <LocationContent onOpen={isOpenDrawer} onClose={handleDrawerClose} EditId={typeof Id === "number" ? Id : 0} />
+                    <ProjectContent onOpen={isOpenDrawer} onClose={handleDrawerClose} EditId={typeof Id === "number" ? Id : 0} />
                     <DrawerOverlay isOpen={isOpenDrawer} onClose={handleDrawerClose} />
                 </div>}
         </>);
 };
 
-export default Location;
+export default Project;

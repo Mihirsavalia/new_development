@@ -291,7 +291,7 @@ const SettingButton = ({ setSetting }: any) => {
         </div>
         {open && (
           <div className=" flex flex-row !z-[3] p-8 w-[700px] bg-white shadow-lg absolute top-7 right-0  justify-center gap-10">
-            <div className="flex flex-col bg-lightGray border-r-2 border-lightSilver ">
+            <div className="flex flex-col  ">
               {global_settings.map((data, index) => (
                 <div className="  flex flex-col gap-4" key={index}>
                   <span className="pb-3 font-semibold border-b border-b-[#d8d8d8]">

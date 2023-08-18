@@ -1,23 +1,15 @@
-import {
-    Button,
-    Close,
-    Select,
-    Text,
-    Toast,
-    Typography
-} from "next-ts-lib";
+import styles from "@/assets/scss/styles.module.scss";
+import { callAPI } from '@/utils/API/callAPI';
+import { Button, Close, Select, Text, Toast, Typography } from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
 import { useEffect, useState } from "react";
-import axios from "axios";
-import styles from "@/assets/scss/styles.module.scss";
-import GLAccount from "../../currency/page";
 
 interface DrawerProps {
     onOpen: boolean;
     onClose: () => void;
     EditId?: number;
 }
-const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
+const VendorContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
 
     const [productId, setProductId] = useState<string>("");
     const [idHasError, setIdHasError] = useState<boolean>(false);
@@ -42,136 +34,50 @@ const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
 
     //GET GLAccount API
     const getGLAccount = async () => {
-        try {
-            const token = await localStorage.getItem("token");
-            const params = {
-                "CompanyId": 86
-            }
-            const config = {
-                headers: {
-                    Authorization: `bearer ${token}`,
-                },
-            };
-            const response = await axios.post(
-                `${process.env.base_url}/account/getdropdown`,
-                params,
-                config
-            );
-            const { ResponseStatus, ResponseData, Message } = response.data;
-            if (response.status === 200) {
-                if (ResponseStatus === "Success") {
-                    if (ResponseData !== null && typeof ResponseData === 'object') {
-                        const newAccountValues = ResponseData.map((label: any) => label.Label);
-                        // setAccount(prevAccount => [...prevAccount, ...newAccountValues]);
-                        setAccount(ResponseData);
-                    }
-                } else {
-                    if (Message === null) {
-                        Toast.error("Error", "Please try again later.");
-                    } else {
-                        Toast.error("Error", Message);
-                    }
-                }
-            }
-            else {
-                if (Message === null) {
-                    Toast.error("Error", "Please try again later.");
-                } else {
-                    Toast.error("Error", Message);
-                }
-            }
-        } catch (error) {
-            console.log(error);
+        const params = {
+            CompanyId: 86,
         }
-    }
+        const url = `${process.env.base_url}/account/getdropdown`;
+        const successCallback = (ResponseData: any) => {
+            if (ResponseData !== null && typeof ResponseData === 'object') {
+                setAccount(ResponseData);
+            }
+        };
+        callAPI(url, params, successCallback);
+    };
 
     //Product Data API
     const getProductById = async () => {
-        try {
-            const token = await localStorage.getItem("token");
-            const params = {
-                "CompanyId": 86,
-                "Id": EditId
-            }
-            const config = {
-                headers: {
-                    Authorization: `bearer ${token}`,
-                },
-            };
-            const response = await axios.post(
-                `${process.env.base_url}/product/getbyid `,
-                params,
-                config
-            );
-            const { ResponseStatus, ResponseData, Message } = response.data;
-            if (response.status === 200) {
-                if (ResponseStatus === "Success") {
-                    if (ResponseData !== null && typeof ResponseData === 'object') {
-                        const { id, name, type } = ResponseData;
-                        setProductId(id);
-                        setName(name);
-                        setType(type)
-                    }
-                } else {
-                    if (Message === null) {
-                        Toast.error("Error", "Please try again later.");
-                    } else {
-                        Toast.error("Error", Message);
-                    }
-                }
-            }
-            else {
-                if (Message === null) {
-                    Toast.error("Error", "Please try again later.");
-                } else {
-                    Toast.error("Error", Message);
-                }
-            }
-        } catch (error) {
-            console.log(error);
+        const params = {
+            CompanyId: 86,
+            Id: EditId
         }
-    }
+        const url = `${process.env.base_url}/product/getbyid`;
+        const successCallback = (ResponseData: any) => {
+            if (ResponseData !== null && typeof ResponseData === 'object') {
+                const { id, name, type } = ResponseData;
+                setProductId(id);
+                setName(name);
+                setType(type)
+            }
+        };
+        callAPI(url, params, successCallback);
+    };
 
     //Account List API
     const getAccountList = async () => {
-        try {
-            const token = await localStorage.getItem("token");
-            const params = {
-                "CompanyId": process.env.CompanyId,
-            }
-            const config = {
-                headers: {
-                    Authorization: `bearer ${token}`,
-                },
-            };
-            const response = await axios.post(
-                `${process.env.base_url}/account/getlist`,
-                params,
-                config
-            );
-            const { ResponseStatus, ResponseData, Message } = response.data;
-            if (response.status === 200) {
-                if (ResponseStatus === "Success") {
-                    if (ResponseData !== null && typeof ResponseData === 'object') {
-                        setAccount(ResponseData);
-                    }
-                } else {
-                    if (Message != null) {
-                        Toast.error("Error", Message);
-                    }
-                }
-            }
-            else {
-                if (Message === null) {
-                    Toast.error("Error", "Please try again later.");
-                } else {
-                    Toast.error("Error", Message);
-                }
-            }
-        } catch (error) {
-            console.log(error);
+        const params = {
+            CompanyId: 86
         }
-    }
+        const url = `${process.env.base_url}/account/getlist`;
+        const successCallback = (ResponseData: any) => {
+            if (ResponseData !== null && typeof ResponseData === 'object') {
+                setAccount(ResponseData);
+            }
+        };
+        callAPI(url, params, successCallback);
+    };
+
     useEffect(() => {
         getAccountList();
     }, []);
@@ -185,61 +91,31 @@ const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
         account.length <= 0 && setAccountError(true);
 
         if (!(productId.trim().length <= 0) && !(name.trim().length <= 0) && !(type.trim().length <= 0) && !(account.length <= 0)) {
-            try {
-                const token = await localStorage.getItem("token");
-                const params = {
-                    ItemId: productId || 0,
-                    RecordNo: "",
-                    CompanyId: 86,
-                    Name: name,
-                    IntacctItemId: "testpo1",
-                    ItemType: type,
-                    SKU: null,
-                    Description: null,
-                    InventoryAccount: null,
-                    IntacctVendorID: null,
-                    SalePrice: null,
-                    CostPrice: null,
-                    AsOfDate: null,
-                    CreatedBy: null,
-                    CreatedOn: null,
-                    UpdatedBy: null,
-                    UpdatedOn: null
-                }
-                const config = {
-                    headers: {
-                        Authorization: `bearer ${token}`,
-                    },
-                };
-                const response = await axios.post(
-                    `${process.env.base_url}/product/save`, params,
-                    config
-                );
-
-                const { ResponseStatus, Message } = response.data;
-                if (response.status === 200) {
-                    if (ResponseStatus === "Success") {
-                        Toast.success(`Product ${EditId ? "updated" : "added"} successfully.`);
-                        onClose();
-                    } else {
-                        onClose();
-                        if (Message === null) {
-                            Toast.error("Error", "Please try again later.");
-                        } else {
-                            Toast.error("Error", Message);
-                        }
-                    }
-                }
-                else {
-                    if (Message === null) {
-                        Toast.error("Error", "Please try again later.");
-                    } else {
-                        Toast.error("Error", Message);
-                    }
-                }
-            } catch (error) {
-                console.log(error);
+            const params = {
+                ItemId: productId || 0,
+                RecordNo: "",
+                CompanyId: 86,
+                Name: name,
+                IntacctItemId: "testpo1",
+                ItemType: type,
+                SKU: null,
+                Description: null,
+                InventoryAccount: null,
+                IntacctVendorID: null,
+                SalePrice: null,
+                CostPrice: null,
+                AsOfDate: null,
+                CreatedBy: null,
+                CreatedOn: null,
+                UpdatedBy: null,
+                UpdatedOn: null
             }
+            const url = `${process.env.base_url}/product/save`;
+            const successCallback = () => {
+                Toast.success(`Product ${EditId ? "updated" : "added"} successfully.`);
+                onClose();
+            };
+            callAPI(url, params, successCallback);
         }
         else {
             Toast.error("Error", "Please fill required field!");
@@ -374,4 +250,4 @@ const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
     );
 }
 
-export default ProductContent
+export default VendorContent

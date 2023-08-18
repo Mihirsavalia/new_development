@@ -1,21 +1,9 @@
-import {
-    Button,
-    Close,
-    DataTable,
-    Loader,
-    Modal,
-    ModalAction,
-    ModalContent,
-    ModalTitle,
-    Switch,
-    Toast,
-    Typography,
-} from "next-ts-lib";
-import React, { useEffect, useRef, useState } from "react";
-import axios from "axios";
-import MeatballsMenuIcon from "@/assets/Icons/MeatballsMenu";
-import ClassContent from "../Drawer/ClassContent";
 import DrawerOverlay from "@/app/manage/users/DrawerOverlay";
+import MeatballsMenuIcon from "@/assets/Icons/MeatballsMenu";
+import { callAPI } from "@/utils/API/callAPI";
+import { Button, Close, DataTable, Loader, Modal, ModalAction, ModalContent, ModalTitle, Switch, Toast, Typography } from 'next-ts-lib';
+import React, { useEffect, useRef, useState } from "react";
+import ClassDrawer from "../Drawer/ClassDrawer";
 
 interface classList {
     name: string;
@@ -38,6 +26,11 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
 
     const columns = [
         {
+            header: "CLASS ID",
+            accessor: "id",
+            sortable: true,
+        },
+        {
             header: "NAME",
             accessor: "name",
             sortable: true,
@@ -56,58 +49,45 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
 
     //Class List API
     const getClassList = async () => {
-        try {
-            const params = {
-                FilterObj: {
-                    ClassId: "",
-                    Name: "",
-                    FullyQualifiedName: "",
-                    Status: "",
-                    GlobalFilter: "",
-                },
-                CompanyId: 86,
-                Index: 1,
-                PageSize: 1000,
-            };
-
-            const token = await localStorage.getItem("token");
-            const config = {
-                headers: {
-                    Authorization: `bearer ${token}`,
-                },
-            };
-            const response = await axios.post(
-                `${process.env.base_url}/class/getlist`,
-                params,
-                config
-            );
-            const { ResponseStatus, ResponseData, Message } = response.data;
-            if (response.status === 200) {
-                if (ResponseStatus === "Success") {
-                    if (ResponseData !== null && typeof ResponseData === "object") {
-                        setClassList(ResponseData.List);
-                    }
-                } else {
-                    if (Message === null) {
-                        Toast.error("Error", "Please try again later.");
-                    } else {
-                        Toast.error("Error", Message);
-                    }
-                }
-            } else {
-                if (Message === null) {
-                    Toast.error("Error", "Please try again later.");
-                } else {
-                    Toast.error("Error", Message);
-                }
+        const params = {
+            FilterObj: {
+                ClassId: "",
+                Name: "",
+                FullyQualifiedName: "",
+                Status: "",
+                GlobalFilter: "",
+            },
+            CompanyId: 86,
+            Index: 1,
+            PageSize: 1000,
+        };
+        const url = `${process.env.base_url}/class/getlist`;
+        const successCallback = (ResponseData: any) => {
+            if (ResponseData !== null && typeof ResponseData === "object") {
+                setClassList(ResponseData.List);
             }
-        } catch (error) {
-            console.error(error);
-        }
+        };
+        callAPI(url, params, successCallback);
     };
     useEffect(() => {
         getClassList();
     }, [refreshTable]);
+
+    //Delete Class API
+    const handleClassDelete = async () => {
+        modalClose();
+        const params = {
+            CompanyId: 86,
+            Id: Id,
+            RecordNo: RecordNo,
+        };
+        const url = `${process.env.base_url}/class/delete`;
+        const successCallback = () => {
+            Toast.success("Success", "Class Remove successfully");
+            getClassList();
+        };
+        callAPI(url, params, successCallback);
+    };
 
     const actionArray = ["Edit", "Remove"];
 
@@ -171,6 +151,7 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
     const classListData = classList?.map(
         (e: any) =>
             new Object({
+                id: e.ClassId,
                 name: e.Name,
                 status: (
                     <div>
@@ -219,52 +200,6 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
 
     const modalClose = () => {
         setIsRemoveOpen(false);
-    };
-
-    //Delete Class API
-    const handleClassDelete = async () => {
-        modalClose();
-        try {
-            const token = await localStorage.getItem("token");
-            const params = {
-                CompanyId: 86,
-                Id: Id,
-                RecordNo: RecordNo,
-            };
-            const config = {
-                headers: {
-                    Authorization: `bearer ${token}`,
-                },
-            };
-            const response = await axios.post(
-                `${process.env.base_url}/class/delete `,
-                params,
-                config
-            );
-            const { ResponseStatus, ResponseData, Message } = response.data;
-            if (response.status === 200) {
-                if (ResponseStatus === "Success") {
-                    if (ResponseData !== null && typeof ResponseData === "object") {
-                        Toast.success("Success", "Class Remove successfully");
-                        getClassList();
-                    }
-                } else {
-                    if (Message === null) {
-                        Toast.error("Error", "Please try again later.");
-                    } else {
-                        Toast.error("Error", Message);
-                    }
-                }
-            } else {
-                if (Message === null) {
-                    Toast.error("Error", "Please try again later.");
-                } else {
-                    Toast.error("Error", Message);
-                }
-            }
-        } catch (error) {
-            console.error(error);
-        }
     };
 
     return (
@@ -319,7 +254,7 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
                     </ModalAction>
                 </Modal>
 
-                <ClassContent onOpen={isOpenDrawer} onClose={handleDrawerClose} EditId={typeof Id === "number" ? Id : 0} />
+                <ClassDrawer onOpen={isOpenDrawer} onClose={handleDrawerClose} EditId={typeof Id === "number" ? Id : 0} />
                 <DrawerOverlay isOpen={isOpenDrawer} onClose={handleDrawerClose} />
 
             </div>}
