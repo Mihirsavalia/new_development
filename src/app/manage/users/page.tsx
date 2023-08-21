@@ -236,6 +236,8 @@ const page: React.FC = () => {
     setIsOpenDrawer(true);
   };
 
+
+
   useEffect(() => {
     getUserDataList();
   }, []);
@@ -267,7 +269,7 @@ const page: React.FC = () => {
                   <DataTable
                     columns={columns}
                     data={updatedUserData}
-                 
+                    // headerInvisible={false}
                     sticky
                     hoverEffect={true}
                   />

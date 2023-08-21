@@ -4,6 +4,7 @@ import { callAPI } from "@/utils/API/callAPI";
 import { Button, Close, DataTable, Loader, Modal, ModalAction, ModalContent, ModalTitle, Switch, Toast, Tooltip, Typography } from 'next-ts-lib';
 import React, { useEffect, useRef, useState } from "react";
 import DepartmentContent from "../Drawer/DepartmentDrawer";
+import { useCompanyContext } from "@/context/companyContext";
 
 interface departmentList {
   name: string;
@@ -17,10 +18,11 @@ interface DepartmentProps {
 }
 
 const Department: React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose }) => {
+  const { CompanyId } = useCompanyContext();
   const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
   const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
   const [departmentList, setDepartmentList] = useState<departmentList[]>([]);
-  const [Id, setId] = useState<number | null>();
+  const [Id, setId] = useState<string>();
   const [RecordNo, setRecordNo] = useState<number | null>();
   const [refreshTable, setRefreshTable] = useState<boolean>(false);
 
@@ -56,7 +58,7 @@ const Department: React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose }) 
         Status: "active",
         GlobalFilter: "",
       },
-      CompanyId: 86,
+      CompanyId: CompanyId,
       Index: 1,
       PageSize: 1000,
     };
@@ -76,7 +78,7 @@ const Department: React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose }) 
   const handleDepartmentDelete = async () => {
     modalClose();
     const params = {
-      CompanyId: 86,
+      CompanyId: CompanyId,
       Id: Id,
       RecordNo: RecordNo,
     };
@@ -165,7 +167,7 @@ const Department: React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose }) 
       })
   );
 
-  const handleKebabChange = (actionName: string, id: number, RecordNo: number) => {
+  const handleKebabChange = (actionName: string, id: string, RecordNo: number) => {
     setId(id);
     if (actionName === "Edit") {
       setIsOpenDrawer(true);
@@ -178,7 +180,7 @@ const Department: React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose }) 
 
   const handleDrawerClose = () => {
     setIsOpenDrawer(false);
-    setId(null);
+    setId("");
     setRefreshTable(prevValue => !prevValue);
     onDrawerClose();
   };
@@ -199,61 +201,61 @@ const Department: React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose }) 
 
   return (
     <>
+
+      {/* DataTable */}
       {departmentList.length <= 0 ? <div className="h-[445px] w-full flex items-center justify-center"><Loader size="md" helperText /></div> :
-        <div>
-          {/* DataTable */}
-          <div className="h-[445px]">
-            {departmentListData.length > 0 && (
-              <DataTable
-                columns={columns}
-                data={departmentListData}
+        <div className="h-[445px]">
+          {departmentListData.length > 0 ? (
+            <DataTable
+              columns={columns}
+              data={departmentListData}
 
-                sticky
-                hoverEffect={true}
-              />
-            )}
-          </div>
-
-          {/* Remove Modal */}
-          <Modal isOpen={isRemoveOpen} onClose={modalClose} width="376px">
-            <ModalTitle>
-              <div className="py-3 px-4 font-bold">Remove</div>
-              <div onClick={modalClose}>
-                <Close variant="medium" />
-              </div>
-            </ModalTitle>
-            <ModalContent>
-              <div className="p-2 my-5">
-                <Typography type="h5" className="!font-normal">
-                  Are you sure you want to remove the department ?
-                </Typography>
-              </div>
-            </ModalContent>
-            <ModalAction>
-              <div>
-                <Button
-                  className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
-                  variant="btn-outline"
-                  onClick={modalClose}
-                >
-                  NO
-                </Button>
-              </div>
-              <div>
-                <Button
-                  className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
-                  variant="btn-error"
-                  onClick={handleDepartmentDelete}
-                >
-                  YES
-                </Button>
-              </div>
-            </ModalAction>
-          </Modal>
-
-          <DepartmentContent onOpen={isOpenDrawer} onClose={handleDrawerClose} EditId={typeof Id === "number" ? Id : 0} />
-          <DrawerOverlay isOpen={isOpenDrawer} onClose={handleDrawerClose} />
+              sticky
+              hoverEffect={true}
+            />
+          ): <span className="flex justify-center">There is no data available at the moment.</span>}
         </div>}
+
+      {/* Remove Modal */}
+      <Modal isOpen={isRemoveOpen} onClose={modalClose} width="376px">
+        <ModalTitle>
+          <div className="py-3 px-4 font-bold">Remove</div>
+          <div onClick={modalClose}>
+            <Close variant="medium" />
+          </div>
+        </ModalTitle>
+        <ModalContent>
+          <div className="px-4 my-5">
+            <Typography type="h5" className="!font-normal">
+              Are you sure you want to remove the department ?
+            </Typography>
+          </div>
+        </ModalContent>
+        <ModalAction>
+          <div>
+            <Button
+              className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
+              variant="btn-outline"
+              onClick={modalClose}
+            >
+              NO
+            </Button>
+          </div>
+          <div>
+            <Button
+              className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
+              variant="btn-error"
+              onClick={handleDepartmentDelete}
+            >
+              YES
+            </Button>
+          </div>
+        </ModalAction>
+      </Modal>
+
+      <DepartmentContent onOpen={isOpenDrawer} onClose={handleDrawerClose} EditId={typeof Id === "number" ? Id : 0} />
+      <DrawerOverlay isOpen={isOpenDrawer} onClose={handleDrawerClose} />
+
     </>);
 };
 

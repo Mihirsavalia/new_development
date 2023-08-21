@@ -36,9 +36,9 @@ const global_settings = [
   {
     heading: "Global Setting",
     items: [
-      { name: "Manage Company", href: "/manage/companies" },
-      { name: "Manage Users", href: "/manage/users" },
-      { name: "Manage Roles", href: "/manage/roles" },
+      { name: "Manage Company", href: "/companies" },
+      { name: "Manage Users", href: "/users" },
+      { name: "Manage Roles", href: "/roles" },
     ],
   },
 ];
@@ -238,7 +238,7 @@ const HelpButton = () => {
     <>
       <div className="relative cursor-pointer">
         <div onClick={() => setOpen(!open)}>
-          <Help />
+          {/* <Help /> */}
         </div>
         {/* {open && (
           <div className="py-2 w-36 bg-slate-200 shadow-md rounded absolute top-3 right-4 z-50">
@@ -293,14 +293,14 @@ const SettingButton = ({ setSetting }: any) => {
           <div className=" flex flex-row !z-[3] p-8 w-[700px] bg-white shadow-lg absolute top-7 right-0  justify-center gap-10">
             <div className="flex flex-col  ">
               {global_settings.map((data, index) => (
-                <div className="  flex flex-col gap-4" key={index}>
+                <div className="flex flex-col gap-4" key={index}>
                   <span className="pb-3 font-semibold border-b border-b-[#d8d8d8]">
                     {data.heading}
                   </span>
                   {data.items.map((element, index) => (
                     <Link
                       key={index}
-                      href="/users"
+                      href={`/manage/${element.href}`}
                       className="font-light text-sm hover:text-[#02b89d]"
                     >
                       {element.name}

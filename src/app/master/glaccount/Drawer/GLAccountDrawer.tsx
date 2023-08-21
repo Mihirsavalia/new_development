@@ -1,4 +1,5 @@
 import styles from "@/assets/scss/styles.module.scss";
+import { useCompanyContext } from "@/context/companyContext";
 import { callAPI } from '@/utils/API/callAPI';
 import axios from "axios";
 import {
@@ -17,6 +18,7 @@ interface DrawerProps {
     EditId?: number;
 }
 const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
+    const { CompanyId } = useCompanyContext();
 
     const [accountId, setAccountId] = useState<string>("");
     const [idHasError, setIdHasError] = useState<boolean>(false);
@@ -37,7 +39,7 @@ const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
     //Account Get Data API
     const getAccountById = async () => {
         const params = {
-            CompanyId: 86,
+            CompanyId: CompanyId,
             Id: EditId
         }
         const url = `${process.env.base_url}/account/getdropdown`;
@@ -160,7 +162,7 @@ const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                                 className="rounded-full font-medium w-28 mx-3 xsm:!px-1"
                                 variant="btn-outline-primary"
                             >
-                                <Typography type="h6" className="!font-bold"> CANCLE</Typography>
+                                <Typography type="h6" className="!font-bold"> CANCEL</Typography>
                             </Button>
                             <Button
                                 type="submit"

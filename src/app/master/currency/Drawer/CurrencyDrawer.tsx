@@ -290,7 +290,7 @@ const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, productEditId 
                                 className="rounded-full font-medium w-28 mx-3 xsm:!px-1"
                                 variant="btn-outline-primary"
                             >
-                                <Typography type="h6" className="!font-bold"> CANCLE</Typography>
+                                <Typography type="h6" className="!font-bold"> CANCEL</Typography>
                             </Button>
                             <Button
                                 type="submit"

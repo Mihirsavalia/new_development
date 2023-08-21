@@ -15,6 +15,7 @@ import {
   Avatar,
   DataTable,
   Select,
+  Loader,
 } from "next-ts-lib";
 
 import axios from "axios";
@@ -27,6 +28,7 @@ import "next-ts-lib/dist/index.css";
 import CompaniesModal from "./CompaniesModal";
 import FilterIcon from "@/assets/Icons/FilterIcons";
 import { useRouter } from "next/navigation";
+import { useCompanyContext } from "@/context/companyContext";
 
 // Table Headers
 const headers = [
@@ -63,6 +65,7 @@ const ManageCompanies: React.FC = () => {
   const [companyList, setCompanyList] = useState<any[]>([]);
   const [accountingTool, setAccountingTool] = useState<number | null>();
   const [companyConnected, setCompanyConnected] = useState<boolean>();
+  const {setCompanyId,setAccountingToolType} = useCompanyContext();
 
   useEffect(() => {
     if (openFilterBox) {
@@ -128,8 +131,13 @@ const ManageCompanies: React.FC = () => {
         const body = {
           code: localStorage.getItem("qbcode"),
           realmId: localStorage.getItem("realmId"),
+          CompanyId: localStorage.getItem("state"),
         };
-        if (localStorage.getItem("qbcode") && localStorage.getItem("realmId")) {
+        if (
+          localStorage.getItem("qbcode") &&
+          localStorage.getItem("realmId") &&
+          localStorage.getItem("state")
+        ) {
           const response = await axios.post(
             `${process.env.base_url}/company/connectqbocompany`,
             body,
@@ -139,17 +147,26 @@ const ManageCompanies: React.FC = () => {
           if (response.status === 200) {
             const responseData = response.data.ResponseData;
             setQboCompanyData(responseData);
-            setOpenDrawer(response.data.ResponseData.Id === 0 ? true : false);
+            console.log(responseData);
+            if(responseData.Name===null){
+              Toast.success("Company connected successfully");
+              setOpenDrawer(false);
+              getCompanyList();
+            }
+            else{
+              setOpenDrawer(true)
+            }
             setAccountingTool(2);
+            setAccountingToolType(2);
           }
         }
       } catch (error) {
         console.log(error);
       }
     };
-
     qbConnect();
   }, []);
+
 
   // Redirect Url to the Xero page
   const handleConnectXero = async (companyId?: number) => {
@@ -163,7 +180,6 @@ const ManageCompanies: React.FC = () => {
           headers: headers,
         }
       );
-      console.log(companyId);
 
       if (responseConfig.status === 200) {
         const client_id = responseConfig.data.ResponseData[0].Value;
@@ -188,9 +204,12 @@ const ManageCompanies: React.FC = () => {
         const headers = {
           Authorization: localStorage.getItem("token"),
         };
-        const body = { Code: localStorage.getItem("xerocode") };
+        const body = {
+          Code: localStorage.getItem("xerocode"),
+          CompanyId: localStorage.getItem("state"),
+        };
 
-        if (localStorage.getItem("xerocode")) {
+        if (localStorage.getItem("xerocode") && localStorage.getItem("state")) {
           const response = await axios.post(
             `${process.env.base_url}/company/connectxerocompany`,
             body,
@@ -199,9 +218,18 @@ const ManageCompanies: React.FC = () => {
 
           if (response.status === 200) {
             const responseData = response.data.ResponseData;
-            setXeroCompanyData(responseData);
-            setOpenDrawer(response.data.ResponseData.Id === 0 ? true : false);
+            setXeroCompanyData(responseData)
+            
+            if(responseData.Name===null){
+              Toast.success("Company connected successfully");
+              setOpenDrawer(false);
+              getCompanyList();
+            }
+            else{
+              setOpenDrawer(true)
+            }
             setAccountingTool(3);
+            setAccountingToolType(3);
           }
         }
       } catch (error) {
@@ -292,6 +320,9 @@ const ManageCompanies: React.FC = () => {
       if (actionType.toLowerCase() === "remove") {
         setOpenRemoveModal(true);
       }
+      if (actionType.toLowerCase() === "master configuration") {
+        masterConfiguration(actionId);
+      }
     };
 
     return (
@@ -330,6 +361,10 @@ const ManageCompanies: React.FC = () => {
     );
   };
 
+  const masterConfiguration = (Id:any)=>{
+    setCompanyId(Id);
+    router.push("/master/vendor");
+  }
   // Show Table of Contents
   const compData = companyList.map(
     (list) =>
@@ -382,11 +417,13 @@ const ManageCompanies: React.FC = () => {
               list.IsActive ? "Deactivate" : "Activate",
               list.IsConnected ? "Disconnect" : "Connect",
               "Remove",
+              "Master Configuration"
             ]}
           />
         ),
       })
   );
+  const EmptyData = ['Data is not available'];
 
   // Perform the actions Deactivate, Activate, Remove and Disconnect
   const performCompanyAction = async (
@@ -783,13 +820,12 @@ const ManageCompanies: React.FC = () => {
         </div>
 
         {/* Table Seaction */}
-        {companyList.length > 0 ? (
+        {companyList.length <= 0 ? <div className="h-[445px] w-full flex items-center justify-center"><Loader size="md" helperText /></div> : 
           <div className="h-[445px]">
+            {companyList.length > 0 ? (
             <DataTable data={compData} columns={headers} sticky />
-          </div>
-        ) : (
-          <span className="p-2">Data is not available</span>
-        )}
+            ):<span className="flex justify-center">No data available</span>}
+          </div>}
       </Wrapper>
     </>
   );

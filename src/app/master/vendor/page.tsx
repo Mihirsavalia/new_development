@@ -6,6 +6,7 @@ import PlusIcon from '@/assets/Icons/PlusIcon';
 import SearchIcon from '@/assets/Icons/SearchIcon';
 import SyncIcon from "@/assets/Icons/SyncIcon";
 import Wrapper from '@/components/common/Wrapper';
+import { useCompanyContext } from '@/context/companyContext';
 import { callAPI } from '@/utils/API/callAPI';
 import { hasNoToken } from "@/utils/commonFunction";
 import { Button, Close, DataTable, Loader, Modal, ModalAction, ModalContent, ModalTitle, Text, Toast, Tooltip, Typography } from 'next-ts-lib';
@@ -26,6 +27,7 @@ const Vendor: React.FC = () => {
         hasNoToken(router);
     }, [router]);
 
+    const { CompanyId } = useCompanyContext();
     const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
     const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
     const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
@@ -68,7 +70,7 @@ const Vendor: React.FC = () => {
     const handleSync = async () => {
         modalClose();
         const params = {
-            CompanyId: 86
+            CompanyId: CompanyId
         };
         const url = `${process.env.base_url}/vendor/sync`;
         const successCallback = () => {
@@ -92,7 +94,7 @@ const Vendor: React.FC = () => {
                 Status: "active",
                 GlobalFilter: ""
             },
-            CompanyId: 86,
+            CompanyId: CompanyId,
             Index: 1,
             PageSize: 1000
         }
@@ -112,7 +114,7 @@ const Vendor: React.FC = () => {
     const handleVendorDelete = async () => {
         modalClose();
         const params = {
-            CompanyId: 86,
+            CompanyId: CompanyId,
             Id: 354,
             RecordNo: "124"
         };

@@ -75,7 +75,6 @@ const Drawer: React.FC<DrawerProps> = ({
 
   useEffect(() => {
     if (CompanyData) {
-      console.log(CompanyData);
       setCompanyName(CompanyData.Name);
       CompanyData.Name !== undefined &&
         CompanyData.Name !== null &&
@@ -129,7 +128,6 @@ const Drawer: React.FC<DrawerProps> = ({
 
       if (response.status === 200) {
         const responseData = response.data.ResponseData;
-        console.log(responseData);
         setId(responseData.Id);
         setCompanyName(responseData.Name);
         responseData.Name.length > 0 && setCompanyNameHasError(true);

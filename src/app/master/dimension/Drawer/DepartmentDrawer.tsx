@@ -1,4 +1,5 @@
 import styles from "@/assets/scss/styles.module.scss";
+import { useCompanyContext } from "@/context/companyContext";
 import { callAPI } from "@/utils/API/callAPI";
 import { Button, Close, Text, Toast, Typography } from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
@@ -11,7 +12,9 @@ interface DrawerProps {
 }
 const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
 
-    const AccountingTool = 1;
+    const {CompanyId,AccountingTools} = useCompanyContext();
+
+    const AccountingTool = AccountingTools;
     const [departmentId, setDepartmentId] = useState<string>("");
     const [departmentCode, setDepartmentCode] = useState<string>("");
     const [idHasError, setIdHasError] = useState<boolean>(false);
@@ -20,7 +23,7 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) =
     const [title, setTitle] = useState<string>("");
     const [titleError, setTitleError] = useState<boolean>(false);
     const [titleHasError, setTitleHasError] = useState<boolean>(false);
-    const [clicked, setClicked] = useState(false);
+    const [clicked, setClicked] = useState<boolean>(false);
 
     const handleClose = () => {
         onClose();
@@ -29,7 +32,7 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) =
     //Department Get Data API
     const getDepartmentById = async () => {
         const params = {
-            CompanyId: 86,
+            CompanyId: CompanyId,
             Id: EditId
         }
         const url = `${process.env.base_url}/department/getbyid`;
@@ -55,9 +58,7 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) =
     };
 
     const generatedId = () => {
-        const length = 6;
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let result = Array.from({ length }, () => characters[Math.floor(Math.random() * characters.length)]).join('');
+        const result =Math.floor((Math.random() * 10000) + 1)
         return result;
     }
 
@@ -70,7 +71,7 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) =
             setClicked(true);
             const params = {
                 DepartmentId: departmentId || 0,
-                CompanyId: 86,
+                CompanyId: CompanyId,
                 DepartmentCode: departmentCode,
                 RecordNo: "",
                 Title: title,
@@ -99,8 +100,8 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) =
             setDepartmentCode("");
             setClicked(false);
         }
-        if (AccountingTool === 1) {
-            setDepartmentCode(generatedId())
+        if (AccountingTool != 1) {
+            setDepartmentCode('PQ-D' + generatedId())
         }
     }, [onOpen]);
 
@@ -131,6 +132,7 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) =
                                 placeholder="Please Enter ID Name"
                                 validate
                                 value={departmentCode}
+                                readOnly={EditId ? false : true}
                                 hasError={idError}
                                 getValue={(value: any) => handleDeptCodeChange(value)}
                                 getError={(e: any) => setIdHasError(e)}
@@ -160,7 +162,7 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) =
                                 className="rounded-full font-medium w-28 mx-3 xsm:!px-1"
                                 variant="btn-outline-primary"
                             >
-                                <Typography type="h6" className="!font-bold"> CANCLE</Typography>
+                                <Typography type="h6" className="!font-bold"> CANCEL</Typography>
                             </Button>
                             <Button
                                 type="submit"

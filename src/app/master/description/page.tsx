@@ -11,6 +11,7 @@ import { Button, Close, DataTable, Loader, Modal, ModalAction, ModalContent, Mod
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from 'react';
 import DescriptionContent from './Drawer/DescriptionDrawer';
+import { useCompanyContext } from '@/context/companyContext';
 
 interface descriptionList {
     name: string;
@@ -24,7 +25,7 @@ const Description: React.FC = () => {
     useEffect(() => {
         hasNoToken(router);
     }, [router]);
-
+    const { CompanyId } = useCompanyContext();
     const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
     const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
     const [Id, setId] = useState<number | null>();
@@ -55,7 +56,7 @@ const Description: React.FC = () => {
     //Description List API
     const getDescriptionList = async () => {
         const params = {
-            CompanyId: 86,
+            CompanyId: CompanyId,
             APFieldId: 47,
             Description: "",
             Index: 1,
@@ -78,7 +79,7 @@ const Description: React.FC = () => {
         modalClose();
         const params = {
             Id: Id,
-            CompanyId: 86,
+            CompanyId: CompanyId,
             APFieldId: 47
         };
         const url = `${process.env.base_url}/description/delete`;

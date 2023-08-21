@@ -49,10 +49,10 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
     const [imagePreview, setImagePreview] = useState<string>("");
     const [userData, setUserData] = useState<userData[]>([]);
     const [country, setCountry] = useState([]);
-    const [countryId, setCountryId] = useState<number>(0);
+    const [countryId, setCountryId] = useState<number>();
     const [countryError, setCountryError] = useState<boolean>(false);
     const [state, setState] = useState([]);
-    const [stateId, setStateId] = useState<number>(0);
+    const [stateId, setStateId] = useState<number>();
     const [stateError, setStateError] = useState<boolean>(false);
 
     // const [selectedFile, setSelectedFile] = useState(null);
@@ -294,6 +294,8 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
         }
     }, [onOpen]);
 
+
+
     return (
         <>
             {onOpen && (
@@ -304,7 +306,7 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                     <div className="p-4 flex justify-between items-center border-b border-lightSilver">
                         <Typography type="label" className="!font-bold !text-lg">
                             {" "}
-                            {editId ? "Edit" : "Add"} USER
+                            {editId ? "EDIT" : "ADD"} USER
                         </Typography>
                         <div
                             className="mx-2 cursor-pointer"
@@ -412,7 +414,7 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
                             >
                                 <Typography type="h6" className="!font-bold">
                                     {" "}
-                                    CANCLE
+                                    CANCEL
                                 </Typography>
                             </Button>
                             <Button

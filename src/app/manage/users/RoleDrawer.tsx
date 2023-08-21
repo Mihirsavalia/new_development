@@ -299,7 +299,7 @@ const RoleDrawer: React.FC<DrawerProps> = ({ onClose }) => {
                     <DataTable
                         columns={columns}
                         data={data}
-                     
+                        // headerInvisible={false}
                         sticky
                         hoverEffect={true}
                     />
@@ -311,7 +311,7 @@ const RoleDrawer: React.FC<DrawerProps> = ({ onClose }) => {
                             className="rounded-full font-medium !w-28 mx-3"
                             variant="btn-outline-primary"
                         >
-                            CANCLE
+                            CANCEL
                         </Button>
                         <Button
                             type="submit"

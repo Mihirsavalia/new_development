@@ -13,6 +13,7 @@ import Class from './Content/ClassContent';
 import Department from './Content/DepartmentContent';
 import Location from './Content/LocationContent';
 import Project from './Content/ProjectContent';
+import { useCompanyContext } from '@/context/companyContext';
 
 const tabs = [
     { id: "class", label: "CLASS" },
@@ -27,7 +28,7 @@ const Dimension: React.FC = () => {
     useEffect(() => {
         hasNoToken(router);
     }, [router]);
-
+    const { CompanyId } = useCompanyContext();
     const [selectedTabIndex, setSelectedTabIndex] = useState<number>(0);
     const [tab, setTab] = useState<string>("class");
     const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
@@ -41,7 +42,7 @@ const Dimension: React.FC = () => {
     const handleSync = async () => {
         modalClose();
         const params = {
-            CompanyId: 86
+            CompanyId: CompanyId
         }
         const url = `${process.env.base_url}/${tab}/sync`;
         const successCallback = () => {

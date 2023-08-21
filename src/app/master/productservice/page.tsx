@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from 'react';
 import ProductContent from './Drawer/Product&ServiceDrawer';
 import { callAPI } from '@/utils/API/callAPI';
+import { useCompanyContext } from '@/context/companyContext';
 
 interface productList {
     name: string;
@@ -27,7 +28,7 @@ const Product_Service: React.FC = () => {
     useEffect(() => {
         hasNoToken(router);
     }, [router]);
-
+    const { CompanyId } = useCompanyContext();
     const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
     const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
     const [Id, setId] = useState<number | null>();
@@ -70,7 +71,7 @@ const Product_Service: React.FC = () => {
     const handleSync = async () => {
         modalClose();
         const params = {
-            CompanyId: 86,
+            CompanyId: CompanyId,
         }
         const url = `${process.env.base_url}/productandservice/sync`;
         const successCallback = () => {
@@ -90,7 +91,7 @@ const Product_Service: React.FC = () => {
                 Status: "",
                 GlobalFilter: ""
             },
-            CompanyId: 86,
+            CompanyId: CompanyId,
             PageSize: 100,
             Index: 1
         }
@@ -108,7 +109,7 @@ const Product_Service: React.FC = () => {
     const handleProductDelete = async () => {
         modalClose();
         const params = {
-            CompanyId: 86,
+            CompanyId: CompanyId,
             Id: Id,
         };
         const url = `${process.env.base_url}/productandservice/delete`;

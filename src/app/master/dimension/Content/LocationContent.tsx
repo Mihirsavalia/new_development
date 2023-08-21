@@ -4,6 +4,7 @@ import { callAPI } from "@/utils/API/callAPI";
 import { Button, Close, DataTable, Loader, Modal, ModalAction, ModalContent, ModalTitle, Switch, Toast, Typography } from 'next-ts-lib';
 import React, { useEffect, useRef, useState } from "react";
 import LocationContent from "../Drawer/LocationDrawer";
+import { useCompanyContext } from "@/context/companyContext";
 
 interface locationList {
     locationId: number;
@@ -18,10 +19,11 @@ interface LocationProps {
 }
 
 const Location: React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => {
+    const { CompanyId } = useCompanyContext();
     const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
     const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
     const [locationList, setLocationList] = useState<locationList[]>([]);
-    const [Id, setId] = useState<any>();
+    const [Id, setId] = useState<string>();
     const [RecordNo, setRecordNo] = useState<number | null>();
     const [refreshTable, setRefreshTable] = useState<boolean>(false);
 
@@ -58,7 +60,7 @@ const Location: React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => {
                 Status: "active",
                 GlobalFilter: "",
             },
-            CompanyId: 86,
+            CompanyId: CompanyId,
             Index: 1,
             PageSize: 1000,
         };
@@ -78,7 +80,7 @@ const Location: React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => {
     const handleLocationDelete = async () => {
         modalClose();
         const params = {
-            CompanyId: 86,
+            CompanyId: CompanyId,
             Id: Id,
             RecordNo: RecordNo,
         };
@@ -147,7 +149,7 @@ const Location: React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => {
             </div>
         );
     };
-    
+
     //DataTable Data
     const locationListData = locationList?.map(
         (e: any) =>
@@ -169,7 +171,7 @@ const Location: React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => {
 
     const handleKebabChange = (
         actionName: string,
-        id: any,
+        id: string,
         RecordNo: number
     ) => {
         setId(id);
@@ -184,7 +186,7 @@ const Location: React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => {
 
     const handleDrawerClose = () => {
         setIsOpenDrawer(false);
-        setId(null);
+        setId("");
         setRefreshTable(prevValue => !prevValue);
         onDrawerClose();
     };
@@ -205,61 +207,61 @@ const Location: React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => {
 
     return (
         <>
+
+            {/* DataTable */}
             {locationList.length <= 0 ? <div className="h-[445px] w-full flex items-center justify-center"><Loader size="md" helperText /></div> :
-                <div>
-                    {/* DataTable */}
-                    <div className="h-[445px]">
-                        {locationListData.length > 0 && (
-                            <DataTable
-                                columns={columns}
-                                data={locationListData}
+                <div className="h-[445px]">
+                    {locationListData.length > 0 ? (
+                        <DataTable
+                            columns={columns}
+                            data={locationListData}
 
-                                sticky
-                                hoverEffect={true}
-                            />
-                        )}
+                            sticky
+                            hoverEffect={true}
+                        />
+                    ) : <span className="flex justify-center">There is no data available at the moment.</span>}
+                </div>
+            }
+            {/* Remove Modal */}
+            <Modal isOpen={isRemoveOpen} onClose={modalClose} width="376px">
+                <ModalTitle>
+                    <div className="py-3 px-4 font-bold">Remove</div>
+                    <div onClick={modalClose}>
+                        <Close variant="medium" />
                     </div>
+                </ModalTitle>
+                <ModalContent>
+                    <div className="px-4 my-5">
+                        <Typography type="h5" className="!font-normal">
+                            Are you sure you want to remove the location ?
+                        </Typography>
+                    </div>
+                </ModalContent>
+                <ModalAction>
+                    <div>
+                        <Button
+                            className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
+                            variant="btn-outline"
+                            onClick={modalClose}
+                        >
+                            NO
+                        </Button>
+                    </div>
+                    <div>
+                        <Button
+                            className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
+                            variant="btn-error"
+                            onClick={handleLocationDelete}
+                        >
+                            YES
+                        </Button>
+                    </div>
+                </ModalAction>
+            </Modal>
 
-                    {/* Remove Modal */}
-                    <Modal isOpen={isRemoveOpen} onClose={modalClose} width="376px">
-                        <ModalTitle>
-                            <div className="py-3 px-4 font-bold">Remove</div>
-                            <div onClick={modalClose}>
-                                <Close variant="medium" />
-                            </div>
-                        </ModalTitle>
-                        <ModalContent>
-                            <div className="p-2 my-5">
-                                <Typography type="h5" className="!font-normal">
-                                    Are you sure you want to remove the location ?
-                                </Typography>
-                            </div>
-                        </ModalContent>
-                        <ModalAction>
-                            <div>
-                                <Button
-                                    className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
-                                    variant="btn-outline"
-                                    onClick={modalClose}
-                                >
-                                    NO
-                                </Button>
-                            </div>
-                            <div>
-                                <Button
-                                    className="rounded-full btn-sm font-semibold mx-2 my-3 !w-16 !h-[36px]"
-                                    variant="btn-error"
-                                    onClick={handleLocationDelete}
-                                >
-                                    YES
-                                </Button>
-                            </div>
-                        </ModalAction>
-                    </Modal>
+            <LocationContent onOpen={isOpenDrawer} onClose={handleDrawerClose} EditId={typeof Id === "number" ? Id : 0} />
+            <DrawerOverlay isOpen={isOpenDrawer} onClose={handleDrawerClose} />
 
-                    <LocationContent onOpen={isOpenDrawer} onClose={handleDrawerClose} EditId={typeof Id === "number" ? Id : 0} />
-                    <DrawerOverlay isOpen={isOpenDrawer} onClose={handleDrawerClose} />
-                </div>}
         </>);
 };
 

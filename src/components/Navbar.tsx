@@ -36,7 +36,7 @@ interface Product {
   name: string;
 }
 
-const page = ({ onData }: any) => {
+const page = ({ onData, isFormOpen }: any) => {
   const router = useRouter();
 
   const toggleRef = useRef<HTMLDivElement>(null);
@@ -91,6 +91,9 @@ const page = ({ onData }: any) => {
       setToggleHelpChange(false);
       setToggleCandyBoxChange(false);
     }
+  };
+  const manageCompany = () => {
+    router.push("/manage/companies");
   };
 
   const productRadioData = profileData?.products.map((product: any, index) => {
@@ -184,6 +187,10 @@ const page = ({ onData }: any) => {
     };
   }, []);
 
+  useEffect(() => {
+    getProfileData();
+  }, [isFormOpen]);
+
   return (
     <div>
       <nav className="w-full  flex items-center justify-between flex-wrap p-2 border-b border-b-lightSilver">
@@ -192,6 +199,7 @@ const page = ({ onData }: any) => {
         </div>
 
         <div className="xs:!hidden xsm:!flex w-auto flex-shrink-0  lg:flex lg:items-center lg:w-auto justify-end flex gap-1.5 mr-4 ">
+          <button onClick={manageCompany}>Manage Companies</button>
           <div
             className="w-8 h-8 flex items-center justify-center cursor-pointer"
             onClick={() => handleToggleChange("CandyBox")}

@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "@/assets/scss/styles.module.scss";
 import { callAPI } from "@/utils/API/callAPI";
+import { useCompanyContext } from "@/context/companyContext";
 
 interface DrawerProps {
     onOpen: boolean;
@@ -18,6 +19,7 @@ interface DrawerProps {
     EditId?: number;
 }
 const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
+    const { CompanyId } = useCompanyContext();
 
     const [name, setName] = useState<string>("");
     const [nameError, setNameError] = useState<boolean>(false);
@@ -52,7 +54,7 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
     //APTerm Data API
     const getAPTermById = async () => {
         const params = {
-            CompanyId: 86,
+            CompanyId: CompanyId,
             Id: EditId
         };
         const url = `${process.env.base_url}/apTerm/getbyid`;
@@ -70,7 +72,7 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
     //DueForm List API
     // const getDueFormList = async () => {
     //     const params = {
-    //         CompanyId: 86
+    //         CompanyId: CompanyId
     //     };
     //     const url = `${process.env.base_url}/account/getlist`;
     //     const successCallback = (ResponseData: any) => {
@@ -87,7 +89,7 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
     //Default Account List API
     // const getAccountList = async () => {
     //     const params = {
-    //         CompanyId: 86
+    //         CompanyId: CompanyId
     //     };
     //     const url = `${process.env.base_url}/account/getlist`;
     //     const successCallback = (ResponseData: any) => {
@@ -113,7 +115,7 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                 APTermId: EditId,
                 Description: "",
                 RecordNo: "",
-                CompanyId: 86,
+                CompanyId: CompanyId,
                 Name: name,
                 ParentId: "",
                 ParentName: "",
@@ -262,7 +264,7 @@ const APTermContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                                 className="rounded-full font-medium w-28 mx-3 xsm:!px-1"
                                 variant="btn-outline-primary"
                             >
-                                <Typography type="h6" className="!font-bold"> CANCLE</Typography>
+                                <Typography type="h6" className="!font-bold"> CANCEL</Typography>
                             </Button>
                             <Button
                                 type="submit"

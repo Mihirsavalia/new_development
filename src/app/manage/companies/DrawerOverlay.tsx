@@ -6,6 +6,8 @@ const DrawerOverlay = ({ isOpen, onClose }: any) => {
   localStorage.removeItem("xerocode");
   localStorage.removeItem("qbcode");
   localStorage.removeItem("realmId");
+  localStorage.removeItem("state");
+
 
   return (
     <div

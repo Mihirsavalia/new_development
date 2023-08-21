@@ -1,6 +1,7 @@
 import styles from "@/assets/scss/styles.module.scss";
+import { useCompanyContext } from "@/context/companyContext";
 import { callAPI } from "@/utils/API/callAPI";
-import { Button, Close, Loader, Text, Toast, Typography } from "next-ts-lib";
+import { Button, Close, Text, Toast, Typography } from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
 import { useEffect, useState } from "react";
 
@@ -11,7 +12,8 @@ interface DrawerProps {
 }
 const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
 
-    const AccountingTool = 1;
+    const { CompanyId, AccountingTools } = useCompanyContext();
+    const AccountingTool = AccountingTools;
     const [Id, setId] = useState<string>("");
     const [classId, setClassId] = useState<string>("");
     const [idHasError, setIdHasError] = useState<boolean>(false);
@@ -20,7 +22,7 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
     const [name, setName] = useState<string>("");
     const [nameError, setNameError] = useState<boolean>(false);
     const [nameHasError, setNameHasError] = useState<boolean>(false);
-    const [clicked, setClicked] = useState(false);
+    const [clicked, setClicked] = useState<boolean>(false);
 
     const handleClose = () => {
         onClose();
@@ -29,7 +31,7 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
     //Class Get Data API
     const getClassById = async () => {
         const params = {
-            CompanyId: 86,
+            CompanyId: CompanyId,
             Id: EditId
         }
         const url = `${process.env.base_url}/class/getbyid`;
@@ -47,17 +49,19 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
     };
 
     const generatedId = () => {
-        const length = 6;
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let result = Array.from({ length }, () => characters[Math.floor(Math.random() * characters.length)]).join('');
+        const result = Math.floor((Math.random() * 10000) + 1)
         return result;
     }
 
     const handleIdChange = (value: any) => {
-        const pattern = /^[a-zA-Z0-9]*$/;
-        if (pattern.test(value)) {
+        const pattern = /^[a-zA-Z0-9-]*$/;
+        if (pattern.test(value) || value.startsWith('PQ-C')) {
             setIdError(false);
-            setClassId(value);
+            const cleanedValue = value.replace(/^PQ-C/g, '');
+            setClassId('PQ-C' + cleanedValue);
+        } else {
+            const cleanedValue = value.replace(/[^a-zA-Z0-9-]/g, '');
+            setClassId(cleanedValue.length > 0 ? 'PQ-C' + cleanedValue : 'PQ-C');
         }
     };
 
@@ -74,7 +78,7 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                 ClassId: classId,
                 Description: name,
                 RecordNo: "",
-                CompanyId: 86,
+                CompanyId: CompanyId,
                 Name: name,
                 ParentId: "",
                 ParentName: "",
@@ -104,9 +108,7 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
             setNameError(false);
             setClicked(false);
         }
-        if (AccountingTool === 1 ) {
-            setClassId(generatedId())
-        }
+        setClassId(generatedId() + '')
     }, [onOpen]);
 
     useEffect(() => {
@@ -135,6 +137,7 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                                 name="id"
                                 placeholder="Please Enter ID Name"
                                 validate
+                                readOnly={EditId ? false : true}
                                 value={classId}
                                 hasError={idError}
                                 getValue={(value: any) => handleIdChange(value)}
@@ -165,7 +168,7 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                                 className="rounded-full font-medium w-28 mx-3 xsm:!px-1"
                                 variant="btn-outline-primary"
                             >
-                                <Typography type="h6" className="!font-bold"> CANCLE</Typography>
+                                <Typography type="h6" className="!font-bold"> CANCEL</Typography>
                             </Button>
                             <Button
                                 type="submit"

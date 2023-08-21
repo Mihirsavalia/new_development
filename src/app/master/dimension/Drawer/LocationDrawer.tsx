@@ -1,4 +1,5 @@
 import styles from "@/assets/scss/styles.module.scss";
+import { useCompanyContext } from "@/context/companyContext";
 import { callAPI } from "@/utils/API/callAPI";
 import { Button, Close, Text, Toast, Typography } from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
@@ -10,8 +11,9 @@ interface DrawerProps {
     EditId?: number;
 }
 const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
-    
-    const AccountingTool = 1;
+    const { CompanyId, AccountingTools } = useCompanyContext();
+
+    const AccountingTool = AccountingTools;
     const [Id, setId] = useState<string>("");
     const [locationId, setLocationId] = useState<string>("");
     const [idHasError, setIdHasError] = useState<boolean>(false);
@@ -20,7 +22,7 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
     const [name, setName] = useState<string>("");
     const [nameError, setNameError] = useState<boolean>(false);
     const [nameHasError, setNameHasError] = useState<boolean>(false);
-    const [clicked, setClicked] = useState(false);
+    const [clicked, setClicked] = useState<boolean>(false);
 
     const handleClose = () => {
         onClose();
@@ -29,7 +31,7 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
     //Location Get Data API
     const getLocationById = async () => {
         const params = {
-            CompanyId: 86,
+            CompanyId: CompanyId,
             Id: EditId
         }
         const url = `${process.env.base_url}/location/getbyid`;
@@ -54,10 +56,9 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
         }
     };
 
+
     const generatedId = () => {
-        const length = 6;
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let result = Array.from({ length }, () => characters[Math.floor(Math.random() * characters.length)]).join('');
+        const result = Math.floor((Math.random() * 10000) + 1)
         return result;
     }
 
@@ -69,7 +70,7 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
         if (!(locationId.length <= 0) && !(name.length <= 0)) {
             setClicked(true);
             const params = {
-                CompanyId: 86,
+                CompanyId: CompanyId,
                 Id: Id || 0,
                 Name: name,
                 RecordNo: "",
@@ -103,8 +104,8 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
             setNameError(false);
             setClicked(false);
         }
-        if (AccountingTool === 1) {
-            setLocationId(generatedId())
+        if (AccountingTool != 1) {
+            setLocationId('PQ-L' + generatedId())
         }
     }, [onOpen]);
 
@@ -135,6 +136,7 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
                                 placeholder="Please Enter ID Name"
                                 validate
                                 value={locationId}
+                                readOnly={EditId ? false : true}
                                 hasError={idError}
                                 getValue={(value: any) => handleIdChange(value)}
                                 getError={(e: any) => setIdHasError(e)}
@@ -164,7 +166,7 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
                                 className="rounded-full font-medium w-28 mx-3 xsm:!px-1"
                                 variant="btn-outline-primary"
                             >
-                                <Typography type="h6" className="!font-bold"> CANCLE</Typography>
+                                <Typography type="h6" className="!font-bold"> CANCEL</Typography>
                             </Button>
                             <Button
                                 type="submit"

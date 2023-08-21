@@ -1,4 +1,5 @@
 import styles from "@/assets/scss/styles.module.scss";
+import { useCompanyContext } from "@/context/companyContext";
 import { callAPI } from "@/utils/API/callAPI";
 import { Button, Close, Text, Toast, Typography } from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
@@ -13,6 +14,7 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
     // const [Id, setId] = useState<string>("");
     // const [idHasError, setIdHasError] = useState<boolean>(false);
     // const [idError, setIdError] = useState<boolean>(false);
+    const { CompanyId } = useCompanyContext();
 
     const [description, setDescription] = useState<string>("");
     const [descriptionError, setDescriptionError] = useState<boolean>(false);
@@ -30,7 +32,7 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
         if (!(description.trim().length <= 0)) {
             const params = {
                 Id: 0,
-                CompanyId: 86,
+                CompanyId: CompanyId,
                 APFieldId: 47,
                 Description: description
             }
@@ -117,7 +119,7 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
                                 className="rounded-full font-medium w-28 mx-3 xsm:!px-1"
                                 variant="btn-outline-primary"
                             >
-                                <Typography type="h6" className="!font-bold"> CANCLE</Typography>
+                                <Typography type="h6" className="!font-bold"> CANCEL</Typography>
                             </Button>
                             <Button
                                 type="submit"

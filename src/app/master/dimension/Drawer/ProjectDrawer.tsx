@@ -1,4 +1,5 @@
 import styles from "@/assets/scss/styles.module.scss";
+import { useCompanyContext } from "@/context/companyContext";
 import { callAPI } from "@/utils/API/callAPI";
 import { Button, Close, Text, Toast, Typography } from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
@@ -10,8 +11,9 @@ interface DrawerProps {
     EditId?: number;
 }
 const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
+    const { CompanyId, AccountingTools } = useCompanyContext();
     
-    const AccountingTool = 1;
+    const AccountingTool = AccountingTools;
     const [Id, setId] = useState<string>("");
     const [projectId, setProjectId] = useState<string>("");
     const [idHasError, setIdHasError] = useState<boolean>(false);
@@ -20,7 +22,7 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
     const [name, setName] = useState<string>("");
     const [nameError, setNameError] = useState<boolean>(false);
     const [nameHasError, setNameHasError] = useState<boolean>(false);
-    const [clicked, setClicked] = useState(false);
+    const [clicked, setClicked] = useState<boolean>(false);
 
     const handleClose = () => {
         onClose();
@@ -29,7 +31,7 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
     //Project Get Data API
     const getProjectById = async () => {
         const params = {
-            CompanyId: 86,
+            CompanyId: CompanyId,
             Id: EditId
         }
         const url = `${process.env.base_url}/project/getbyid`;
@@ -55,11 +57,10 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
     };
 
     const generatedId = () => {
-        const length = 6;
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let result = Array.from({ length }, () => characters[Math.floor(Math.random() * characters.length)]).join('');
+        const result =Math.floor((Math.random() * 10000) + 1)
         return result;
     }
+
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
@@ -72,7 +73,7 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                 Id: Id || 0,
                 ProjectId: projectId,
                 RecordNo: "",
-                CompanyId: 86,
+                CompanyId: CompanyId,
                 Name: name,
                 Description: "f4g4",
                 Category: "Capitalized",
@@ -106,8 +107,8 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
             setNameError(false);
             setClicked(false);
         }
-        if (AccountingTool === 1) {
-            setProjectId(generatedId())
+        if (AccountingTool != 1) {
+            setProjectId('PQ-P' +generatedId())
         }
     }, [onOpen]);
 
@@ -131,6 +132,7 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                                 name="id"
                                 placeholder="Please Enter ID Name"
                                 validate
+                                readOnly={EditId ? false : true}
                                 value={projectId}
                                 hasError={idError}
                                 getValue={(value: any) => handleIdChange(value)}
@@ -161,7 +163,7 @@ const ProjectContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                                 className="rounded-full font-medium w-28 mx-3 xsm:!px-1"
                                 variant="btn-outline-primary"
                             >
-                                <Typography type="h6" className="!font-bold"> CANCLE</Typography>
+                                <Typography type="h6" className="!font-bold"> CANCEL</Typography>
                             </Button>
                             <Button
                                 type="submit"

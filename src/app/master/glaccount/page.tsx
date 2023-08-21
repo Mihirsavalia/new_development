@@ -14,6 +14,7 @@ import "next-ts-lib/dist/index.css";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from 'react';
 import GLAccountContent from './Drawer/GLAccountDrawer';
+import { useCompanyContext } from '@/context/companyContext';
 
 interface accountList {
     name: string;
@@ -28,6 +29,7 @@ const GLAccount: React.FC = () => {
         hasNoToken(router);
     }, [router]);
 
+    const { CompanyId } = useCompanyContext();
     const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
 
     const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
@@ -66,7 +68,7 @@ const GLAccount: React.FC = () => {
     const handleSync = async () => {
         modalClose();
         const params = {
-            CompanyId: 86,
+            CompanyId: CompanyId,
         }
         const url = `${process.env.base_url}/account/sync`;
         const successCallback = () => {
@@ -89,7 +91,7 @@ const GLAccount: React.FC = () => {
                 Status: "",
                 GlobalFilter: ""
             },
-            CompanyId: 86,
+            CompanyId: CompanyId,
             Index: 1,
             PageSize: 1000
         }
@@ -109,7 +111,7 @@ const GLAccount: React.FC = () => {
     const handleAccountDelete = async () => {
         modalClose();
         const params = {
-            CompanyId: 86,
+            CompanyId: CompanyId,
             Id: Id,
         };
         const url = `${process.env.base_url}/account/delete`;

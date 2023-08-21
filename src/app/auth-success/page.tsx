@@ -26,8 +26,8 @@ const AuthSuccessPage: React.FC = () => {
   useEffect(() => {
     const sendToken = async () => {
       if (accessToken !== "" && token !== "") {
-        console.log(accessToken);
-        console.log(token);
+        // console.log(accessToken);
+        // console.log(token);
         try {
           const response = await axios.post(
             `${process.env.api_url}/social-login`,

@@ -13,6 +13,7 @@ import "next-ts-lib/dist/index.css";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from 'react';
 import APTermContent from './Drawer/ApTermDrawer';
+import { useCompanyContext } from '@/context/companyContext';
 
 interface apTermList {
   name: string;
@@ -26,10 +27,11 @@ const Vendor: React.FC = () => {
   useEffect(() => {
     hasNoToken(router);
   }, [router]);
+  const { CompanyId } = useCompanyContext();
   const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
   const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
-  const [editId, setEditId] = useState<number | null>();
+  const [EditId, setEditId] = useState<number | null>();
   const [apTermList, setAPTermList] = useState<apTermList[]>([]);
   const [isSyncModalOpen, setIsSyncModalOpen] = useState<boolean>(false);
   const [isSearch, setIsSearch] = useState<boolean>(false);
@@ -63,7 +65,7 @@ const Vendor: React.FC = () => {
   const handleSync = async () => {
     modalClose();
     const params = {
-      CompanyId: 86
+      CompanyId: CompanyId
     };
     const url = `${process.env.base_url}/apTerm/sync`;
     const successCallback = () => {
@@ -86,7 +88,7 @@ const Vendor: React.FC = () => {
         Status: "active",
         GlobalFilter: ""
       },
-      CompanyId: 86,
+      CompanyId: CompanyId,
       Index: 1,
       PageSize: 1000
     };
@@ -106,7 +108,7 @@ const Vendor: React.FC = () => {
   const handleAPTermDelete = async () => {
     modalClose();
     const params = {
-      CompanyId: 86,
+      CompanyId: CompanyId,
       Id: 354,
       RecordNo: "124"
     };
@@ -355,7 +357,7 @@ const Vendor: React.FC = () => {
           />
         )}
 
-        <APTermContent onOpen={isOpenDrawer} onClose={handleDrawerClose} editId={typeof editId === 'number' ? editId : 0} />
+        <APTermContent onOpen={isOpenDrawer} onClose={handleDrawerClose} EditId={typeof EditId === 'number' ? EditId : 0} />
 
         <DrawerOverlay
           isOpen={isOpenDrawer}

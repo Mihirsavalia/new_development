@@ -1,4 +1,5 @@
 import styles from "@/assets/scss/styles.module.scss";
+import { useCompanyContext } from "@/context/companyContext";
 import { callAPI } from '@/utils/API/callAPI';
 import { Button, Close, Select, Text, Toast, Typography } from "next-ts-lib";
 import "next-ts-lib/dist/index.css";
@@ -10,6 +11,7 @@ interface DrawerProps {
     EditId?: number;
 }
 const VendorContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
+    const { CompanyId } = useCompanyContext();
 
     const [productId, setProductId] = useState<string>("");
     const [idHasError, setIdHasError] = useState<boolean>(false);
@@ -35,7 +37,7 @@ const VendorContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
     //GET GLAccount API
     const getGLAccount = async () => {
         const params = {
-            CompanyId: 86,
+            CompanyId: CompanyId,
         }
         const url = `${process.env.base_url}/account/getdropdown`;
         const successCallback = (ResponseData: any) => {
@@ -49,7 +51,7 @@ const VendorContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
     //Product Data API
     const getProductById = async () => {
         const params = {
-            CompanyId: 86,
+            CompanyId: CompanyId,
             Id: EditId
         }
         const url = `${process.env.base_url}/product/getbyid`;
@@ -67,7 +69,7 @@ const VendorContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
     //Account List API
     const getAccountList = async () => {
         const params = {
-            CompanyId: 86
+            CompanyId: CompanyId
         }
         const url = `${process.env.base_url}/account/getlist`;
         const successCallback = (ResponseData: any) => {
@@ -94,7 +96,7 @@ const VendorContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
             const params = {
                 ItemId: productId || 0,
                 RecordNo: "",
-                CompanyId: 86,
+                CompanyId: CompanyId,
                 Name: name,
                 IntacctItemId: "testpo1",
                 ItemType: type,
@@ -232,7 +234,7 @@ const VendorContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                                 className="rounded-full font-medium w-28 mx-3 xsm:!px-1"
                                 variant="btn-outline-primary"
                             >
-                                <Typography type="h6" className="!font-bold"> CANCLE</Typography>
+                                <Typography type="h6" className="!font-bold"> CANCEL</Typography>
                             </Button>
                             <Button
                                 type="submit"

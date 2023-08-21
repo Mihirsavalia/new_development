@@ -4,7 +4,7 @@
 import PMSIcon from "../../assets/Icons/Product Icons/PMSIcon";
 import TMSIcon from "../../assets/Icons/Product Icons/TMSIcon";
 import { hasNoToken } from "@/utils/commonFunction";
-import { Avatar, Tooltip, Typography } from "next-ts-lib";
+import { Avatar, Loader, Toast, Tooltip, Typography } from "next-ts-lib";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import EditIcon from "../../assets/Icons/EditIcon";
@@ -13,34 +13,54 @@ import ATSIcon from "../../assets/Icons/Product Icons/ATSIcon";
 import DMSIcon from "../../assets/Icons/Product Icons/DMSIcon";
 import NavBar from "../../components/Navbar";
 import BiIcon from "../../assets/Icons/Product Icons/BIIcon";
+import DrawerOverlay from "@/components/Drawer/DrawerOverlay";
+import Drawer from "@/components/Drawer/Drawer";
 
-interface ProfileData {
+export interface ProfileData {
   first_name: string;
   last_name: string;
   phone: string;
   email: string;
   address: string;
   country_id: string;
+  country: string;
   state_id: string;
+  state: string;
   city_id: string;
+  city: string;
   postal_code: string;
   time_zone: string;
   products: Product[];
 }
 
-interface Product {
+export interface Product {
   name: string;
+}
+
+interface toastData {
+  statusCode?: number;
+  statusMsg?: string;
 }
 
 const page: React.FC = () => {
   const router = useRouter();
+  const productTitle: string[] = [];
+  const [edit, setEdit] = useState<string>("");
+  const [isOpen, setOpen] = useState<boolean>(false);
+  const [profileData, setProfileData] = useState<ProfileData | null>(null);
+
+  const globalData = (data: any) => {
+    setProfileData(data);
+  };
+
+  const handleEdit = (arg1: boolean, arg2: string) => {
+    setOpen(arg1);
+    setEdit(arg2);
+  };
 
   useEffect(() => {
     hasNoToken(router);
   }, [router]);
-
-  const [profileData, setProfileData] = useState<ProfileData | null>(null);
-  const productTitle: string[] = [];
 
   const productItems = profileData?.products.map((product: any, index) => {
     return (
@@ -61,14 +81,17 @@ const page: React.FC = () => {
     );
   });
 
-  const globalData = (data: any) => {
-    setProfileData(data);
-  };
-
   return (
     <>
+      <DrawerOverlay isOpen={isOpen} handleEdit={handleEdit} />
+      <Drawer
+        isOpen={isOpen}
+        edit={edit}
+        handleEdit={handleEdit}
+        profileData={profileData}
+      />
       {/* Navigation Bar */}
-      <NavBar onData={globalData} />
+      <NavBar onData={globalData} isFormOpen={isOpen} />
       <div className="flex xs:!flex-col sm:!flex-row md:!flex-row lg:!flex-row pb-5">
         <div className="flex flex-col xs:!w-11/12 sm:!w-2/4 lg:!w-1/4 md:!w-3/6 xl:w-1/4 ">
           <div className="h-auto w-auto flex border my-4 ml-7 border-lightSilver rounded-md">
@@ -81,7 +104,14 @@ const page: React.FC = () => {
                         My Profile
                       </Typography>
                     </div>
-                    <div className="flex w-full justify-end items-center">
+                    <div
+                      className={`flex w-full justify-end items-center ${
+                        profileData === null
+                          ? "pointer-events-none"
+                          : "cursor-default"
+                      }`}
+                      onClick={() => handleEdit(true, "profile")}
+                    >
                       <Tooltip content="Edit Profile" position="top">
                         <EditIcon />
                       </Tooltip>
@@ -197,7 +227,7 @@ const page: React.FC = () => {
                       Country
                     </Typography>
                     <Typography type="h6" className="inline-block font-thin">
-                      {profileData?.country_id}
+                      {profileData?.country}
                     </Typography>
                   </div>
                 </li>
@@ -210,7 +240,7 @@ const page: React.FC = () => {
                       State
                     </Typography>
                     <Typography type="h6" className="inline-block font-thin">
-                      {profileData?.state_id}
+                      {profileData?.state}
                     </Typography>
                   </div>
                 </li>
@@ -223,7 +253,7 @@ const page: React.FC = () => {
                       City
                     </Typography>
                     <Typography type="h6" className="inline-block font-thin">
-                      {profileData?.city_id}
+                      {profileData?.city}
                     </Typography>
                   </div>
                 </li>
@@ -265,7 +295,12 @@ const page: React.FC = () => {
                       Profile Password
                     </Typography>
                   </div>
-                  <div className="flex justify-end items-center">
+                  <div
+                    className="flex justify-end items-center"
+                    onClick={() => {
+                      handleEdit(true, "password");
+                    }}
+                  >
                     <Tooltip content="Edit Profile" position="top">
                       <EditIcon />
                     </Tooltip>
