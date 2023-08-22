@@ -249,7 +249,7 @@ const Sidebar = ({ setOpen, setSettingSidebar, toggleDrawer }: SidebarProps): JS
   }, 250);
 
   const handleSettingChange = () => {
-    router.push('/manage/users')
+    router.push('/manage/companies')
   }
 
   return (

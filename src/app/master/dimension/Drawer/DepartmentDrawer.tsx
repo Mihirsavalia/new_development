@@ -12,9 +12,8 @@ interface DrawerProps {
 }
 const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
 
-    const {CompanyId,AccountingTools} = useCompanyContext();
+    const { CompanyId } = useCompanyContext();
 
-    const AccountingTool = AccountingTools;
     const [departmentId, setDepartmentId] = useState<string>("");
     const [departmentCode, setDepartmentCode] = useState<string>("");
     const [idHasError, setIdHasError] = useState<boolean>(false);
@@ -49,17 +48,12 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) =
         callAPI(url, params, successCallback);
     };
 
-    const handleDeptCodeChange = (value: any) => {
-        const pattern = /^[a-zA-Z0-9]*$/;
-        if (pattern.test(value)) {
-            setIdError(false);
-            setDepartmentCode(value);
-        }
-    };
-
     const generatedId = () => {
-        const result =Math.floor((Math.random() * 10000) + 1)
-        return result;
+        const minLength = 4;
+        const maxLength = 8;
+        const length = Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength;
+        const randomDigits = Array.from({ length }, () => Math.floor(Math.random() * 10));
+        return randomDigits.join('');
     }
 
     const handleSubmit = async (e: any) => {
@@ -80,7 +74,7 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) =
             const url = `${process.env.base_url}/department/save`;
             const successCallback = (ResponseData: any) => {
                 if (ResponseData.ResponseStatus === "Failure") {
-                    Toast.error("Error", ResponseData.Message);
+                    Toast.error("Error", ResponseData.ErrorData.Error);
                 }
                 else {
                     Toast.success(`Department ${EditId ? "updated" : "added"} successfully.`);
@@ -100,9 +94,7 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) =
             setDepartmentCode("");
             setClicked(false);
         }
-        if (AccountingTool != 1) {
-            setDepartmentCode('PQ-D' + generatedId())
-        }
+        setDepartmentCode('PQ-D' + generatedId())
     }, [onOpen]);
 
     useEffect(() => {
@@ -132,9 +124,9 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) =
                                 placeholder="Please Enter ID Name"
                                 validate
                                 value={departmentCode}
-                                readOnly={EditId ? false : true}
+                                readOnly={true}
                                 hasError={idError}
-                                getValue={(value: any) => handleDeptCodeChange(value)}
+                                getValue={(value: any) => setDepartmentCode(value)}
                                 getError={(e: any) => setIdHasError(e)}
                             >
                             </Text>

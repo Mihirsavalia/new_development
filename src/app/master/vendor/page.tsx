@@ -74,7 +74,7 @@ const Vendor: React.FC = () => {
         };
         const url = `${process.env.base_url}/vendor/sync`;
         const successCallback = () => {
-            Toast.success("Success", "Vendor Sync successfully");
+            Toast.success("Vendor Sync successfully");
         };
         callAPI(url, params, successCallback);
     };
@@ -82,29 +82,29 @@ const Vendor: React.FC = () => {
     //Account List API
     const getAccountList = async () => {
         modalClose();
-        const params = {
-            FilterObj: {
-                AccountNo: "",
-                Name: "",
-                FullyQualifiedName: "",
-                AccountType: "",
-                ClosingType: "",
-                NormalBalance: "",
-                CurrentBalance: "",
-                Status: "active",
-                GlobalFilter: ""
-            },
-            CompanyId: CompanyId,
-            Index: 1,
-            PageSize: 1000
-        }
-        const url = `${process.env.base_url}/vendor/getlist`;
-        const successCallback = (ResponseData: any) => {
-            if (ResponseData !== null && typeof ResponseData === 'object') {
-                setAccountList(ResponseData);
-            }
-        };
-        callAPI(url, params, successCallback);
+        // const params = {
+        //     FilterObj: {
+        //         AccountNo: "",
+        //         Name: "",
+        //         FullyQualifiedName: "",
+        //         AccountType: "",
+        //         ClosingType: "",
+        //         NormalBalance: "",
+        //         CurrentBalance: "",
+        //         Status: "active",
+        //         GlobalFilter: ""
+        //     },
+        //     CompanyId: CompanyId,
+        //     Index: 1,
+        //     PageSize: 1000
+        // }
+        // const url = `${process.env.base_url}/vendor/getlist`;
+        // const successCallback = (ResponseData: any) => {
+        //     if (ResponseData !== null && typeof ResponseData === 'object') {
+        //         setAccountList(ResponseData);
+        //     }
+        // };
+        // callAPI(url, params, successCallback);
     };
     useEffect(() => {
         getAccountList();
@@ -113,16 +113,16 @@ const Vendor: React.FC = () => {
     //Delete Class API 
     const handleVendorDelete = async () => {
         modalClose();
-        const params = {
-            CompanyId: CompanyId,
-            Id: 354,
-            RecordNo: "124"
-        };
-        const url = `${process.env.base_url}/vendor/delete`;
-        const successCallback = () => {
-            Toast.success("Error", "Vendor Remove successfully");
-        };
-        callAPI(url, params, successCallback);
+        // const params = {
+        //     CompanyId: CompanyId,
+        //     Id: 354,
+        //     RecordNo: "124"
+        // };
+        // const url = `${process.env.base_url}/vendor/delete`;
+        // const successCallback = () => {
+        //     Toast.success("Error", "Vendor Remove successfully");
+        // };
+        // callAPI(url, params, successCallback);
     };
 
     const actionArray = ["Edit", "Remove"];

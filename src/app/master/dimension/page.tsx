@@ -46,7 +46,7 @@ const Dimension: React.FC = () => {
         }
         const url = `${process.env.base_url}/${tab}/sync`;
         const successCallback = () => {
-            Toast.success("Success", `${tab} sync successfully`);
+            Toast.success(`${tab} sync successfully`);
         };
         callAPI(url, params, successCallback);
     };

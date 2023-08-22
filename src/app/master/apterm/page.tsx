@@ -8,7 +8,7 @@ import SyncIcon from "@/assets/Icons/SyncIcon";
 import Wrapper from '@/components/common/Wrapper';
 import { callAPI } from '@/utils/API/callAPI';
 import { hasNoToken } from "@/utils/commonFunction";
-import { Button, Close, DataTable, Modal, ModalAction, ModalContent, ModalTitle, Switch, Text, Toast, Tooltip, Typography } from 'next-ts-lib';
+import { Button, Close, DataTable, Loader, Modal, ModalAction, ModalContent, ModalTitle, Switch, Text, Toast, Tooltip, Typography } from 'next-ts-lib';
 import "next-ts-lib/dist/index.css";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from 'react';
@@ -37,6 +37,7 @@ const Vendor: React.FC = () => {
   const [isSearch, setIsSearch] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>("");
   const [searchHasError, setSearchHasError] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const columns = [
     {
@@ -69,36 +70,38 @@ const Vendor: React.FC = () => {
     };
     const url = `${process.env.base_url}/apTerm/sync`;
     const successCallback = () => {
-      Toast.success("Success", "APTerm Sync successfully");
+      Toast.success("APTerm Sync successfully");
     };
     callAPI(url, params, successCallback);
   };
 
   //APTerm List API
   const getAPTermList = async () => {
-    const params = {
-      FilterObj: {
-        APTermNo: "",
-        Name: "",
-        FullyQualifiedName: "",
-        APTermType: "",
-        ClosingType: "",
-        NormalBalance: "",
-        CurrentBalance: "",
-        Status: "active",
-        GlobalFilter: ""
-      },
-      CompanyId: CompanyId,
-      Index: 1,
-      PageSize: 1000
-    };
-    const url = `${process.env.base_url}/apTerm/getlist`;
-    const successCallback = (ResponseData: any) => {
-      if (ResponseData !== null && typeof ResponseData === 'object') {
-        setAPTermList(ResponseData);
-      }
-    };
-    callAPI(url, params, successCallback);
+    setIsLoading(true);
+    // const params = {
+    //   FilterObj: {
+    //     APTermNo: "",
+    //     Name: "",
+    //     FullyQualifiedName: "",
+    //     APTermType: "",
+    //     ClosingType: "",
+    //     NormalBalance: "",
+    //     CurrentBalance: "",
+    //     Status: "active",
+    //     GlobalFilter: ""
+    //   },
+    //   CompanyId: CompanyId,
+    //   Index: 1,
+    //   PageSize: 1000
+    // };
+    // const url = `${process.env.base_url}/apTerm/getlist`;
+    // const successCallback = (ResponseData: any) => {
+    //   if (ResponseData !== null && typeof ResponseData === 'object') {
+    //     setAPTermList(ResponseData);
+    //   }
+    // setIsLoading(false);
+    // };
+    // callAPI(url, params, successCallback);
   };
   useEffect(() => {
     getAPTermList();
@@ -347,15 +350,25 @@ const Vendor: React.FC = () => {
           </ModalAction>
         </Modal>
 
+
         {/* DataTable */}
-        {tableData.length > 0 && (
-          <DataTable
-            columns={columns}
-            data={tableData}
-            sticky
-            hoverEffect={true}
-          />
-        )}
+        {/* <div className={`${tableData.length > 0 && "h-[445px]"}`}>
+          {isLoading ? (
+            <div className="h-[445px] w-full flex items-center justify-center">
+              <Loader size="md" helperText />
+            </div>
+          ) :
+            <> */}
+        <DataTable
+          columns={columns}
+          data={tableData.length > 0 ? tableData : []}
+          sticky
+          hoverEffect={true}
+        />
+        {/* {tableData.length > 0 ? "" : <div className="w-auto h-[48px] flex justify-center items-center border-b border-b-[#ccc]">There is no data available at the moment.</div>}
+            </>
+          }
+        </div> */}
 
         <APTermContent onOpen={isOpenDrawer} onClose={handleDrawerClose} EditId={typeof EditId === 'number' ? EditId : 0} />
 

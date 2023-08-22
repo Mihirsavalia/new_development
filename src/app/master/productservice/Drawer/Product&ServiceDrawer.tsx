@@ -79,7 +79,7 @@ const ProductContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
         productId.trim().length <= 0 && setIdError(true);
         name.trim().length <= 0 && setNameError(true);
         type.trim().length <= 0 && setTypeError(true);
-        account.length <= 0 && setAccountError(true);
+        account.length >= 0 && setAccountError(true);
 
         if (!(productId.trim().length <= 0) && !(name.trim().length <= 0) && !(type.trim().length <= 0) && !(account.length <= 0)) {
             const params = {

@@ -8,7 +8,7 @@
   }
 }
 .slideInAnimation {
-  animation: slideInRight 0.5s ease-out;
+  animation: slideInRight 0.3s ease-out;
 }
 
 @keyframes slideOutRight {
@@ -20,7 +20,7 @@
   }
 }
 .slideOutAnimation {
-  animation: slideOutRight 0.5s ease-out;
+  animation: slideOutRight 0.3s ease-out;
 }
 
 @media screen and (max-width: 1023px) {
@@ -41,7 +41,7 @@
 }
 
 .leftToRight {
-  animation: leftToRight 0.5s ease-out;
+  animation: leftToRight 0.3s ease-out;
 }
 
 @keyframes leftToRight {
@@ -55,7 +55,7 @@
 }
 
 .rightToLeft {
-  animation: rightToLeft 0.5s ease-out;
+  animation: rightToLeft 0.3s ease-out;
 }
 
 @keyframes rightToLeft {
@@ -69,7 +69,7 @@
 }
 
 .rightAnimation {
-  animation: rightAnimation 0.5s ease-in-out both;
+  animation: rightAnimation 0.3s ease-in-out both;
 }
 
 @keyframes rightAnimation {
@@ -83,7 +83,7 @@
 }
 
 .leftAnimation {
-  animation: leftAnimation 0.5s ease-in-out both;
+  animation: leftAnimation 0.3s ease-in-out both;
 }
 
 @keyframes leftAnimation {

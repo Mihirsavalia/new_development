@@ -12,8 +12,7 @@ interface DrawerProps {
 }
 const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
 
-    const { CompanyId, AccountingTools } = useCompanyContext();
-    const AccountingTool = AccountingTools;
+    const { CompanyId } = useCompanyContext();
     const [Id, setId] = useState<string>("");
     const [classId, setClassId] = useState<string>("");
     const [idHasError, setIdHasError] = useState<boolean>(false);
@@ -48,22 +47,14 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
         callAPI(url, params, successCallback);
     };
 
-    const generatedId = () => {
-        const result = Math.floor((Math.random() * 10000) + 1)
-        return result;
-    }
 
-    const handleIdChange = (value: any) => {
-        const pattern = /^[a-zA-Z0-9-]*$/;
-        if (pattern.test(value) || value.startsWith('PQ-C')) {
-            setIdError(false);
-            const cleanedValue = value.replace(/^PQ-C/g, '');
-            setClassId('PQ-C' + cleanedValue);
-        } else {
-            const cleanedValue = value.replace(/[^a-zA-Z0-9-]/g, '');
-            setClassId(cleanedValue.length > 0 ? 'PQ-C' + cleanedValue : 'PQ-C');
-        }
-    };
+    const generatedId = () => {
+        const minLength = 4;
+        const maxLength = 8;
+        const length = Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength;
+        const randomDigits = Array.from({ length }, () => Math.floor(Math.random() * 10));
+        return randomDigits.join('');
+    }
 
     //Save Data API
     const handleSubmit = async (e: any) => {
@@ -88,7 +79,7 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
             const url = `${process.env.base_url}/class/save`;
             const successCallback = (ResponseData: any) => {
                 if (ResponseData.ResponseStatus === "Failure") {
-                    Toast.error("Error", ResponseData.Message);
+                    Toast.error("Error", ResponseData.ErrorData.Error);
                 }
                 else {
                     Toast.success(`Class ${EditId ? "updated" : "added"} successfully.`);
@@ -108,7 +99,7 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
             setNameError(false);
             setClicked(false);
         }
-        setClassId(generatedId() + '')
+        setClassId('PQ-C' + generatedId())
     }, [onOpen]);
 
     useEffect(() => {
@@ -137,10 +128,10 @@ const ClassContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
                                 name="id"
                                 placeholder="Please Enter ID Name"
                                 validate
-                                readOnly={EditId ? false : true}
+                                readOnly={true}
                                 value={classId}
                                 hasError={idError}
-                                getValue={(value: any) => handleIdChange(value)}
+                                getValue={(value: any) => setClassId(value)}
                                 getError={(e: any) => setIdHasError(e)}
                             >
                             </Text>

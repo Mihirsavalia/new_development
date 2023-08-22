@@ -5,13 +5,13 @@ import MeatballsMenuIcon from "@/assets/Icons/MeatballsMenu";
 import PlusIcon from '@/assets/Icons/PlusIcon';
 import SearchIcon from '@/assets/Icons/SearchIcon';
 import Wrapper from '@/components/common/Wrapper';
+import { useCompanyContext } from '@/context/companyContext';
 import { callAPI } from '@/utils/API/callAPI';
 import { hasNoToken } from "@/utils/commonFunction";
-import { Button, Close, DataTable, Loader, Modal, ModalAction, ModalContent, ModalTitle, Toast, Text, Tooltip, Typography } from 'next-ts-lib';
+import { Button, Close, DataTable, Loader, Modal, ModalAction, ModalContent, ModalTitle, Text, Toast, Tooltip, Typography } from 'next-ts-lib';
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from 'react';
 import DescriptionContent from './Drawer/DescriptionDrawer';
-import { useCompanyContext } from '@/context/companyContext';
 
 interface descriptionList {
     name: string;
@@ -34,6 +34,7 @@ const Description: React.FC = () => {
     const [isSearch, setIsSearch] = useState<boolean>(false);
     const [searchValue, setSearchValue] = useState<string>("");
     const [searchHasError, setSearchHasError] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const columns = [
         {
@@ -55,6 +56,7 @@ const Description: React.FC = () => {
 
     //Description List API
     const getDescriptionList = async () => {
+        setIsLoading(true);
         const params = {
             CompanyId: CompanyId,
             APFieldId: 47,
@@ -67,6 +69,7 @@ const Description: React.FC = () => {
             if (ResponseData !== null && typeof ResponseData === 'object') {
                 setDescriptionList(ResponseData.APDescriptions);
             }
+            setIsLoading(false);
         };
         callAPI(url, params, successCallback);
     };
@@ -84,7 +87,7 @@ const Description: React.FC = () => {
         };
         const url = `${process.env.base_url}/description/delete`;
         const successCallback = () => {
-            Toast.success("Success", "Description Remove successfully");
+            Toast.success("Description Remove successfully");
             getDescriptionList();
         };
         callAPI(url, params, successCallback);
@@ -237,18 +240,24 @@ const Description: React.FC = () => {
                     </div>
                 </div>
 
-                {descriptionList.length <= 0 ? <div className="h-[445px] w-full  flex items-center justify-center"><Loader size="md" helperText /></div> :
-                    <div className="h-[445px]">
-                        {descriptionListData.length > 0 && (
+                {/* DataTable */}
+                <div className={`${descriptionList.length > 0 && "h-[445px]"}`}>
+                    {isLoading ? (
+                        <div className="h-[445px] w-full flex items-center justify-center">
+                            <Loader size="md" helperText />
+                        </div>
+                    ) :
+                        <>
                             <DataTable
                                 columns={columns}
-                                data={descriptionListData}
+                                data={descriptionList.length > 0 ? descriptionListData : []}
                                 sticky
                                 hoverEffect={true}
                             />
-                        )}
-                    </div>
-                }
+                            {descriptionList.length > 0 ? "" : <div className="w-auto h-[48px] flex justify-center items-center border-b border-b-[#ccc]">There is no data available at the moment.</div>}
+                        </>
+                    }
+                </div>
 
                 {/* Remove Modal */}
                 <Modal isOpen={isRemoveOpen} onClose={modalClose} width="376px">
@@ -259,7 +268,7 @@ const Description: React.FC = () => {
                         </div>
                     </ModalTitle>
                     <ModalContent>
-                        <div className="p-2 my-5">
+                        <div className="px-4 my-5">
                             <Typography type="h5" className="!font-normal">
                                 Are you sure you want to remove the description ?
                             </Typography>

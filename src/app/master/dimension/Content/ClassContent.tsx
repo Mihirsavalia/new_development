@@ -2,7 +2,7 @@ import DrawerOverlay from "@/app/manage/users/DrawerOverlay";
 import MeatballsMenuIcon from "@/assets/Icons/MeatballsMenu";
 import { callAPI } from "@/utils/API/callAPI";
 import { Button, Close, DataTable, Loader, Modal, ModalAction, ModalContent, ModalTitle, Switch, Toast, Typography } from 'next-ts-lib';
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import ClassDrawer from "../Drawer/ClassDrawer";
 import { useCompanyContext } from "@/context/companyContext";
 
@@ -25,6 +25,7 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
     const [Id, setId] = useState<string>();
     const [RecordNo, setRecordNo] = useState<number | null>();
     const [refreshTable, setRefreshTable] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const columns = [
         {
@@ -68,11 +69,16 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
             if (ResponseData !== null && typeof ResponseData === "object") {
                 setClassList(ResponseData.List);
             }
+            setIsLoading(false);
         };
         callAPI(url, params, successCallback);
     };
+
     useEffect(() => {
         getClassList();
+        if (classList.length <= 0) {
+            setIsLoading(true);
+        }
     }, [refreshTable]);
 
     //Delete Class API
@@ -85,7 +91,7 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
         };
         const url = `${process.env.base_url}/class/delete`;
         const successCallback = () => {
-            Toast.success("Success", "Class Remove successfully");
+            Toast.success("Class Remove successfully");
             getClassList();
         };
         callAPI(url, params, successCallback);
@@ -110,7 +116,8 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
             return () => {
                 window.removeEventListener("click", handleOutsideClick);
             };
-        }, []);
+        }, [handleOutsideClick]);
+
         return (
             <div className="relative w-full flex justify-end">
                 <div
@@ -194,6 +201,7 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
         setIsOpenDrawer(onDrawerOpen);
     }, [onDrawerOpen]);
 
+    
     useEffect(() => {
         if (isOpenDrawer) {
             handleDrawerClose();
@@ -207,19 +215,23 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
     return (
         <>
             {/* DataTable */}
-            {classListData.length <= 0 ? <div className="h-[445px] w-full flex items-center justify-center"><Loader size="md" helperText /></div> :
-                <div className="h-[445px]">
-                    {classListData.length > 0 ? (
+            <div className={`${classList.length > 0 && "h-[445px]"}`}>
+                {isLoading ? (
+                    <div className="h-[445px] w-full flex items-center justify-center">
+                        <Loader size="md" helperText />
+                    </div>
+                ) :
+                    <>
                         <DataTable
                             columns={columns}
-                            data={classListData}
+                            data={classList.length > 0 ? classListData : []}
                             sticky
                             hoverEffect={true}
                         />
-                    ) : <span className="flex justify-center">There is no data available at the moment.</span>
-                    }
-                </div>
-            }
+                        {classList.length > 0 ? "" : <div className="w-auto h-[48px] flex justify-center items-center border-b border-b-[#ccc]">There is no data available at the moment.</div>}
+                    </>
+                }
+            </div >
 
             {/* Remove Modal */}
             <Modal isOpen={isRemoveOpen} onClose={modalClose} width="376px">

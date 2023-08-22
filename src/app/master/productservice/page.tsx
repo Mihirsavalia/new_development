@@ -6,15 +6,14 @@ import PlusIcon from '@/assets/Icons/PlusIcon';
 import SearchIcon from '@/assets/Icons/SearchIcon';
 import SyncIcon from "@/assets/Icons/SyncIcon";
 import Wrapper from '@/components/common/Wrapper';
+import { useCompanyContext } from '@/context/companyContext';
+import { callAPI } from '@/utils/API/callAPI';
 import { hasNoToken } from "@/utils/commonFunction";
-import axios from 'axios';
-import { Button, Close, DataTable, Loader, Modal, ModalAction, ModalContent, ModalTitle, Toast, Text, Tooltip, Typography } from 'next-ts-lib';
+import { Button, Close, DataTable, Loader, Modal, ModalAction, ModalContent, ModalTitle, Text, Toast, Tooltip, Typography } from 'next-ts-lib';
 import "next-ts-lib/dist/index.css";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from 'react';
 import ProductContent from './Drawer/Product&ServiceDrawer';
-import { callAPI } from '@/utils/API/callAPI';
-import { useCompanyContext } from '@/context/companyContext';
 
 interface productList {
     name: string;
@@ -38,6 +37,7 @@ const Product_Service: React.FC = () => {
     const [isSearch, setIsSearch] = useState<boolean>(false);
     const [searchValue, setSearchValue] = useState<string>("");
     const [searchHasError, setSearchHasError] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const columns = [
         {
@@ -75,13 +75,14 @@ const Product_Service: React.FC = () => {
         }
         const url = `${process.env.base_url}/productandservice/sync`;
         const successCallback = () => {
-            Toast.success("Success", "Product & Service Sync successfully");
+            Toast.success("Product & Service Sync successfully");
         };
         callAPI(url, params, successCallback);
     };
 
     //Product List API
     const getProductList = async () => {
+        setIsLoading(true);
         const params = {
             ProductSerObject: {
                 Name: "",
@@ -97,7 +98,10 @@ const Product_Service: React.FC = () => {
         }
         const url = `${process.env.base_url}/productandservice/getlist`;
         const successCallback = (ResponseData: any) => {
-            setProductList(ResponseData.AllItems);
+            if (ResponseData !== null && typeof ResponseData === "object") {
+                setProductList(ResponseData.AllItems);
+            }
+            setIsLoading(false);
         };
         callAPI(url, params, successCallback);
     };
@@ -114,7 +118,7 @@ const Product_Service: React.FC = () => {
         };
         const url = `${process.env.base_url}/productandservice/delete`;
         const successCallback = () => {
-            Toast.success("Success", "Product Remove successfully");
+            Toast.success("Product Remove successfully");
             getProductList();
         };
         callAPI(url, params, successCallback);
@@ -317,17 +321,25 @@ const Product_Service: React.FC = () => {
                         </div>
                     </ModalAction>
                 </Modal>
-                {productList.length <= 0 ? <div className="h-[445px] w-full  flex items-center justify-center"><Loader size="md" helperText /></div> :
-                    <div className="h-[445px]">
-                        {productListData.length > 0 && (
+
+                {/* DataTable */}
+                <div className={`${productList.length > 0 && "h-[445px]"}`}>
+                    {isLoading ? (
+                        <div className="h-[445px] w-full flex items-center justify-center">
+                            <Loader size="md" helperText />
+                        </div>
+                    ) :
+                        <>
                             <DataTable
                                 columns={columns}
-                                data={productListData}
+                                data={productList.length > 0 ? productListData : []}
                                 sticky
                                 hoverEffect={true}
                             />
-                        )}
-                    </div>}
+                            {productList.length > 0 ? "" : <div className="w-auto h-[48px] flex justify-center items-center border-b border-b-[#ccc]">There is no data available at the moment.</div>}
+                        </>
+                    }
+                </div>
 
                 {/* Remove Modal */}
                 <Modal isOpen={isRemoveOpen} onClose={modalClose} width="376px">

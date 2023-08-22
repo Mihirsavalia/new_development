@@ -11,9 +11,7 @@ interface DrawerProps {
     EditId?: number;
 }
 const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
-    const { CompanyId, AccountingTools } = useCompanyContext();
-
-    const AccountingTool = AccountingTools;
+    const { CompanyId } = useCompanyContext();
     const [Id, setId] = useState<string>("");
     const [locationId, setLocationId] = useState<string>("");
     const [idHasError, setIdHasError] = useState<boolean>(false);
@@ -48,18 +46,12 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
         callAPI(url, params, successCallback);
     };
 
-    const handleIdChange = (value: any) => {
-        const pattern = /^[a-zA-Z0-9]*$/;
-        if (pattern.test(value)) {
-            setIdError(false);
-            setLocationId(value);
-        }
-    };
-
-
     const generatedId = () => {
-        const result = Math.floor((Math.random() * 10000) + 1)
-        return result;
+        const minLength = 4;
+        const maxLength = 8;
+        const length = Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength;
+        const randomDigits = Array.from({ length }, () => Math.floor(Math.random() * 10));
+        return randomDigits.join('');
     }
 
     const handleSubmit = async (e: any) => {
@@ -84,7 +76,7 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
             const url = `${process.env.base_url}/location/save`;
             const successCallback = (ResponseData: any) => {
                 if (ResponseData.ResponseStatus === "Failure") {
-                    Toast.error("Error", ResponseData.Message);
+                    Toast.error("Error", ResponseData.ErrorData.Error);
                 }
                 else {
                     Toast.success(`Location ${EditId ? "updated" : "added"} successfully.`);
@@ -104,9 +96,7 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
             setNameError(false);
             setClicked(false);
         }
-        if (AccountingTool != 1) {
-            setLocationId('PQ-L' + generatedId())
-        }
+        setLocationId('PQ-L' + generatedId())
     }, [onOpen]);
 
     useEffect(() => {
@@ -136,9 +126,9 @@ const LocationContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => 
                                 placeholder="Please Enter ID Name"
                                 validate
                                 value={locationId}
-                                readOnly={EditId ? false : true}
+                                readOnly={true}
                                 hasError={idError}
-                                getValue={(value: any) => handleIdChange(value)}
+                                getValue={(value: any) => setLocationId(value)}
                                 getError={(e: any) => setIdHasError(e)}
                             >
                             </Text>

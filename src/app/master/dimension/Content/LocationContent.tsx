@@ -1,10 +1,10 @@
 import DrawerOverlay from "@/app/manage/users/DrawerOverlay";
 import MeatballsMenuIcon from "@/assets/Icons/MeatballsMenu";
+import { useCompanyContext } from "@/context/companyContext";
 import { callAPI } from "@/utils/API/callAPI";
 import { Button, Close, DataTable, Loader, Modal, ModalAction, ModalContent, ModalTitle, Switch, Toast, Typography } from 'next-ts-lib';
 import React, { useEffect, useRef, useState } from "react";
 import LocationContent from "../Drawer/LocationDrawer";
-import { useCompanyContext } from "@/context/companyContext";
 
 interface locationList {
     locationId: number;
@@ -26,6 +26,7 @@ const Location: React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => {
     const [Id, setId] = useState<string>();
     const [RecordNo, setRecordNo] = useState<number | null>();
     const [refreshTable, setRefreshTable] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const columns = [
         {
@@ -50,6 +51,7 @@ const Location: React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => {
         },
     ];
 
+
     //Location List API
     const getLocationList = async () => {
         const params = {
@@ -69,11 +71,15 @@ const Location: React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => {
             if (ResponseData !== null && typeof ResponseData === "object") {
                 setLocationList(ResponseData.List);
             }
+            setIsLoading(false);
         };
         callAPI(url, params, successCallback);
     };
     useEffect(() => {
         getLocationList();
+        if (locationList.length <= 0) {
+            setIsLoading(true);
+        }
     }, [refreshTable]);
 
     //Delete Location API
@@ -86,7 +92,7 @@ const Location: React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => {
         };
         const url = `${process.env.base_url}/location/delete`;
         const successCallback = () => {
-            Toast.success("Success", "Location Remove successfully");
+            Toast.success("Location Remove successfully");
             getLocationList();
         };
         callAPI(url, params, successCallback);
@@ -151,23 +157,22 @@ const Location: React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => {
     };
 
     //DataTable Data
-    const locationListData = locationList?.map(
-        (e: any) =>
-            new Object({
-                locationId: e.LocationId,
-                name: e.Name,
-                status: (
-                    <div>
-                        {e.Status == "active" ? (
-                            <Switch checked={true} />
-                        ) : (
-                            <Switch checked={false} />
-                        )}
-                    </div>
-                ),
-                action: <Actions id={e.Id} recNo={e.RecordNo} actions={actionArray} />,
-            })
-    );
+
+    const locationListData =
+        locationList.map((e: any) => ({
+            locationId: e.LocationId,
+            name: e.Name,
+            status: (
+                <div>
+                    {e.Status === "active" ? (
+                        <Switch checked={true} />
+                    ) : (
+                        <Switch checked={false} />
+                    )}
+                </div>
+            ),
+            action: <Actions id={e.Id} recNo={e.RecordNo} actions={actionArray} />,
+        }));
 
     const handleKebabChange = (
         actionName: string,
@@ -209,19 +214,24 @@ const Location: React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => {
         <>
 
             {/* DataTable */}
-            {locationList.length <= 0 ? <div className="h-[445px] w-full flex items-center justify-center"><Loader size="md" helperText /></div> :
-                <div className="h-[445px]">
-                    {locationListData.length > 0 ? (
+            <div className={`${locationList.length > 0 && "h-[445px]"}`}>
+                {isLoading ? (
+                    <div className="h-[445px] w-full flex items-center justify-center">
+                        <Loader size="md" helperText />
+                    </div>
+                ) :
+                    <>
                         <DataTable
                             columns={columns}
-                            data={locationListData}
-
+                            data={locationList.length > 0 ? locationListData : []}
                             sticky
                             hoverEffect={true}
                         />
-                    ) : <span className="flex justify-center">There is no data available at the moment.</span>}
-                </div>
-            }
+                        {locationList.length > 0 ? "" : <div className="w-auto h-[48px] flex justify-center items-center border-b border-b-[#ccc]">There is no data available at the moment.</div>}
+                    </>
+                }
+            </div >
+
             {/* Remove Modal */}
             <Modal isOpen={isRemoveOpen} onClose={modalClose} width="376px">
                 <ModalTitle>

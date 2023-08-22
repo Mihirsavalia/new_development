@@ -1,10 +1,10 @@
 import DrawerOverlay from "@/app/manage/users/DrawerOverlay";
 import MeatballsMenuIcon from "@/assets/Icons/MeatballsMenu";
+import { useCompanyContext } from "@/context/companyContext";
 import { callAPI } from "@/utils/API/callAPI";
 import { Button, Close, DataTable, Loader, Modal, ModalAction, ModalContent, ModalTitle, Switch, Toast, Typography } from 'next-ts-lib';
 import React, { useEffect, useRef, useState } from "react";
 import ProjectContent from "../Drawer/ProjectDrawer";
-import { useCompanyContext } from "@/context/companyContext";
 
 interface projectList {
     name: string;
@@ -25,6 +25,7 @@ const Project: React.FC<ProjectProps> = ({ onDrawerOpen, onDrawerClose }) => {
     const [Id, setId] = useState<string>();
     const [RecordNo, setRecordNo] = useState<number | null>();
     const [refreshTable, setRefreshTable] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const columns = [
         {
@@ -67,14 +68,17 @@ const Project: React.FC<ProjectProps> = ({ onDrawerOpen, onDrawerClose }) => {
         const successCallback = (ResponseData: any) => {
             if (ResponseData !== null && typeof ResponseData === "object") {
                 setProjectList(ResponseData.List);
+                setIsLoading(false);
             }
         };
         callAPI(url, params, successCallback);
     };
     useEffect(() => {
         getProjectList();
+        if (projectList.length <= 0) {
+            setIsLoading(true);
+        }
     }, [refreshTable]);
-
 
     //Delete Project API
     const handleProjectDelete = async () => {
@@ -86,7 +90,7 @@ const Project: React.FC<ProjectProps> = ({ onDrawerOpen, onDrawerClose }) => {
         };
         const url = `${process.env.base_url}/project/delete`;
         const successCallback = () => {
-            Toast.success("Success", "Project Remove successfully");
+            Toast.success("Project Remove successfully");
             getProjectList();
         };
         callAPI(url, params, successCallback);
@@ -168,6 +172,7 @@ const Project: React.FC<ProjectProps> = ({ onDrawerOpen, onDrawerClose }) => {
             })
     );
 
+
     const handleKebabChange = (
         actionName: string,
         id: string,
@@ -207,20 +212,26 @@ const Project: React.FC<ProjectProps> = ({ onDrawerOpen, onDrawerClose }) => {
     return (
         <>
             {/* DataTable */}
-            {projectList.length <= 0 ? <div className="h-[445px] w-full flex items-center justify-center"><Loader size="md" helperText /></div> :
-                <div className="h-[445px]">
-                    {projectListData.length > 0 ? (
+            <div className={`${projectList.length > 0 && "h-[445px]"}`}>
+                {isLoading ? (
+                    <div className="h-[445px] w-full flex items-center justify-center">
+                        <Loader size="md" helperText />
+                    </div>
+                ) :
+                    <>
                         <DataTable
                             columns={columns}
-                            data={projectListData}
+                            data={projectList.length > 0 ? projectListData : []}
                             sticky
                             hoverEffect={true}
                         />
-                    ) : <span className="flex justify-center">There is no data available at the moment.</span>}
-                </div>
-            }
+                        {projectList.length > 0 ? "" : <div className="w-auto h-[48px] flex justify-center items-center border-b border-b-[#ccc]">There is no data available at the moment.</div>}
+                    </>
+                }
+            </div >
+
             {/* Remove Modal */}
-            <Modal isOpen={isRemoveOpen} onClose={modalClose} width="376px">
+            < Modal isOpen={isRemoveOpen} onClose={modalClose} width="376px" >
                 <ModalTitle>
                     <div className="py-3 px-4 font-bold">Remove</div>
                     <div onClick={modalClose}>

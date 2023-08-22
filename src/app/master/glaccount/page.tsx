@@ -40,6 +40,7 @@ const GLAccount: React.FC = () => {
     const [isSearch, setIsSearch] = useState<boolean>(false);
     const [searchValue, setSearchValue] = useState<string>("");
     const [searchHasError, setSearchHasError] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const columns = [
         {
@@ -72,13 +73,14 @@ const GLAccount: React.FC = () => {
         }
         const url = `${process.env.base_url}/account/sync`;
         const successCallback = () => {
-            Toast.success("Success", "Account Sync successfully");
+            Toast.success("Account Sync successfully");
         };
         callAPI(url, params, successCallback);
     };
 
     //GL Account List API
     const getAccountList = async () => {
+        setIsLoading(true);
         const params = {
             FilterObj: {
                 AccountNo: "",
@@ -100,6 +102,7 @@ const GLAccount: React.FC = () => {
             if (ResponseData !== null && typeof ResponseData === 'object') {
                 setAccountList(ResponseData.List);
             }
+            setIsLoading(false);
         };
         callAPI(url, params, successCallback);
     };
@@ -117,7 +120,7 @@ const GLAccount: React.FC = () => {
         const url = `${process.env.base_url}/account/delete`;
         const successCallback = (ResponseData: any) => {
             if (ResponseData !== null && typeof ResponseData === 'object') {
-                // Toast.success("Success", "Account Remove successfully");
+                // Toast.success("Account Remove successfully");
                 getAccountList();
             }
         };
@@ -324,17 +327,25 @@ const GLAccount: React.FC = () => {
                         </div>
                     </ModalAction>
                 </Modal>
-                {accountList.length <= 0 ? <div className="h-[445px] w-full  flex items-center justify-center"><Loader size="md" helperText /></div> :
-                    <div className="h-[445px]">
-                        {accountListData.length > 0 && (
+
+                {/* DataTable */}
+                <div className={`${accountList.length > 0 && "h-[445px]"}`}>
+                    {isLoading ? (
+                        <div className="h-[445px] w-full flex items-center justify-center">
+                            <Loader size="md" helperText />
+                        </div>
+                    ) :
+                        <>
                             <DataTable
                                 columns={columns}
-                                data={accountListData}
+                                data={accountList.length > 0 ? accountListData : []}
                                 sticky
                                 hoverEffect={true}
                             />
-                        )}
-                    </div>}
+                            {accountList.length > 0 ? "" : <div className="w-auto h-[48px] flex justify-center items-center border-b border-b-[#ccc]">There is no data available at the moment.</div>}
+                        </>
+                    }
+                </div>
 
                 {/* Remove Modal */}
                 <Modal isOpen={isRemoveOpen} onClose={modalClose} width="376px">
@@ -345,7 +356,7 @@ const GLAccount: React.FC = () => {
                         </div>
                     </ModalTitle>
                     <ModalContent>
-                        <div className="p-2 my-5">
+                        <div className="mx-4 my-5">
                             <Typography type="h5" className="!font-normal">
                                 Are you sure you want to remove the Account ?
                             </Typography>
