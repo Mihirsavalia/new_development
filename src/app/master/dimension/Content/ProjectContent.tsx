@@ -199,12 +199,6 @@ const Project: React.FC<ProjectProps> = ({ onDrawerOpen, onDrawerClose }) => {
         setIsOpenDrawer(onDrawerOpen);
     }, [onDrawerOpen]);
 
-    useEffect(() => {
-        if (isOpenDrawer) {
-            handleDrawerClose();
-        }
-    }, [onDrawerClose]);
-
     const modalClose = () => {
         setIsRemoveOpen(false);
     };
@@ -267,7 +261,7 @@ const Project: React.FC<ProjectProps> = ({ onDrawerOpen, onDrawerClose }) => {
                 </ModalAction>
             </Modal>
 
-            <ProjectContent onOpen={isOpenDrawer} onClose={handleDrawerClose} EditId={typeof Id === "number" ? Id : 0} />
+            <ProjectContent onOpen={isOpenDrawer} onClose={handleDrawerClose} EditId={typeof Id === "number" ? Id : 0} projectData={projectList}/>
             <DrawerOverlay isOpen={isOpenDrawer} onClose={handleDrawerClose} />
 
         </>);

@@ -1,5 +1,5 @@
 "use client";
-import { Tooltip, Typography, Loader } from "next-ts-lib";
+import { Typography, Loader } from "next-ts-lib";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -92,11 +92,7 @@ const DashboardItems = ({ pathname, isCollapsed }: any) => {
             }`}
         >
           {isCollapsed ? (
-            <div className=" pl-0 py-[9.65px]">
-              <Tooltip content={`${item.name}`} position="right">
-                <span className="">{item.icon}</span>
-              </Tooltip>
-            </div>
+            <span className="pl-[10px] py-[18.65px]">{item.icon}</span>
           ) : (
             <>
               <span className="py-[17.65px]">{item.icon}</span>

@@ -80,7 +80,6 @@ const GLAccount: React.FC = () => {
 
     //GL Account List API
     const getAccountList = async () => {
-        setIsLoading(true);
         const params = {
             FilterObj: {
                 AccountNo: "",
@@ -108,6 +107,9 @@ const GLAccount: React.FC = () => {
     };
     useEffect(() => {
         getAccountList();
+        if (accountList.length <= 0) {
+            setIsLoading(true);
+        }
     }, [refreshTable]);
 
     //Delete Account API
@@ -274,9 +276,6 @@ const GLAccount: React.FC = () => {
                                     <SearchIcon />
                                 </div>
                             </Tooltip>}
-                        <Tooltip content={`Import`} position="bottom" className='!z-[2] !p-0 !ml-3'>
-                            <ImportIcon />
-                        </Tooltip>
 
                         <Tooltip content={`Sync Account`} position="bottom" className='!z-[2] !p-0 !m-0'>
                             <div onClick={() => setIsSyncModalOpen(true)}>

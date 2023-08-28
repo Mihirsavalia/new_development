@@ -200,12 +200,6 @@ const Location: React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => {
         setIsOpenDrawer(onDrawerOpen);
     }, [onDrawerOpen]);
 
-    useEffect(() => {
-        if (isOpenDrawer) {
-            handleDrawerClose();
-        }
-    }, [onDrawerClose]);
-
     const modalClose = () => {
         setIsRemoveOpen(false);
     };
@@ -269,7 +263,7 @@ const Location: React.FC<LocationProps> = ({ onDrawerOpen, onDrawerClose }) => {
                 </ModalAction>
             </Modal>
 
-            <LocationContent onOpen={isOpenDrawer} onClose={handleDrawerClose} EditId={typeof Id === "number" ? Id : 0} />
+            <LocationContent onOpen={isOpenDrawer} onClose={handleDrawerClose} EditId={typeof Id === "number" ? Id : 0} locationData={locationList}/>
             <DrawerOverlay isOpen={isOpenDrawer} onClose={handleDrawerClose} />
 
         </>);

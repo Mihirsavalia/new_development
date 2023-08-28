@@ -10,7 +10,7 @@ interface CompanyContextProps {
 const CompanyContext = createContext<CompanyContextProps | undefined>(undefined);
 
 export const CompanyContextProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [CompanyId, setInternalCompanyId] = useState<string|undefined>();
+    const [CompanyId, setInternalCompanyId] = useState<string|undefined>("86");
     const [AccountingTools, setInternalAccountingTools] = useState<number|undefined>();
 
     const setCompanyId = (value: string) => {

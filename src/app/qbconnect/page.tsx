@@ -25,4 +25,3 @@ import { useSearchParams, useRouter } from "next/navigation";
 };
 
 export default qbConnect;
-

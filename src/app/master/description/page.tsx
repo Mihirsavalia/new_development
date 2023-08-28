@@ -56,7 +56,6 @@ const Description: React.FC = () => {
 
     //Description List API
     const getDescriptionList = async () => {
-        setIsLoading(true);
         const params = {
             CompanyId: CompanyId,
             APFieldId: 47,
@@ -75,6 +74,9 @@ const Description: React.FC = () => {
     };
     useEffect(() => {
         getDescriptionList();
+        if (descriptionList.length <= 0) {
+            setIsLoading(true);
+        }
     }, [refreshTable]);
 
     //Delete Description API

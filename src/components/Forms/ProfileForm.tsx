@@ -40,8 +40,9 @@ const ProfileForm = ({ profileData, handleEdit }: any) => {
     profileData.email ? true : false
   );
   const [phone, setPhone] = useState<string>(
-    profileData.phone ? profileData.phone : ""
+    profileData.phone ? profileData.phone.slice(4) : ""
   );
+
   const [phoneErr, setPhoneErr] = useState<boolean>(false);
   const [phoneHasErr, setPhoneHasErr] = useState<boolean>(
     profileData.phone ? true : false
@@ -243,7 +244,7 @@ const ProfileForm = ({ profileData, handleEdit }: any) => {
             getError={(err) => setFirstNameHasErr(err)}
             hasError={firstNameErr}
             autoComplete="off"
-            minChar={5}
+            minChar={3}
             maxChar={50}
           />
           <Text
@@ -257,7 +258,8 @@ const ProfileForm = ({ profileData, handleEdit }: any) => {
             getError={(err) => setLastNameHasErr(err)}
             hasError={lastNameErr}
             autoComplete="off"
-            maxChar={300}
+            minChar={3}
+            maxChar={50}
           />
           <Tel
             label="Phone No."
@@ -278,6 +280,7 @@ const ProfileForm = ({ profileData, handleEdit }: any) => {
             hasError={emailErr}
             getValue={(value) => setEmail(value)}
             getError={(err) => setEmailHasErr(err)}
+            minChar={10}
             maxChar={100}
           />
           <Textarea
@@ -288,6 +291,7 @@ const ProfileForm = ({ profileData, handleEdit }: any) => {
             hasError={addrErr}
             getValue={(value) => setAddr(value)}
             getError={(err) => setAddrHasErr(err)}
+            maxChar={100}
           />
           <Select
             id="country"
@@ -298,7 +302,10 @@ const ProfileForm = ({ profileData, handleEdit }: any) => {
             defaultValue={country}
             hasError={countryErr}
             autoComplete="off"
-            getValue={(value) => setCountry(value)}
+            getValue={(value) => {
+              setCountry(value);
+              getStateData(value);
+            }}
             getError={(err) => setCountryHasErr(err)}
           />
           <Select
@@ -310,7 +317,10 @@ const ProfileForm = ({ profileData, handleEdit }: any) => {
             defaultValue={state}
             hasError={stateErr}
             autoComplete="off"
-            getValue={(value) => setState(value)}
+            getValue={(value) => {
+              setState(value);
+              getCityData(value);
+            }}
             getError={(err) => setStateHasErr(err)}
           />
           <Select
@@ -329,6 +339,8 @@ const ProfileForm = ({ profileData, handleEdit }: any) => {
             label="Postal Code"
             placeholder="Enter Postal Code"
             validate
+            noSpecialChar
+            noText
             value={postalcode}
             getValue={(value) => setPostalCode(value)}
             getError={(err) => setPostalCodeHasErr(err)}

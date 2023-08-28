@@ -5,6 +5,7 @@ import MeatballsMenuIcon from "@/assets/Icons/MeatballsMenu";
 import PlusIcon from '@/assets/Icons/PlusIcon';
 import SearchIcon from '@/assets/Icons/SearchIcon';
 import SyncIcon from "@/assets/Icons/SyncIcon";
+import ImportIcon from "@/assets/Icons/ImportIcon";
 import Wrapper from '@/components/common/Wrapper';
 import { callAPI } from '@/utils/API/callAPI';
 import { hasNoToken } from "@/utils/commonFunction";
@@ -226,57 +227,61 @@ const Vendor: React.FC = () => {
   return (
     <Wrapper masterSettings={true}>
       <div>
-        <div className="bg-whiteSmoke flex justify-between items-center">
-          <div className="flex items-center py-[10px] px-3">
-            <Typography type="h5" className="!font-bold flex justify-center items-center text-center">
-              AP Term
-            </Typography>
+      <div className="bg-whiteSmoke h-[66px] flex justify-between items-center">
+                    <div className="flex items-center py-[10px] px-3">
+                        <Typography type="h5" className="!font-bold flex justify-center items-center text-center">
+                            AP Term
+                        </Typography>
 
-          </div>
-          <div className="flex items-center px-[10px]">
-            {isSearch
-              ? <div className="flex relative items-center">
-                <Text
-                  id="searching"
-                  name="searching"
-                  value={searchValue}
-                  placeholder="Search"
-                  className='pl-8 border-0 rounded-full'
-                  getValue={(value: any) => handleSearchValue(value)}
-                  getError={(e: any) => setSearchHasError(e)}
-                ></Text>
-                <div className="flex absolute left-2 cursor-pointer">
-                  <SearchIcon />
+                    </div>
+                    <div className="flex items-center px-[10px]">
+                        {isSearch
+                            ? <div className="flex relative items-center">
+                                <Text
+                                    id="searching"
+                                    name="searching"
+                                    value={searchValue}
+                                    placeholder="Search"
+                                    className='pl-8 border-0 rounded-full'
+                                    getValue={(value: any) => handleSearchValue(value)}
+                                    getError={(e: any) => setSearchHasError(e)}
+                                ></Text>
+                                <div className="flex absolute left-2 cursor-pointer">
+                                    <SearchIcon />
+                                </div>
+                                {isSearch && (
+                                    <div
+                                        className="flex absolute -top-2 -right-2 cursor-pointer"
+                                        onClick={handleSearchClose}
+                                    >
+                                        <Tooltip position="bottom" content="close" className='!z-[2]'>
+                                            <Close variant="small" />
+                                        </Tooltip>
+                                    </div>
+                                )}
+                            </div>
+                            : <Tooltip content={"Search"} position="bottom" className='!z-[2]'>
+                                <div onClick={() => { setIsSearch(true) }}>
+                                    <SearchIcon />
+                                </div>
+                            </Tooltip>}
+                        <Tooltip content={`Import`} position="bottom" className='!z-[2] !p-0 !ml-3'>
+                            <ImportIcon />
+                        </Tooltip>
+
+                        <Tooltip content={`Sync AP Term`} position="bottom" className='!z-[2] !p-0 !m-0'>
+                            <div onClick={() => setIsSyncModalOpen(true)}>
+                                <SyncIcon />
+                            </div>
+                        </Tooltip>
+                        <Button
+                            className="rounded-full !px-6 "
+                            variant="btn-primary"
+                            onClick={handleToggleChange}>
+                            <Typography type="h6" className="!font-bold flex justify-center items-center text-center"><span className="mr-1"> <PlusIcon /></span> CREATE NEW</Typography>
+                        </Button>
+                    </div>
                 </div>
-                {isSearch && (
-                  <div
-                    className="flex absolute -top-2 -right-2 cursor-pointer"
-                    onClick={handleSearchClose}
-                  >
-                    <Tooltip position="bottom" content="close" className='!z-[2]'>
-                      <Close variant="small" />
-                    </Tooltip>
-                  </div>
-                )}
-              </div>
-              : <Tooltip content={"Search"} position="bottom" className='!z-[2]'>
-                <div onClick={() => { setIsSearch(true) }}>
-                  <SearchIcon />
-                </div>
-              </Tooltip>}
-            <Tooltip content={`Sync AP Term`} position="bottom" className='!z-[2]'>
-              <div onClick={() => setIsSyncModalOpen(true)}>
-                <SyncIcon />
-              </div>
-            </Tooltip>
-            <Button
-              className="rounded-full !px-6 "
-              variant="btn-primary"
-              onClick={handleToggleChange}>
-              <Typography type="h6" className="!font-bold flex justify-center items-center text-center"><span className="mr-1"> <PlusIcon /></span> CREATE NEW</Typography>
-            </Button>
-          </div>
-        </div>
 
         {/* Sync Modal */}
         <Modal

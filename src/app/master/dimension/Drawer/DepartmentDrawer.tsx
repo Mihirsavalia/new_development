@@ -9,8 +9,9 @@ interface DrawerProps {
     onOpen: boolean;
     onClose: () => void;
     EditId?: number;
+    departmentData: any;
 }
-const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
+const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId, departmentData }) => {
 
     const { CompanyId } = useCompanyContext();
 
@@ -23,6 +24,7 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) =
     const [titleError, setTitleError] = useState<boolean>(false);
     const [titleHasError, setTitleHasError] = useState<boolean>(false);
     const [clicked, setClicked] = useState<boolean>(false);
+    const [lastGeneratedId, setLastGeneratedId] = useState<string>("");
 
     const handleClose = () => {
         onClose();
@@ -48,14 +50,20 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) =
         callAPI(url, params, successCallback);
     };
 
-    const generatedId = () => {
-        const minLength = 4;
-        const maxLength = 8;
-        const length = Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength;
-        const randomDigits = Array.from({ length }, () => Math.floor(Math.random() * 10));
-        return randomDigits.join('');
-    }
 
+    const generatedId = () => {
+        if (!lastGeneratedId) {
+            const lastValue = departmentData[0]?.DepartmentCode || 'PQ-D0000';
+            const lastCounter = parseInt(lastValue.substr(4));
+            const newCounter = lastCounter + 1;
+            const newId = `PQ-D${newCounter.toString().padStart(4, '0')}`;
+            return newId;
+        } else {
+            return lastGeneratedId;
+        }
+    };
+    
+    //Save Data API
     const handleSubmit = async (e: any) => {
         e.preventDefault();
         departmentCode.trim().length <= 0 && setIdError(true);
@@ -94,8 +102,10 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) =
             setDepartmentCode("");
             setClicked(false);
         }
-        setDepartmentCode('PQ-D' + generatedId())
-    }, [onOpen]);
+        if (onOpen && !EditId) {
+            setDepartmentCode(generatedId());
+        }
+    }, [onOpen, EditId]);
 
     useEffect(() => {
         if (EditId) {
@@ -105,69 +115,70 @@ const DepartmentContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) =
 
     return (
         <>
-            {onOpen && (
-                <div
-                    className={`fixed top-0 bg-white  right-0 h-full xsm:!w-5/6 sm:!w-2/4 lg:!w-2/6 xl:!w-2/6 2xl:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.rightAnimation}`}
-                >
-                    <div className="p-4 flex justify-between items-center border-b border-lightSilver">
-                        <Typography type="label" className="!font-bold !text-lg"> {EditId ? "Edit" : "Add"} Department</Typography>
-                        <div className="mx-2 cursor-pointer" onClick={handleClose}>
-                            <Close variant="medium" />
-                        </div>
+            <div
+                className={`fixed top-0 bg-white  right-0 h-full xsm:!w-5/6 sm:!w-2/4 lg:!w-2/6 xl:!w-2/6 2xl:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? "translate-x-0" : "translate-x-full"
+                    } transition-transform duration-300 ease-in-out`}
+            >
+
+                <div className="p-4 flex justify-between items-center border-b border-lightSilver">
+                    <Typography type="label" className="!font-bold !text-lg"> {EditId ? "Edit" : "Add"} Department</Typography>
+                    <div className="mx-2 cursor-pointer" onClick={handleClose}>
+                        <Close variant="medium" />
                     </div>
-                    <div className="flex-1 mx-5 mt-2 mb-12 ">
-                        <div className="flex-1 mt-3">
-                            <Text
-                                label="ID"
-                                id="id"
-                                name="id"
-                                placeholder="Please Enter ID Name"
-                                validate
-                                value={departmentCode}
-                                readOnly={true}
-                                hasError={idError}
-                                getValue={(value: any) => setDepartmentCode(value)}
-                                getError={(e: any) => setIdHasError(e)}
-                            >
-                            </Text>
-                        </div>
-                        <div className="flex-1 mt-3">
-                            <Text
-                                label="Name"
-                                id="name"
-                                name="name"
-                                placeholder="Please Enter Department Name"
-                                validate
-                                maxLength={100}
-                                hasError={titleError}
-                                value={title}
-                                getValue={(value: any) => setTitle(value)}
-                                getError={(e: any) => setTitleHasError(e)}
-                            ></Text>
-                        </div>
+                </div>
+                <div className="flex-1 mx-5 mt-2 mb-12 ">
+                    <div className="flex-1 mt-3">
+                        <Text
+                            label="ID"
+                            id="id"
+                            name="id"
+                            placeholder="Please Enter ID Name"
+                            validate
+                            value={departmentCode}
+                            readOnly={true}
+                            hasError={idError}
+                            getValue={(value: any) => setDepartmentCode(value)}
+                            getError={(e: any) => setIdHasError(e)}
+                        >
+                        </Text>
                     </div>
-                    <span className="flex absolute bottom-16 w-full right-0 border-t border-lightSilver"></span>
-                    <div className={`flex fixed  bottom-0 right-0 justify-end items-center`}>
-                        <div className="py-3 px-5">
-                            <Button
-                                onClick={onClose}
-                                className="rounded-full font-medium w-28 mx-3 xsm:!px-1"
-                                variant="btn-outline-primary"
-                            >
-                                <Typography type="h6" className="!font-bold"> CANCEL</Typography>
-                            </Button>
-                            <Button
-                                type="submit"
-                                onClick={handleSubmit}
-                                className={`rounded-full font-medium w-28 xsm:!px-1  ${clicked && "opacity-50 pointer-events-none"}`}
-                                variant="btn-primary"
-                            >
-                                <Typography type="h6" className="!font-bold"> SAVE</Typography>
-                            </Button>
-                        </div>
+                    <div className="flex-1 mt-3">
+                        <Text
+                            label="Name"
+                            id="name"
+                            name="name"
+                            placeholder="Please Enter Department Name"
+                            validate
+                            maxLength={100}
+                            hasError={titleError}
+                            value={title}
+                            getValue={(value: any) => setTitle(value)}
+                            getError={(e: any) => setTitleHasError(e)}
+                        ></Text>
                     </div>
-                </div >
-            )}
+                </div>
+                <span className="flex absolute bottom-16 w-full right-0 border-t border-lightSilver"></span>
+                <div className={`flex fixed  bottom-0 right-0 justify-end items-center`}>
+                    <div className="py-3 px-5">
+                        <Button
+                            onClick={onClose}
+                            className="rounded-full font-medium w-28 mx-3 xsm:!px-1"
+                            variant="btn-outline-primary"
+                        >
+                            <Typography type="h6" className="!font-bold"> CANCEL</Typography>
+                        </Button>
+                        <Button
+                            type="submit"
+                            onClick={handleSubmit}
+                            className={`rounded-full font-medium w-28 xsm:!px-1  ${clicked && "opacity-50 pointer-events-none"}`}
+                            variant="btn-primary"
+                        >
+                            <Typography type="h6" className="!font-bold"> SAVE</Typography>
+                        </Button>
+                    </div>
+                </div>
+
+            </div>
         </>
     );
 }

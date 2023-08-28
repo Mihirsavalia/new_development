@@ -104,10 +104,7 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
         const actionsRef = useRef<HTMLDivElement>(null);
         const [open, setOpen] = useState(false);
         const handleOutsideClick = (event: MouseEvent) => {
-            if (
-                actionsRef.current &&
-                !actionsRef.current.contains(event.target as Node)
-            ) {
+            if (actionsRef.current && !actionsRef.current.contains(event.target as Node)) {
                 setOpen(false);
             }
         };
@@ -116,7 +113,7 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
             return () => {
                 window.removeEventListener("click", handleOutsideClick);
             };
-        }, [handleOutsideClick]);
+        }, []);
 
         return (
             <div className="relative w-full flex justify-end">
@@ -156,30 +153,7 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
         );
     };
 
-    //DataTable Data
-    const classListData = classList?.map(
-        (e: any) =>
-            new Object({
-                id: e.ClassId,
-                name: e.Name,
-                status: (
-                    <div>
-                        {e.Status == "active" ? (
-                            <Switch checked={true} />
-                        ) : (
-                            <Switch checked={false} />
-                        )}
-                    </div>
-                ),
-                action: <Actions id={e.Id} recNo={e.RecordNo} actions={actionArray} />,
-            })
-    );
-
-    const handleKebabChange = (
-        actionName: string,
-        id: string,
-        RecordNo: number
-    ) => {
+    const handleKebabChange = (actionName: string, id: string, RecordNo: number) => {
         setId(id);
         if (actionName === "Edit") {
             setIsOpenDrawer(true);
@@ -189,6 +163,22 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
             setIsRemoveOpen(!isRemoveOpen);
         }
     };
+
+    //DataTable Data
+    const classListData = classList?.map((e: any) => ({
+        id: e.ClassId,
+        name: e.Name,
+        status: (
+            <div>
+                {e.Status === "active" ? (
+                    <Switch checked={true} />
+                ) : (
+                    <Switch checked={false} />
+                )}
+            </div>
+        ),
+        action: <Actions id={e.Id} recNo={e.RecordNo} actions={actionArray} />,
+    }));
 
     const handleDrawerClose = () => {
         setIsOpenDrawer(false);
@@ -200,13 +190,6 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
     useEffect(() => {
         setIsOpenDrawer(onDrawerOpen);
     }, [onDrawerOpen]);
-
-    
-    useEffect(() => {
-        if (isOpenDrawer) {
-            handleDrawerClose();
-        }
-    }, [onDrawerClose]);
 
     const modalClose = () => {
         setIsRemoveOpen(false);
@@ -270,7 +253,7 @@ const Class: React.FC<ClassProps> = ({ onDrawerOpen, onDrawerClose }) => {
                 </ModalAction>
             </Modal>
 
-            <ClassDrawer onOpen={isOpenDrawer} onClose={handleDrawerClose} EditId={typeof Id === "number" ? Id : 0} />
+            <ClassDrawer onOpen={isOpenDrawer} onClose={handleDrawerClose} EditId={typeof Id === "number" ? Id : 0} classData={classList} />
             <DrawerOverlay isOpen={isOpenDrawer} onClose={handleDrawerClose} />
         </>
     );

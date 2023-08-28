@@ -82,7 +82,6 @@ const Product_Service: React.FC = () => {
 
     //Product List API
     const getProductList = async () => {
-        setIsLoading(true);
         const params = {
             ProductSerObject: {
                 Name: "",
@@ -107,6 +106,9 @@ const Product_Service: React.FC = () => {
     };
     useEffect(() => {
         getProductList();
+        if (productList.length <= 0) {
+            setIsLoading(true);
+        }
     }, [refreshTable]);
 
     //Delete Product API

@@ -80,7 +80,7 @@ const PasswordForm = ({ profileData, handleEdit }: any) => {
   return (
     <div>
       <form onSubmit={handleSubmit}>
-        <div className="flex gap-[20px] flex-col p-[20px] max-h-[78.5vh]">
+        <div className="mt-36 flex gap-[20px] flex-col p-[20px] max-h-[78.5vh]">
           <Password
             label="Current Password"
             placeholder="Enter Current Password"
@@ -99,9 +99,11 @@ const PasswordForm = ({ profileData, handleEdit }: any) => {
             validate
             autoComplete="off"
             hasError={newPwdErr}
+            minChar={12}
+            maxChar={28}
             getValue={(value) => {
               setNewPwd(value);
-              value === newPwd ? setIsMatched(true) : setIsMatched(false);
+              value === confirmPwd ? setIsMatched(true) : setIsMatched(false);
             }}
             getError={(err) => setNewPwdHasNoErr(err)}
           />
@@ -110,6 +112,7 @@ const PasswordForm = ({ profileData, handleEdit }: any) => {
             placeholder="Enter Confirm Password"
             value={confirmPwd}
             validate
+            novalidate
             autoComplete="off"
             hasError={confirmPwdErr}
             getValue={(value) => {

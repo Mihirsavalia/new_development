@@ -16,6 +16,7 @@ import {
   DataTable,
   Select,
   Loader,
+  Typography,
 } from "next-ts-lib";
 
 import axios from "axios";
@@ -32,7 +33,7 @@ import { useCompanyContext } from "@/context/companyContext";
 
 // Table Headers
 const headers = [
-  { header: "Id", accessor: "Id", sortable: true },
+  { header: "ID", accessor: "Id", sortable: true },
   { header: "Company", accessor: "Name", sortable: true },
   { header: "Connected with", accessor: "AccountingTool", sortable: false },
   { header: "Modified Date", accessor: "UpdatedOn", sortable: false },
@@ -65,7 +66,9 @@ const ManageCompanies: React.FC = () => {
   const [companyList, setCompanyList] = useState<any[]>([]);
   const [accountingTool, setAccountingTool] = useState<number | null>();
   const [companyConnected, setCompanyConnected] = useState<boolean>();
-  const {setCompanyId,setAccountingToolType} = useCompanyContext();
+  const [loaderShow, setLoaderShow] = useState<boolean>(true);
+
+  const { setCompanyId, setAccountingToolType } = useCompanyContext();
 
   useEffect(() => {
     if (openFilterBox) {
@@ -147,14 +150,15 @@ const ManageCompanies: React.FC = () => {
           if (response.status === 200) {
             const responseData = response.data.ResponseData;
             setQboCompanyData(responseData);
-            console.log(responseData);
-            if(responseData.Name===null){
+            if (responseData.Name === null) {
               Toast.success("Company connected successfully");
               setOpenDrawer(false);
               getCompanyList();
-            }
-            else{
-              setOpenDrawer(true)
+              localStorage.removeItem("qbcode");
+              localStorage.removeItem("realmId");
+              localStorage.removeItem("state");
+            } else {
+              setOpenDrawer(true);
             }
             setAccountingTool(2);
             setAccountingToolType(2);
@@ -166,7 +170,6 @@ const ManageCompanies: React.FC = () => {
     };
     qbConnect();
   }, []);
-
 
   // Redirect Url to the Xero page
   const handleConnectXero = async (companyId?: number) => {
@@ -218,15 +221,15 @@ const ManageCompanies: React.FC = () => {
 
           if (response.status === 200) {
             const responseData = response.data.ResponseData;
-            setXeroCompanyData(responseData)
-            
-            if(responseData.Name===null){
+            setXeroCompanyData(responseData);
+            if (responseData.Name === null) {
               Toast.success("Company connected successfully");
               setOpenDrawer(false);
               getCompanyList();
-            }
-            else{
-              setOpenDrawer(true)
+              localStorage.removeItem("xerocode");
+              localStorage.removeItem("state");
+            } else {
+              setOpenDrawer(true);
             }
             setAccountingTool(3);
             setAccountingToolType(3);
@@ -361,53 +364,75 @@ const ManageCompanies: React.FC = () => {
     );
   };
 
-  const masterConfiguration = (Id:any)=>{
+  const masterConfiguration = (Id: any) => {
     setCompanyId(Id);
     router.push("/master/vendor");
-  }
+  };
+
   // Show Table of Contents
   const compData = companyList.map(
     (list) =>
       new Object({
-        Id: list.Id,
+        Id: (
+          <div className={`${list.IsActive ? "" : "opacity-[50%]"}`}>
+            {list.Id}
+          </div>
+        ),
         Name: (
-          <div className="flex items-center gap-1">
+          <div
+            className={`flex items-center gap-1 ${
+              list.IsActive ? "" : "opacity-[50%]"
+            }`}
+          >
             <Avatar variant="small" name={list.Name} />
             {list.Name}
           </div>
         ),
         AccountingTool: (
-          <div className="flex items-center gap-1">
+          <div
+            className={`flex items-center gap-1 ${
+              list.IsActive ? "" : "opacity-[50%]"
+            }`}
+          >
             {list.IsConnected ? (
               list.AccountingTool === 1 ? (
                 <>
-                  <Avatar variant="small" name="Intact" />
+                  <Avatar
+                    variant="small"
+                    name="Intact"
+                    imageUrl="https://vectorlogoseek.com/wp-content/uploads/2019/05/sage-intacct-inc-vector-logo.png"
+                  />
                   {"Intact"}
                 </>
               ) : list.AccountingTool === 2 ? (
                 <>
-                  <Avatar variant="small" name="QuickBook" />
+                  <Avatar
+                    variant="small"
+                    name="QBO"
+                    imageUrl="https://www.cdnlogo.com/logos/q/8/quickbooks.svg"
+                  />
                   {"QuickBook"}
                 </>
               ) : (
                 <>
-                  <Avatar variant="small" name="Xero" />
+                  <Avatar
+                    variant="small"
+                    name="Xero"
+                    imageUrl="https://www.vectorlogo.zone/logos/xero/xero-icon.svg"
+                  />
                   {"Xero"}
                 </>
               )
             ) : (
-              <span className="text-red-500 text-center w-32">
-                Disconnected
-              </span>
+              <Typography className="text-red-500">Disconnected</Typography>
             )}
           </div>
         ),
         UpdatedOn: (
-          <div className="text-center w-24">
-            {list.UpdatedOn && list.UpdatedOn.split("T")[0]}
+          <div className={`${list.IsActive ? "" : "opacity-[50%]"}`}>
+            {list.UpdatedOn && list.UpdatedOn}
           </div>
         ),
-
         action: (
           <Actions
             id={list.Id}
@@ -417,13 +442,13 @@ const ManageCompanies: React.FC = () => {
               list.IsActive ? "Deactivate" : "Activate",
               list.IsConnected ? "Disconnect" : "Connect",
               "Remove",
-              "Master Configuration"
+              "Master Configuration",
             ]}
           />
         ),
       })
   );
-  const EmptyData = ['Data is not available'];
+  const EmptyData = ["Data is not available"];
 
   // Perform the actions Deactivate, Activate, Remove and Disconnect
   const performCompanyAction = async (
@@ -455,10 +480,10 @@ const ManageCompanies: React.FC = () => {
             Toast.success("Company disconnected successfully");
             break;
           case 3:
-            Toast.success("Company deleted successfully");
+            Toast.success("Company removed successfully");
             break;
           case 4:
-            Toast.success("Company activate successfully");
+            Toast.success("Company activated successfully");
             break;
           default:
             break;
@@ -820,12 +845,19 @@ const ManageCompanies: React.FC = () => {
         </div>
 
         {/* Table Seaction */}
-        {companyList.length <= 0 ? <div className="h-[445px] w-full flex items-center justify-center"><Loader size="md" helperText /></div> : 
+        {companyList.length <= 0 ? (
+          <div className="h-[445px] w-full flex items-center justify-center">
+            <Loader size="md" helperText />
+          </div>
+        ) : (
           <div className="h-[445px]">
             {companyList.length > 0 ? (
-            <DataTable data={compData} columns={headers} sticky />
-            ):<span className="flex justify-center">No data available</span>}
-          </div>}
+              <DataTable data={compData} columns={headers} sticky />
+            ) : (
+              <span className="flex justify-center">No data available</span>
+            )}
+          </div>
+        )}
       </Wrapper>
     </>
   );

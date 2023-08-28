@@ -51,7 +51,7 @@ const Dimension: React.FC = () => {
         callAPI(url, params, successCallback);
     };
 
-    const handleToggleChange = (tab: any) => {
+    const handleToggleChange = () => {
         setIsOpenDrawer(true);
     };
     const handleDrawerClose = () => {
@@ -132,7 +132,7 @@ const Dimension: React.FC = () => {
                     <Button
                         className="rounded-full !px-6 "
                         variant="btn-primary"
-                        onClick={(e: any) => handleToggleChange(tab)}>
+                        onClick={handleToggleChange}>
                         <Typography type="h6" className="!font-bold flex justify-center items-center text-center"><span className="mr-1"> <PlusIcon /></span> CREATE NEW</Typography>
                     </Button>
                 </div>

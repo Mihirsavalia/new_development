@@ -13,6 +13,7 @@ import { Button, Close, DataTable, Loader, Modal, ModalAction, ModalContent, Mod
 import "next-ts-lib/dist/index.css";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from 'react';
+import VendorDrawer from './Drawer/VendorDrawer';
 
 interface accountList {
     name: string;
@@ -31,6 +32,7 @@ const Vendor: React.FC = () => {
     const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
     const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
     const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
+    const [Id, setId] = useState<number | null>();
     const [accountEditId, setAccountEditId] = useState<number | null>();
     const [accountList, setAccountList] = useState<accountList[]>([]);
     const [isSyncModalOpen, setIsSyncModalOpen] = useState<boolean>(false);
@@ -374,6 +376,8 @@ const Vendor: React.FC = () => {
                             />
                         )}
                     </div>}
+
+                <VendorDrawer onOpen={isOpenDrawer} onClose={handleDrawerClose} EditId={typeof Id === 'number' ? Id : 0} />
                 <DrawerOverlay
                     isOpen={isOpenDrawer}
                     onClose={handleDrawerClose}

@@ -1,34 +1,9 @@
-
-@keyframes slideInRight {
-  0% {
-    transform: translateX(100%);
-  }
-  100% {
-    transform: translateX(0%);
-  }
-}
-.slideInAnimation {
-  animation: slideInRight 0.3s ease-out;
-}
-
-@keyframes slideOutRight {
-  0% {
-    transform: translateX(0%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
-.slideOutAnimation {
-  animation: slideOutRight 0.3s ease-out;
-}
-
 @media screen and (max-width: 1023px) {
   .expandDiv {
     left: 0%;
     width: 215px;
     top: 64px;
-    height: auto;
+    height: full;
     animation: leftToRight 0.3s ease-in-out both;
   }
   .collapsedDiv {
@@ -67,38 +42,8 @@
     transform: translateX(0%);
   }
 }
-
-.rightAnimation {
-  animation: rightAnimation 0.3s ease-in-out both;
-}
-
-@keyframes rightAnimation {
-  0% {
-    transform: translateX(0%);
-  }
-
-  100% {
-    transform: translateX(10%);
-  }
-}
-
-.leftAnimation {
-  animation: leftAnimation 0.3s ease-in-out both;
-}
-
-@keyframes leftAnimation {
-  0% {
-    transform: translateX(-10%);
-  }
-
-  100% {
-    transform: translateX(0%);
-  }
-}
-
-
 .mainWidth {
-  width: -webkit-fill-available; 
-  width: -moz-available; 
-  // width: fill-available; 
+  width: -webkit-fill-available;
+  width: -moz-available;
+  // width: fill-available;
 }

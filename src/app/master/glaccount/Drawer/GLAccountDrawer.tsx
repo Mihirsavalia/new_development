@@ -103,79 +103,78 @@ const AccountContent: React.FC<DrawerProps> = ({ onOpen, onClose, EditId }) => {
 
     return (
         <>
-            {onOpen && (
-                <div
-                    className={`fixed top-0 bg-white  right-0 h-full xsm:!w-5/6 sm:!w-2/4 lg:!w-2/6 xl:!w-2/6 2xl:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.rightAnimation}`}
-                >
-                    <div className="p-4 flex justify-between items-center border-b border-lightSilver">
-                        <Typography type="label" className="!font-bold !text-lg"> Add Account</Typography>
-                        <div className="mx-2 cursor-pointer" onClick={handleClose}>
-                            <Close variant="medium" />
+            <div
+                className={`fixed top-0 bg-white  right-0 h-full xsm:!w-5/6 sm:!w-2/4 lg:!w-2/6 xl:!w-2/6 2xl:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? "translate-x-0" : "translate-x-full"
+                    } transition-transform duration-300 ease-in-out`}
+            >
+                        <div className="p-4 flex justify-between items-center border-b border-lightSilver">
+                            <Typography type="label" className="!font-bold !text-lg"> Add Account</Typography>
+                            <div className="mx-2 cursor-pointer" onClick={handleClose}>
+                                <Close variant="medium" />
+                            </div>
                         </div>
-                    </div>
-                    <div className="flex-1 mx-5 mt-2 mb-12 ">
-                        <div className="flex-1 mt-3">
-                            <Text
-                                label="Item ID"
-                                id="id"
-                                name="id"
-                                placeholder="Please Enter Item ID"
-                                validate
-                                value={accountId}
-                                hasError={idError}
-                                getValue={(value: any) => setAccountId(value)}
-                                getError={(e: any) => setIdHasError(e)}
-                            ></Text>
+                        <div className="flex-1 mx-5 mt-2 mb-12 ">
+                            <div className="flex-1 mt-3">
+                                <Text
+                                    label="Item ID"
+                                    id="id"
+                                    name="id"
+                                    placeholder="Please Enter Item ID"
+                                    validate
+                                    value={accountId}
+                                    hasError={idError}
+                                    getValue={(value: any) => setAccountId(value)}
+                                    getError={(e: any) => setIdHasError(e)}
+                                ></Text>
+                            </div>
+                            <div className="flex-1 mt-3">
+                                <Text
+                                    label="Item Name"
+                                    id="name"
+                                    name="name"
+                                    placeholder="Please Enter Item Name"
+                                    validate
+                                    hasError={nameError}
+                                    value={name}
+                                    getValue={(value: any) => setName(value)}
+                                    getError={(e: any) => setNameHasError(e)}
+                                ></Text>
+                            </div>
+                            <div className="flex-1 mt-3">
+                                <Text
+                                    label="Item Type"
+                                    id="itemType"
+                                    name="itemType"
+                                    placeholder="Please Enter Item Type"
+                                    validate
+                                    hasError={typeError}
+                                    value={type}
+                                    getValue={(value: any) => setType(value)}
+                                    getError={(e: any) => setTypeHasError(e)}
+                                ></Text>
+                            </div>
                         </div>
-                        <div className="flex-1 mt-3">
-                            <Text
-                                label="Item Name"
-                                id="name"
-                                name="name"
-                                placeholder="Please Enter Item Name"
-                                validate
-                                hasError={nameError}
-                                value={name}
-                                getValue={(value: any) => setName(value)}
-                                getError={(e: any) => setNameHasError(e)}
-                            ></Text>
+                        <span className="flex absolute bottom-16 w-full right-0 border-t border-lightSilver"></span>
+                        <div className={`flex fixed bg-white  bottom-0 right-0 justify-end items-center`}>
+                            <div className="py-3 px-5">
+                                <Button
+                                    onClick={onClose}
+                                    className="rounded-full font-medium w-28 mx-3 xsm:!px-1"
+                                    variant="btn-outline-primary"
+                                >
+                                    <Typography type="h6" className="!font-bold"> CANCEL</Typography>
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    onClick={handleSubmit}
+                                    className={`rounded-full font-medium w-28 xsm:!px-1`}
+                                    variant="btn-primary"
+                                >
+                                    <Typography type="h6" className="!font-bold"> SAVE</Typography>
+                                </Button>
+                            </div>
                         </div>
-                        <div className="flex-1 mt-3">
-                            <Text
-                                label="Item Type"
-                                id="itemType"
-                                name="itemType"
-                                placeholder="Please Enter Item Type"
-                                validate
-                                hasError={typeError}
-                                value={type}
-                                getValue={(value: any) => setType(value)}
-                                getError={(e: any) => setTypeHasError(e)}
-                            ></Text>
-                        </div>
-                    </div>
-                    <span className="flex absolute bottom-16 w-full right-0 border-t border-lightSilver"></span>
-                    <div className={`flex fixed bg-white  bottom-0 right-0 justify-end items-center`}>
-                        <div className="py-3 px-5">
-                            <Button
-                                onClick={onClose}
-                                className="rounded-full font-medium w-28 mx-3 xsm:!px-1"
-                                variant="btn-outline-primary"
-                            >
-                                <Typography type="h6" className="!font-bold"> CANCEL</Typography>
-                            </Button>
-                            <Button
-                                type="submit"
-                                onClick={handleSubmit}
-                                className={`rounded-full font-medium w-28 xsm:!px-1`}
-                                variant="btn-primary"
-                            >
-                                <Typography type="h6" className="!font-bold"> SAVE</Typography>
-                            </Button>
-                        </div>
-                    </div>
-                </div >
-            )}
+            </div>
         </>
     );
 }

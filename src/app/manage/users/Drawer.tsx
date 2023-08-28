@@ -49,10 +49,10 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
     const [imagePreview, setImagePreview] = useState<string>("");
     const [userData, setUserData] = useState<userData[]>([]);
     const [country, setCountry] = useState([]);
-    const [countryId, setCountryId] = useState<number>();
+    const [countryId, setCountryId] = useState<number>(0);
     const [countryError, setCountryError] = useState<boolean>(false);
     const [state, setState] = useState([]);
-    const [stateId, setStateId] = useState<number>();
+    const [stateId, setStateId] = useState<number>(0);
     const [stateError, setStateError] = useState<boolean>(false);
 
     // const [selectedFile, setSelectedFile] = useState(null);
@@ -298,140 +298,138 @@ const Drawer: React.FC<DrawerProps> = ({ onOpen, onClose, editId }) => {
 
     return (
         <>
-            {onOpen && (
-                <div
-                    className={`fixed top-0 bg-white right-0 h-full xsm:!w-5/6 sm:!w-2/4 lg:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? styles.slideInAnimation : styles.rightAnimation
-                        }`}
-                >
-                    <div className="p-4 flex justify-between items-center border-b border-lightSilver">
-                        <Typography type="label" className="!font-bold !text-lg">
-                            {" "}
-                            {editId ? "EDIT" : "ADD"} USER
-                        </Typography>
-                        <div
-                            className="mx-2 cursor-pointer"
-                            onClick={() => {
-                                onClose();
-                            }}
-                        >
-                            <Close variant="medium" />
-                        </div>
-                    </div>
-                    <div className="flex-1 mx-5 mt-2 mb-12">
-                        <div className="relative flex mt-3">
-                            <Avatar variant="large" imageUrl={imagePreview} />
-                            <div
-                                className="absolute bottom-0 left-11 cursor-pointer"
-                                onClick={handleEditIconClick}
-                            >
-                                <EditIcon />
-                            </div>
-
-                            <input
-                                type="file"
-                                id="imageUpload"
-                                accept=".png, .jpg, .jpeg"
-                                className="hidden"
-                                onChange={onUploadImage}
-                            />
-                        </div>
-                        <div className="flex-1 mt-3">
-                            <Text
-                                label="Full Name"
-                                id="name"
-                                name="name"
-                                validate
-                                maxLength={50}
-                                pattern="/^\d{1,50}$/g"
-                                hasError={nameError}
-                                value={name}
-                                getValue={(value: any) => setName(value)}
-                                getError={(e: any) => setNameError(e)}
-                                onChange={(e: any) => setNameError(true)}
-                            ></Text>
-                        </div>
-                        <div className="flex-1 mt-3">
-                            <Email
-                                label="Email-ID"
-                                id="email"
-                                name="email"
-                                type="email"
-                                validate
-                                readOnly={editId ? true : false}
-                                disabled={editId ? true : false}
-                                hasError={emailError}
-                                value={email}
-                                getValue={(value: any) => setEmail(value)}
-                                getError={(e: any) => setEmailError(e)}
-                                onChange={(e: any) => setEmailError(true)}
-                            ></Email>
-                        </div>
-                        <div className="flex-1 mt-3">
-                            <Tel
-                                label="Telephone"
-                                validate
-                                required
-                                hasError={phoneError}
-                                value={phone}
-                                getValue={(value: any) => setPhone(value.slice(4))}
-                                countryCode
-                                max={10}
-                                getError={(e: any) => setPhoneError(e)}
-                                onChange={(e: any) => setPhoneError(true)}
-                            />
-                        </div>
-                        <div className="flex-1 mt-3">
-                            <Select
-                                id="country"
-                                label="Country"
-                                options={country}
-                                validate
-                                defaultValue={countryId}
-                                getValue={(value: any) => setCountryId(value)}
-                                getError={(e: any) => setCountryError(e)}
-                                hasError={countryError}
-                            />
-                        </div>
-                        <div className="flex-1 mt-3">
-                            <Select
-                                id="state"
-                                label="State"
-                                options={state}
-                                validate
-                                defaultValue={stateId}
-                                getValue={(value: any) => setStateId(value)}
-                                getError={(e: any) => setStateError(e)}
-                                hasError={stateError}
-                            />
-                        </div>
-                    </div>
-                    <div className="flex flex-row justify-end items-center border-t border-lightSilver">
-                        <div className="my-3 mx-5 ">
-                            <Button
-                                onClick={onClose}
-                                className="rounded-full font-medium w-28 mx-3 xsm:!px-1"
-                                variant="btn-outline-primary"
-                            >
-                                <Typography type="h6" className="!font-bold">
-                                    {" "}
-                                    CANCEL
-                                </Typography>
-                            </Button>
-                            <Button
-                                type="submit"
-                                onClick={handleSubmit}
-                                className={`rounded-full font-medium w-28 xsm:!px-1`}
-                                variant="btn-primary"
-                            >
-                                <Typography type="h6" className="!font-bold">
-                                    {" "}
-                                    SAVE
-                                </Typography>
-                            </Button>
-                        </div>
+            <div
+                className={`fixed top-0 bg-white  right-0 h-full xsm:!w-5/6 sm:!w-2/4 lg:!w-2/6 xl:!w-2/6 2xl:!w-2/6 z-30 shadow overflow-y-auto ${onOpen ? "translate-x-0" : "translate-x-full"
+                    } transition-transform duration-300 ease-in-out`}
+            >
+                <div className="p-4 flex justify-between items-center border-b border-lightSilver">
+                    <Typography type="label" className="!font-bold !text-lg">
+                        {" "}
+                        {editId ? "EDIT" : "ADD"} USER
+                    </Typography>
+                    <div
+                        className="mx-2 cursor-pointer"
+                        onClick={() => {
+                            onClose();
+                        }}
+                    >
+                        <Close variant="medium" />
                     </div>
                 </div>
-            )}
+                <div className="flex-1 mx-5 mt-2 mb-12">
+                    <div className="relative flex mt-3">
+                        <Avatar variant="large" imageUrl={imagePreview} />
+                        <div
+                            className="absolute bottom-0 left-11 cursor-pointer"
+                            onClick={handleEditIconClick}
+                        >
+                            <EditIcon />
+                        </div>
+
+                        <input
+                            type="file"
+                            id="imageUpload"
+                            accept=".png, .jpg, .jpeg"
+                            className="hidden"
+                            onChange={onUploadImage}
+                        />
+                    </div>
+                    <div className="flex-1 mt-3">
+                        <Text
+                            label="Full Name"
+                            id="name"
+                            name="name"
+                            validate
+                            maxLength={50}
+                            pattern="/^\d{1,50}$/g"
+                            hasError={nameError}
+                            value={name}
+                            getValue={(value: any) => setName(value)}
+                            getError={(e: any) => setNameError(e)}
+                            onChange={(e: any) => setNameError(true)}
+                        ></Text>
+                    </div>
+                    <div className="flex-1 mt-3">
+                        <Email
+                            label="Email-ID"
+                            id="email"
+                            name="email"
+                            type="email"
+                            validate
+                            readOnly={editId ? true : false}
+                            disabled={editId ? true : false}
+                            hasError={emailError}
+                            value={email}
+                            getValue={(value: any) => setEmail(value)}
+                            getError={(e: any) => setEmailError(e)}
+                            onChange={(e: any) => setEmailError(true)}
+                        ></Email>
+                    </div>
+                    <div className="flex-1 mt-3">
+                        <Tel
+                            label="Telephone"
+                            validate
+                            required
+                            hasError={phoneError}
+                            value={phone}
+                            getValue={(value: any) => setPhone(value.slice(4))}
+                            countryCode
+                            max={10}
+                            getError={(e: any) => setPhoneError(e)}
+                            onChange={(e: any) => setPhoneError(true)}
+                        />
+                    </div>
+                    <div className="flex-1 mt-3">
+                        <Select
+                            id="country"
+                            label="Country"
+                            options={country}
+                            validate
+                            defaultValue={countryId}
+                            getValue={(value: any) => setCountryId(value)}
+                            getError={(e: any) => setCountryError(e)}
+                            hasError={countryError}
+                        />
+                    </div>
+                    <div className="flex-1 mt-3">
+                        <Select
+                            id="state"
+                            label="State"
+                            options={state}
+                            validate
+                            defaultValue={stateId}
+                            getValue={(value: any) => setStateId(value)}
+                            getError={(e: any) => setStateError(e)}
+                            hasError={stateError}
+                        />
+                    </div>
+                </div>
+                <div className="flex flex-row justify-end items-center border-t border-lightSilver">
+                    <div className="my-3 mx-5 ">
+                        <Button
+                            onClick={onClose}
+                            className="rounded-full font-medium w-28 mx-3 xsm:!px-1"
+                            variant="btn-outline-primary"
+                        >
+                            <Typography type="h6" className="!font-bold">
+                                {" "}
+                                CANCEL
+                            </Typography>
+                        </Button>
+                        <Button
+                            type="submit"
+                            onClick={handleSubmit}
+                            className={`rounded-full font-medium w-28 xsm:!px-1`}
+                            variant="btn-primary"
+                        >
+                            <Typography type="h6" className="!font-bold">
+                                {" "}
+                                SAVE
+                            </Typography>
+                        </Button>
+                    </div>
+                </div>
+            </div>
         </>
     );
 }

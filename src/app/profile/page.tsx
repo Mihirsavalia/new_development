@@ -82,7 +82,7 @@ const page: React.FC = () => {
   });
 
   return (
-    <>
+    <div className={`${isOpen ? "h-screen overflow-y-hidden" : ""}`}>
       <DrawerOverlay isOpen={isOpen} handleEdit={handleEdit} />
       <Drawer
         isOpen={isOpen}
@@ -301,7 +301,7 @@ const page: React.FC = () => {
                       handleEdit(true, "password");
                     }}
                   >
-                    <Tooltip content="Edit Profile" position="top">
+                    <Tooltip content="Edit Password" position="top">
                       <EditIcon />
                     </Tooltip>
                   </div>
@@ -395,7 +395,7 @@ const page: React.FC = () => {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -194,12 +194,6 @@ const Department: React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose }) 
     setIsOpenDrawer(onDrawerOpen);
   }, [onDrawerOpen]);
 
-  useEffect(() => {
-    if (isOpenDrawer) {
-      handleDrawerClose();
-    }
-  }, [onDrawerClose]);
-
   const modalClose = () => {
     setIsRemoveOpen(false);
   };
@@ -263,7 +257,7 @@ const Department: React.FC<DepartmentProps> = ({ onDrawerOpen, onDrawerClose }) 
         </ModalAction>
       </Modal>
 
-      <DepartmentContent onOpen={isOpenDrawer} onClose={handleDrawerClose} EditId={typeof Id === "number" ? Id : 0} />
+      <DepartmentContent onOpen={isOpenDrawer} onClose={handleDrawerClose} EditId={typeof Id === "number" ? Id : 0} departmentData={departmentList}/>
       <DrawerOverlay isOpen={isOpenDrawer} onClose={handleDrawerClose} />
 
     </>);

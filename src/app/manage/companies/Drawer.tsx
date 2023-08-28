@@ -459,6 +459,8 @@ const Drawer: React.FC<DrawerProps> = ({
             <div className="grid lg:grid-cols-2 md:grid-cols-1 mt-2">
               <div className="lg:w-56 md:w-full">
                 <Text
+                  noNumeric
+                  noSpecialChar
                   label="Company Name"
                   className="!pt-1.5"
                   maxLength={100}
